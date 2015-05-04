@@ -20,6 +20,7 @@ PIP Packages (install via pip):
     * click
     * sqlalchemy
     * mysql-python (optional - needed if you want to connect to MySQL database)
+    * tabulate (optional - needed if you want to have table-formatted output for various commands)
 
 #### Install VirtualEnv
 
@@ -49,7 +50,7 @@ environment if activate to be available only there or without virtual
 environment to be installed in the system.
 
 ```
-  $ git clone ...
+  $ git clone https://github.com/asipto/kamcli.git
   $ cd kamcli
   $ pip install --editable .
 ```
@@ -59,6 +60,48 @@ To deactivate the virtual environment, run:
 ```
   $ deactivate
 ```
+
+#### Install on Debian
+
+Should work on: Ubuntu or Mint
+
+To get kamcli completely installed on Debian, run following commands:
+
+```
+apt-get install python python-pip python-dev
+pip install virtualenv
+mkdir kamclienv
+cd kamclienv
+virtualenv venv
+pip install click
+pip install sqlalchemy
+pip install mysql-python
+pip install tabulate
+git clone https://github.com/asipto/kamcli.git
+cd kamcli
+pip install --editable .
+```
+
+To see if all was installed properly, run:
+
+```
+kamcli --help
+```
+
+### Configuration File
+
+Kamcli uses a configuration file with INI format. The name is kamcli.ini and it looks for it in:
+
+  * /etc/kamcli/kamcli.ini
+  * ~/.kamcli/kamcli.ini
+  * the value of --config command line parameter
+
+The installation process doesn't deploy the configuration file yet.
+
+A sample kamailio.ini is available in sources, at kamcli/kamcli.ini
+
+Note that not all configuration file options in kamcli.ini are used at this moment, some
+values are hardcoded, being planned to be replaced with the configuration options.
 
 ### Usage
 
@@ -71,6 +114,8 @@ Read the help messages:
 ```
 
 #### Examples of Commands
+
+Sample commands to understand quicker the capabilities and how to use it:
 
 ```
 kamcli -v --config=kamcli/kamcli.ini --help
