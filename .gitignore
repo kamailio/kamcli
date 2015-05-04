@@ -1,6 +1,13 @@
+# Editor tmp files
+*~
+*.swp
+*.swo
+
+# Python specific tmp files
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
+*$py.class
 
 # C extensions
 *.so
