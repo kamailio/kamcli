@@ -179,9 +179,9 @@ def command_jsonrpc_fifo(ctx, dryrun, sndpath, rcvname, oformat, cmd, params):
 #
 def command_ctl(ctx, cmd, params):
     if ctx.gconfig.get('ctl', 'type') == 'jsonrpc':
-        command_jsonrpc_fifo(ctx, False, "/var/run/kamailio/kamailio_jsonrpc_fifo",
-                "kamailio_jsonrpc_fifo_reply", "json", cmd, params)
+        command_jsonrpc_fifo(ctx, False, ctx.gconfig.get('jsonrpc', 'path'),
+                ctx.gconfig.get('jsonrpc', 'rplnamebase'), "json", cmd, params)
     else:
-        command_mi_fifo(ctx, False, "/var/run/kamailio/kamailio_fifo",
-                "kamailio_fifo_reply", "raw", cmd, params)
+        command_mi_fifo(ctx, False, ctx.gconfig.get('mi', 'path'),
+                ctx.gconfig.get('mi', 'rplnamebase'), "raw", cmd, params)
 
