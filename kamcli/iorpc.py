@@ -7,6 +7,37 @@ import json
 from random import randint
 
 
+COMMAND_NAMES = {
+    "stats.clear_statistics": {
+        "mi": "clear_statistics",
+        "rpc": "stats.clear_statistics",
+    },
+    "stats.get_statistics": {
+        "mi": "get_statistics",
+        "rpc": "stats.get_statistics",
+    },
+    "stats.reset_statistics": {
+        "mi": "reset_statistics",
+        "rpc": "stats.reset_statistics",
+    },
+    "ul.add": {
+        "mi": "ul_add",
+        "rpc": "ul.add",
+    },
+    "ul.dump": {
+        "mi": "ul_dump",
+        "rpc": "ul.dump",
+    },
+    "ul.rm": {
+        "mi": "ul_rm",
+        "rpc": "ul.rm",
+    },
+    "ul.lookup": {
+        "mi": "ul_show_contact",
+        "rpc": "ul.lookup",
+    }
+}
+
 # Thread to listen on a reply fifo file
 #
 class IOFifoThread (threading.Thread):
@@ -82,7 +113,8 @@ def command_mi_fifo(ctx, dryrun, sndpath, rcvname, oformat, cmd, params):
             print "File with same name as reply fifo exists"
             sys.exit()
 
-    os.mkfifo(rcvpath)
+    os.mkfifo(rcvpath, 0666)
+    os.chmod(rcvpath, 0666)
     # create new thread to read from reply firo
     tiofifo = IOFifoThread(rcvpath, oformat)
     # start new threadd
@@ -151,7 +183,8 @@ def command_jsonrpc_fifo(ctx, dryrun, sndpath, rcvname, oformat, cmd, params):
             print "File with same name as reply fifo exists"
             sys.exit()
 
-    os.mkfifo(rcvpath)
+    os.mkfifo(rcvpath, 0666)
+    os.chmod(rcvpath, 0666)
     # create new thread to read from reply firo
     tiofifo = IOFifoThread(rcvpath, oformat)
     # start new threadd
@@ -180,8 +213,8 @@ def command_jsonrpc_fifo(ctx, dryrun, sndpath, rcvname, oformat, cmd, params):
 def command_ctl(ctx, cmd, params):
     if ctx.gconfig.get('ctl', 'type') == 'jsonrpc':
         command_jsonrpc_fifo(ctx, False, ctx.gconfig.get('jsonrpc', 'path'),
-                ctx.gconfig.get('jsonrpc', 'rplnamebase'), "json", cmd, params)
+                ctx.gconfig.get('jsonrpc', 'rplnamebase'), "json", COMMAND_NAMES[cmd]['rpc'], params)
     else:
         command_mi_fifo(ctx, False, ctx.gconfig.get('mi', 'path'),
-                ctx.gconfig.get('mi', 'rplnamebase'), "raw", cmd, params)
+                ctx.gconfig.get('mi', 'rplnamebase'), "raw", COMMAND_NAMES[cmd]['mi'], params)
 
