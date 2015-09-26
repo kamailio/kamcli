@@ -161,7 +161,7 @@ def cli(ctx, verbose, wdir, config, nodefaultconfigs):
     if not nodefaultconfigs:
         if os.path.isfile("/etc/kamcli/kamcli.ini"):
             ctx.gconfig_paths.append("/etc/kamcli/kamcli.ini")
-        tpath = os.path.expanduser("~/.kamcli/kamacli.ini")
+        tpath = os.path.expanduser("~/.kamcli/kamcli.ini")
         if os.path.isfile(tpath):
             ctx.gconfig_paths.append(tpath)
     if config is not None:
