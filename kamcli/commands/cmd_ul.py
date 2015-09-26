@@ -38,15 +38,15 @@ def ul_show(ctx, brief, table, userid):
     if not userid:
         ctx.vlog('Showing all records')
         if brief:
-            command_ctl(ctx, 'ul_dump', [ 'brief' ])
+            command_ctl(ctx, 'ul.dump', [ 'brief' ])
         else:
-            command_ctl(ctx, 'ul_dump', [ ])
+            command_ctl(ctx, 'ul.dump', [ ])
     else:
         for u in userid:
             udata = parse_user_spec(ctx, u)
             ctx.vlog('Showing record for [%s@%s]', udata['username'], udata['domain'])
             aor =  udata['username'] + '@' + udata['domain']
-            command_ctl(ctx, 'ul_show_contact', [ table, aor ])
+            command_ctl(ctx, 'ul.lookup', [ table, aor ])
 
 
 ##
@@ -81,7 +81,7 @@ def ul_add(ctx, table, expires, qval, cpath, flags, bflags, methods, userid, cur
     udata = parse_user_spec(ctx, userid)
     ctx.vlog('Adding record for [%s@%s]', udata['username'], udata['domain'])
     aor =  udata['username'] + '@' + udata['domain']
-    command_ctl(ctx, 'ul_add', [ table, aor, curi, expires, qval, cpath, flags, bflags, methods ])
+    command_ctl(ctx, 'ul.add', [ table, aor, curi, expires, qval, cpath, flags, bflags, methods ])
 
 
 
@@ -108,9 +108,9 @@ def ul_rm(ctx, table, userid, curi):
     aor =  udata['username'] + '@' + udata['domain']
     if curi:
         for c in curi:
-            command_ctl(ctx, 'ul_rm', [ table, aor, c ])
+            command_ctl(ctx, 'ul.rm', [ table, aor, c ])
     else:
-        command_ctl(ctx, 'ul_rm', [ table, aor ])
+        command_ctl(ctx, 'ul.rm', [ table, aor ])
 
 
 
