@@ -117,7 +117,7 @@ def command_mi_fifo(ctx, dryrun, sndpath, rcvname, oformat, cmd, params):
         print scmd
         return
 
-    rcvpath = "/tmp/" + rcvname
+    rcvpath = ctx.gconfig.get('mi', 'rpldir') + "/" + rcvname
     if os.path.exists(rcvpath):
         if stat.S_ISFIFO(os.stat(rcvpath).st_mode):
             os.unlink(rcvpath)
@@ -187,7 +187,7 @@ def command_jsonrpc_fifo(ctx, dryrun, sndpath, rcvname, oformat, cmd, params):
         print json.dumps(json.loads(scmd), indent=4, separators=(',', ': '))
         return
 
-    rcvpath = "/tmp/" + rcvname
+    rcvpath = ctx.gconfig.get('jsonrpc', 'rpldir') + "/" + rcvname
     if os.path.exists(rcvpath):
         if stat.S_ISFIFO(os.stat(rcvpath).st_mode):
             os.unlink(rcvpath)
