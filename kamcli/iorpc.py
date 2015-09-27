@@ -6,6 +6,13 @@ import threading
 import json
 from random import randint
 
+iorpc_yaml_format = True
+try:
+    import yaml
+except ImportError, e:
+    iorpc_yaml_format = False
+    pass # module doesn't exist, deal with it.
+
 
 COMMAND_NAMES = {
     "stats.clear_statistics": {
@@ -78,6 +85,11 @@ class IOFifoThread (threading.Thread):
             print
             if self.oformat == "json":
                 print json.dumps(json.loads(rdata), indent=4, separators=(',', ': '))
+            elif self.oformat == "yaml":
+                if iorpc_yaml_format is True:
+                    print yaml.safe_dump(json.loads(rdata), default_flow_style=False)
+                else:
+                    print json.dumps(json.loads(rdata), indent=4, separators=(',', ': '))
             else:
                 print rdata
 
@@ -213,7 +225,8 @@ def command_jsonrpc_fifo(ctx, dryrun, sndpath, rcvname, oformat, cmd, params):
 def command_ctl(ctx, cmd, params):
     if ctx.gconfig.get('ctl', 'type') == 'jsonrpc':
         command_jsonrpc_fifo(ctx, False, ctx.gconfig.get('jsonrpc', 'path'),
-                ctx.gconfig.get('jsonrpc', 'rplnamebase'), "json", COMMAND_NAMES[cmd]['rpc'], params)
+                ctx.gconfig.get('jsonrpc', 'rplnamebase'), ctx.gconfig.get('jsonrpc', 'outformat'),
+                COMMAND_NAMES[cmd]['rpc'], params)
     else:
         command_mi_fifo(ctx, False, ctx.gconfig.get('mi', 'path'),
                 ctx.gconfig.get('mi', 'rplnamebase'), "raw", COMMAND_NAMES[cmd]['mi'], params)
