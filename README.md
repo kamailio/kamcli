@@ -21,6 +21,7 @@ PIP Packages (install via pip):
     * sqlalchemy
     * mysql-python (optional - needed if you want to connect to MySQL database)
     * tabulate (optional - needed if you want to have table-formatted output for various commands)
+    * pyaml (optional - needed if you want to print json result as yaml (more compact))
 
 #### Install VirtualEnv
 
@@ -77,6 +78,7 @@ pip install click
 pip install sqlalchemy
 pip install mysql-python
 pip install tabulate
+pip install pyaml
 git clone https://github.com/asipto/kamcli.git
 cd kamcli
 pip install --editable .
