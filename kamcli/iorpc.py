@@ -15,6 +15,14 @@ except ImportError, e:
 
 
 COMMAND_NAMES = {
+    "dispatcher.list": {
+        "mi": "ds_list",
+        "rpc": "dispatcher.list",
+    },
+    "dispatcher.reload": {
+        "mi": "ds_reload",
+        "rpc": "dispatcher.reload",
+    },
     "stats.clear_statistics": {
         "mi": "clear_statistics",
         "rpc": "stats.clear_statistics",
