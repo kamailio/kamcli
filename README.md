@@ -56,6 +56,11 @@ environment to be installed in the system.
   $ pip install --editable .
 ```
 
+The *pip install* command installs the dependencies appart of the
+database connector module needed on top of sqlalchemy. You need to
+install your wanted database module -- e.g., for MySQL use pip to
+install *mysql-python*.
+
 To deactivate the virtual environment, run:
 
 ```
@@ -66,7 +71,8 @@ To deactivate the virtual environment, run:
 
 Should work on: Ubuntu or Mint
 
-To get kamcli completely installed on Debian, run following commands:
+To get kamcli completely installed on Debian with MySQL support,
+run following commands:
 
 ```
 apt-get install python python-pip python-dev
