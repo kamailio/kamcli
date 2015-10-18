@@ -23,6 +23,22 @@ COMMAND_NAMES = {
         "mi": "ds_reload",
         "rpc": "dispatcher.reload",
     },
+    "permissions.addressDump": {
+        "mi": "address_dump",
+        "rpc": "permissions.addressDump",
+    },
+    "permissions.addressReload": {
+        "mi": "address_reload",
+        "rpc": "permissions.addressReload",
+    },
+    "permissions.domainDump": {
+        "mi": "perm_domain_dump",
+        "rpc": "permissions.domainDump",
+    },
+    "permissions.subnetDump": {
+        "mi": "subnet_dump",
+        "rpc": "permissions.subnetDump",
+    },
     "stats.clear_statistics": {
         "mi": "clear_statistics",
         "rpc": "stats.clear_statistics",
