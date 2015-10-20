@@ -79,6 +79,17 @@ COMMAND_NAMES = {
     }
 }
 
+def command_ctl_name(alias, ctype):
+    v = COMMAND_NAMES.get(alias, None)
+    if v == None:
+        return alias
+
+    if ctype == "mi":
+        return COMMAND_NAMES[alias]['mi'];
+    else:
+        return COMMAND_NAMES[alias]['rpc']
+
+
 # Thread to listen on a reply fifo file
 #
 class IOFifoThread (threading.Thread):
@@ -260,8 +271,8 @@ def command_ctl(ctx, cmd, params):
     if ctx.gconfig.get('ctl', 'type') == 'jsonrpc':
         command_jsonrpc_fifo(ctx, False, ctx.gconfig.get('jsonrpc', 'path'),
                 ctx.gconfig.get('jsonrpc', 'rplnamebase'), ctx.gconfig.get('jsonrpc', 'outformat'),
-                COMMAND_NAMES[cmd]['rpc'], params)
+                command_ctl_name(cmd, 'rpc'), params)
     else:
         command_mi_fifo(ctx, False, ctx.gconfig.get('mi', 'path'),
-                ctx.gconfig.get('mi', 'rplnamebase'), "raw", COMMAND_NAMES[cmd]['mi'], params)
+                ctx.gconfig.get('mi', 'rplnamebase'), "raw", command_ctl_name(cmd, 'mi'), params)
 
