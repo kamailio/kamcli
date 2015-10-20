@@ -14,6 +14,16 @@ except ImportError, e:
     pass # module doesn't exist, deal with it.
 
 
+# RPC/MI commands aliases
+#
+# "alias" : {
+#    "mi": "mi command",
+#    "rpc": "rpc command",
+# }
+#
+# - alias is used inside Python function
+# - command_ctl(...) will use mi or rpc variant
+#   based on config options
 COMMAND_NAMES = {
     "dispatcher.list": {
         "mi": "ds_list",
