@@ -30,7 +30,7 @@ def cli(ctx):
 @click.argument('group', metavar='<group>', type=int)
 @click.argument('address', metavar='<address>')
 @pass_context
-def dispatcher_add(ctx, mask, port, tag, group, address):
+def address_add(ctx, mask, port, tag, group, address):
     """Add a new record to address db table
 
     \b
@@ -54,7 +54,7 @@ def dispatcher_add(ctx, mask, port, tag, group, address):
 @click.argument('group', metavar='<group>', type=int)
 @click.argument('address', metavar='<address>')
 @pass_context
-def dispatcher_rm(ctx, mask, port, group, address):
+def address_rm(ctx, mask, port, group, address):
     """Remove a record from address db table
 
     \b
@@ -65,14 +65,14 @@ def dispatcher_rm(ctx, mask, port, group, address):
     e = create_engine(ctx.gconfig.get('db', 'rwurl'))
     if not mask:
         if not port:
-            e.execute('delete from dispatcher where setid={0} and destination={1!r}'.format(setid, destination.encode('ascii','ignore')))
+            e.execute('delete from address where grp={0} and ip_addr={1!r}'.format(group, address.encode('ascii','ignore')))
         else:
-            e.execute('delete from dispatcher where setid={0} and destination={1!r} and port={2}'.format(setid, destination.encode('ascii','ignore'),port))
+            e.execute('delete from address where grp={0} and ip_addr={1!r} and port={2}'.format(group, address.encode('ascii','ignore'),port))
     else:
         if not port:
-            e.execute('delete from dispatcher where setid={0} and destination={1!r} and mask={2}'.format(setid, destination.encode('ascii','ignore'),mask))
+            e.execute('delete from address where grp={0} and ip_addr={1!r} and mask={2}'.format(group, address.encode('ascii','ignore'),mask))
         else:
-            e.execute('delete from dispatcher where setid={0} and destination={1!r} and mask={2} and port={3}'.format(setid, destination.encode('ascii','ignore'),mask, port))
+            e.execute('delete from address where setid={0} and destination={1!r} and mask={2} and port={3}'.format(group, address.encode('ascii','ignore'),mask, port))
 
 
 ##
@@ -86,7 +86,7 @@ def dispatcher_rm(ctx, mask, port, group, address):
                 default=None, help='Style of the output (tabulate table format)')
 @click.argument('group', nargs=-1, metavar='[<group>]', type=int)
 @pass_context
-def dispatcher_showdb(ctx, oformat, ostyle, group):
+def address_showdb(ctx, oformat, ostyle, group):
     """Show details for records in address db table
 
     \b
@@ -111,7 +111,7 @@ def dispatcher_showdb(ctx, oformat, ostyle, group):
             help='What to be printed (all, addresses, subnets, domains)')
 @click.argument('group', nargs=-1, metavar='[<group>]', type=int)
 @pass_context
-def dispatcher_list(ctx, mode, group):
+def address_list(ctx, mode, group):
     """Show details for address records in memory
 
     \b
@@ -137,7 +137,7 @@ def dispatcher_list(ctx, mode, group):
 #
 @cli.command('reload', short_help='Reload address records from database into memory')
 @pass_context
-def dispatcher_reload(ctx):
+def address_reload(ctx):
     """Reload address records from database into memory
     """
     command_ctl(ctx, 'permissions.addressReload', [ ])
