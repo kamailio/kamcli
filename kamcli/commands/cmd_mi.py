@@ -2,6 +2,7 @@ import os
 import sys
 import click
 from kamcli.cli import pass_context
+from kamcli.iorpc import command_ctl_name
 from kamcli.iorpc import command_mi_fifo
 
 @click.command('mi', short_help='Execute raw MI command')
@@ -14,10 +15,16 @@ def cli(ctx, dryrun, cmd, params):
     """Execute raw MI command
 
         \b
+        Command alias: fifo
         Parameters:
             - <command> - the MI command
             - <params>  - parameters for command
+        Examples:
+            - mi uptime
+            - mi ps
     """
     ctx.log("Running MI command: [%s]", cmd)
-    command_mi_fifo(ctx, dryrun, "/var/run/kamailio/kamailio_fifo", "kamailio_fifo_reply", "raw", cmd, params)
+    command_mi_fifo(ctx, dryrun, ctx.gconfig.get('mi', 'path'),
+                ctx.gconfig.get('mi', 'rplnamebase'), "raw",
+                cmd, params)
 
