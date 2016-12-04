@@ -1,5 +1,7 @@
 import os
+import os.path
 import sys
+import socket
 import stat
 import time
 import threading
@@ -267,11 +269,144 @@ def command_jsonrpc_fifo(ctx, dryrun, sndpath, rcvname, oformat, cmd, params):
 ##
 #
 #
+#{
+# "jsonrpc": "2.0",
+#  "method": "command",
+#  "params": [p1, p2, p3],
+#  "id": 1
+#}
+#
+def command_jsonrpc_socket(ctx, dryrun, srvaddr, rcvaddr, oformat, cmd, params):
+    scmd = '{\n  "jsonrpc": "2.0",\n  "method": "' + cmd + '",\n'
+    if params:
+        scmd += '  "params": ['
+        comma = 0
+        for p in params:
+            if comma == 1:
+                scmd += ',\n'
+            else:
+                comma = 1
+            if type(p) is int:
+                scmd += str(p)
+            elif type(p) is float:
+                scmd += str(p)
+            else:
+                if p.startswith("i:") :
+                    scmd += p[2:]
+                elif p.startswith("s:") :
+                    scmd += '"' + p[2:] + '"'
+                else :
+                    scmd += '"' + p + '"'
+        scmd += '],\n'
+
+    scmd += '  "id": ' + str(randint(2,10000)) + '\n'
+    scmd += "}\n"
+    if dryrun:
+        print json.dumps(json.loads(scmd), indent=4, separators=(',', ': '))
+        return
+
+    sockclient = None
+    response = None
+    socktype = "IPv4"
+    host = None
+    port = None
+    if srvaddr.startswith("udp:"):
+        print "udp socket provided: " + srvaddr
+        sproto, saddr = srvaddr.split(":", 1)
+        if server.find("[", 0, 2) == -1:
+            print "IPv4 socket address"
+            host, port = saddr.split(':')
+        else:
+            print "IPv6 socket address"
+            ehost, port = saddr.rsplit(':', 1)
+            host = ehost.strip('[]')
+            socktype = "IPv6"
+
+        # create datagram udp socket
+        try:
+            if socktype == "IPv6":
+                sockclient = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
+            else:
+                sockclient = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+            sockclient.settimeout(4.0)
+            sockclient.sendto(scmd, (host, port))
+
+            # receive the response (content, sockserver)
+            data = sockclient.recvfrom(84000)
+            response = data[0]
+            sockserver = data[1]
+
+            print 'Server response: ' + response
+
+        except socket.timeout, emsg:
+            print 'Timeout receiving response on udp socket'
+            sys.exit()
+        except socket.error, emsg:
+            print 'Error udp sock: ' + str(emsg[0]) + ' - ' + emsg[1]
+            sys.exit()
+    else:
+        print "unix socket provided: " + srvaddr
+        if not os.path.exists( srvaddr ):
+            print "server unix socket file not found"
+            print "be sure kamailio is running and listening on: " + srvaddr
+            return
+        # create datagram udp socket
+        try:
+            sockclient = socket.socket( socket.AF_UNIX, socket.SOCK_DGRAM )
+            sockclient.settimeout( 4.0 )
+            rcvaddr = rcvaddr + "." + str(os.getpid())
+            sockclient.bind( rcvaddr )
+            sockclient.connect( srvaddr )
+            sockclient.send( scmd )
+
+            # receive the response (content, sockserver)
+            response = sockclient.recv(84000)
+            sockclient.close()
+            os.remove( rcvaddr )
+
+            print 'Server response: ' + response
+
+        except socket.timeout, emsg:
+            print 'Timeout receiving response on unix sock'
+            sockclient.close()
+            os.remove( rcvaddr )
+            sys.exit()
+        except socket.error, emsg:
+            print 'Error unix sock: ' + str(emsg[0]) + ' - ' + emsg[1]
+            sockclient.close()
+            os.remove( rcvaddr )
+            sys.exit()
+
+    if response is None :
+        print "timeout - nothing read"
+    else:
+        print
+        if oformat == "json":
+            print json.dumps(json.loads(response), indent=4, separators=(',', ': '))
+        elif oformat == "yaml":
+            if iorpc_yaml_format is True:
+                print yaml.safe_dump(json.loads(response), default_flow_style=False)
+            else:
+                print json.dumps(json.loads(response), indent=4, separators=(',', ': '))
+        else:
+            print response
+
+
+
+##
+#
+#
 def command_ctl(ctx, cmd, params):
     if ctx.gconfig.get('ctl', 'type') == 'jsonrpc':
-        command_jsonrpc_fifo(ctx, False, ctx.gconfig.get('jsonrpc', 'path'),
-                ctx.gconfig.get('jsonrpc', 'rplnamebase'), ctx.gconfig.get('jsonrpc', 'outformat'),
-                command_ctl_name(cmd, 'rpc'), params)
+        if ctx.gconfig.get('jsonrpc', 'transport') == 'socket':
+            command_jsonrpc_socket(ctx, False, ctx.gconfig.get('jsonrpc', 'srvaddr'),
+                    ctx.gconfig.get('jsonrpc', 'rcvaddr'), ctx.gconfig.get('jsonrpc', 'outformat'),
+                    command_ctl_name(cmd, 'rpc'), params)
+        else:
+            command_jsonrpc_fifo(ctx, False, ctx.gconfig.get('jsonrpc', 'path'),
+                    ctx.gconfig.get('jsonrpc', 'rplnamebase'), ctx.gconfig.get('jsonrpc', 'outformat'),
+                    command_ctl_name(cmd, 'rpc'), params)
     else:
         command_mi_fifo(ctx, False, ctx.gconfig.get('mi', 'path'),
                 ctx.gconfig.get('mi', 'rplnamebase'), "raw", command_ctl_name(cmd, 'mi'), params)
