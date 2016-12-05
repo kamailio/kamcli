@@ -64,7 +64,7 @@ COMMAND_ALIASES = {
 class Context(object):
 
     def __init__(self):
-        self.verbose = False
+        self.debug = False
         self.wdir = os.getcwd()
         self.gconfig_paths = []
         self._gconfig = None
@@ -73,12 +73,14 @@ class Context(object):
         """Logs a message to stderr."""
         if args:
             msg %= args
-        click.echo(msg, file=sys.stderr)
+        click.echo("(log): " + msg, file=sys.stderr)
 
     def vlog(self, msg, *args):
         """Logs a message to stderr only if verbose is enabled."""
-        if self.verbose:
-            self.log(msg, *args)
+        if self.debug:
+            if args:
+                msg %= args
+            click.echo("(dbg): " + msg, file=sys.stderr)
 
     @property
     def gconfig(self):
@@ -132,14 +134,14 @@ def global_read_config(ctx, param, value):
 @click.option('--wdir', type=click.Path(exists=True, file_okay=False,
                                         resolve_path=True),
               help='Working directory.')
-@click.option('-v', '--verbose', is_flag=True,
-              help='Enable verbose mode.')
+@click.option('--debug', '-d', is_flag=True,
+              help='Enable debug mode.')
 @click.option('--config', '-c',
               default=None, help="Configuration file.")
 @click.option('nodefaultconfigs', '--no-default-configs', is_flag=True,
             help='Skip loading default configuration files.')
 @pass_context
-def cli(ctx, verbose, wdir, config, nodefaultconfigs):
+def cli(ctx, debug, wdir, config, nodefaultconfigs):
     """Kamailio command line interface control tool.
 
     \b
@@ -155,7 +157,7 @@ def cli(ctx, verbose, wdir, config, nodefaultconfigs):
     License: GPLv2
     Copyright: asipto.com
     """
-    ctx.verbose = verbose
+    ctx.debug = debug
     if wdir is not None:
         ctx.wdir = wdir
     if not nodefaultconfigs:

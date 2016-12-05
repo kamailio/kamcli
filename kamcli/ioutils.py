@@ -25,7 +25,7 @@ def ioutils_dbres_print(ctx, oformat, ostyle, res):
     else:
        if oformat == 'table':
             if ioutils_tabulate_format is False:
-                print "Package tabulate is not installed"
+                ctx.log("Package tabulate is not installed")
                 sys.exit()
 
     if ostyle is None:

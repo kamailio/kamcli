@@ -95,14 +95,15 @@ def command_ctl_name(alias, ctype):
 # Thread to listen on a reply fifo file
 #
 class IOFifoThread (threading.Thread):
-    def __init__(self, rplpath, oformat):
+    def __init__(self, rplpath, oformat, ctx):
         threading.Thread.__init__(self)
         self.rplpath = rplpath
         self.oformat = oformat
         self.stop_signal = False
+        self.ctx = ctx
 
     def run(self):
-        print "Starting to wait for reply on: " + self.rplpath
+        self.ctx.vlog("Starting to wait for reply on: " + self.rplpath)
         r = os.open( self.rplpath, os.O_RDONLY|os.O_NONBLOCK )
         scount = 0
         rcount = 0
@@ -127,7 +128,7 @@ class IOFifoThread (threading.Thread):
                 rdata += rbuf
 
         if rcount==0 :
-            print "timeout - nothing read"
+            self.ctx.vlog("timeout - nothing read")
         else:
             print
             if self.oformat == "json":
@@ -169,13 +170,13 @@ def command_mi_fifo(ctx, dryrun, sndpath, rcvname, oformat, cmd, params):
         if stat.S_ISFIFO(os.stat(rcvpath).st_mode):
             os.unlink(rcvpath)
         else:
-            print "File with same name as reply fifo exists"
+            ctx.log("File with same name as reply fifo exists")
             sys.exit()
 
     os.mkfifo(rcvpath, 0666)
     os.chmod(rcvpath, 0666)
-    # create new thread to read from reply firo
-    tiofifo = IOFifoThread(rcvpath, oformat)
+    # create new thread to read from reply fifo
+    tiofifo = IOFifoThread(rcvpath, oformat, ctx)
     # start new threadd
     tiofifo.start()
 
@@ -190,7 +191,7 @@ def command_mi_fifo(ctx, dryrun, sndpath, rcvname, oformat, cmd, params):
                 waitrun = False
                 break
         except KeyboardInterrupt:
-            print "Ctrl-c received! Sending kill to threads..."
+            ctx.log("Ctrl-c received! Sending kill to threads...")
             tiofifo.stop_signal = True
 
     os.unlink(rcvpath)
@@ -239,13 +240,13 @@ def command_jsonrpc_fifo(ctx, dryrun, sndpath, rcvname, oformat, cmd, params):
         if stat.S_ISFIFO(os.stat(rcvpath).st_mode):
             os.unlink(rcvpath)
         else:
-            print "File with same name as reply fifo exists"
+            ctx.log("File with same name as reply fifo exists")
             sys.exit()
 
     os.mkfifo(rcvpath, 0666)
     os.chmod(rcvpath, 0666)
-    # create new thread to read from reply firo
-    tiofifo = IOFifoThread(rcvpath, oformat)
+    # create new thread to read from reply fifo
+    tiofifo = IOFifoThread(rcvpath, oformat, ctx)
     # start new threadd
     tiofifo.start()
 
@@ -260,7 +261,7 @@ def command_jsonrpc_fifo(ctx, dryrun, sndpath, rcvname, oformat, cmd, params):
                 waitrun = False
                 break
         except KeyboardInterrupt:
-            print "Ctrl-c received! Sending kill to threads..."
+            ctx.log("Ctrl-c received! Sending kill to threads...")
             tiofifo.stop_signal = True
 
     os.unlink(rcvpath)
@@ -311,13 +312,13 @@ def command_jsonrpc_socket(ctx, dryrun, srvaddr, rcvaddr, oformat, cmd, params):
     host = None
     port = None
     if srvaddr.startswith("udp:"):
-        print "udp socket provided: " + srvaddr
+        ctx.vlog("udp socket provided: " + srvaddr)
         sproto, saddr = srvaddr.split(":", 1)
         if server.find("[", 0, 2) == -1:
-            print "IPv4 socket address"
+            ctx.vlog("IPv4 socket address")
             host, port = saddr.split(':')
         else:
-            print "IPv6 socket address"
+            ctx.vlog("IPv6 socket address")
             ehost, port = saddr.rsplit(':', 1)
             host = ehost.strip('[]')
             socktype = "IPv6"
@@ -337,19 +338,19 @@ def command_jsonrpc_socket(ctx, dryrun, srvaddr, rcvaddr, oformat, cmd, params):
             response = data[0]
             sockserver = data[1]
 
-            print 'Server response: ' + response
+            ctx.vlog('Server response: ' + response)
 
         except socket.timeout, emsg:
-            print 'Timeout receiving response on udp socket'
+            ctx.log('Timeout receiving response on udp socket')
             sys.exit()
         except socket.error, emsg:
-            print 'Error udp sock: ' + str(emsg[0]) + ' - ' + emsg[1]
+            ctx.log('Error udp sock: ' + str(emsg[0]) + ' - ' + emsg[1])
             sys.exit()
     else:
-        print "unix socket provided: " + srvaddr
+        ctx.vlog("unix socket provided: " + srvaddr)
         if not os.path.exists( srvaddr ):
-            print "server unix socket file not found"
-            print "be sure kamailio is running and listening on: " + srvaddr
+            ctx.vlog("server unix socket file not found")
+            ctx.vlog("be sure kamailio is running and listening on: " + srvaddr)
             return
         # create datagram udp socket
         try:
@@ -365,21 +366,21 @@ def command_jsonrpc_socket(ctx, dryrun, srvaddr, rcvaddr, oformat, cmd, params):
             sockclient.close()
             os.remove( rcvaddr )
 
-            print 'Server response: ' + response
+            ctx.vlog('Server response: ' + response)
 
         except socket.timeout, emsg:
-            print 'Timeout receiving response on unix sock'
+            ctx.log('Timeout receiving response on unix sock')
             sockclient.close()
             os.remove( rcvaddr )
             sys.exit()
         except socket.error, emsg:
-            print 'Error unix sock: ' + str(emsg[0]) + ' - ' + emsg[1]
+            ctx.log('Error unix sock: ' + str(emsg[0]) + ' - ' + emsg[1])
             sockclient.close()
             os.remove( rcvaddr )
             sys.exit()
 
     if response is None :
-        print "timeout - nothing read"
+        ctx.vlog("timeout - nothing read")
     else:
         print
         if oformat == "json":
