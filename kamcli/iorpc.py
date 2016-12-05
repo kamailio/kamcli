@@ -91,6 +91,18 @@ def command_ctl_name(alias, ctype):
     else:
         return COMMAND_NAMES[alias]['rpc']
 
+def command_ctl_response_print(response, oformat):
+    print
+    if oformat == "json":
+        print json.dumps(json.loads(response), indent=4, separators=(',', ': '))
+    elif oformat == "yaml":
+        if iorpc_yaml_format is True:
+            print yaml.safe_dump(json.loads(response), default_flow_style=False)
+        else:
+            print json.dumps(json.loads(response), indent=4, separators=(',', ': '))
+    else:
+        print response
+
 
 # Thread to listen on a reply fifo file
 #
@@ -130,16 +142,8 @@ class IOFifoThread (threading.Thread):
         if rcount==0 :
             self.ctx.vlog("timeout - nothing read")
         else:
-            print
-            if self.oformat == "json":
-                print json.dumps(json.loads(rdata), indent=4, separators=(',', ': '))
-            elif self.oformat == "yaml":
-                if iorpc_yaml_format is True:
-                    print yaml.safe_dump(json.loads(rdata), default_flow_style=False)
-                else:
-                    print json.dumps(json.loads(rdata), indent=4, separators=(',', ': '))
-            else:
-                print rdata
+            command_ctl_response_print(rdata, self.oformat)
+
 
 # :command:reply_fifo
 # p1
@@ -382,17 +386,7 @@ def command_jsonrpc_socket(ctx, dryrun, srvaddr, rcvaddr, oformat, cmd, params):
     if response is None :
         ctx.vlog("timeout - nothing read")
     else:
-        print
-        if oformat == "json":
-            print json.dumps(json.loads(response), indent=4, separators=(',', ': '))
-        elif oformat == "yaml":
-            if iorpc_yaml_format is True:
-                print yaml.safe_dump(json.loads(response), default_flow_style=False)
-            else:
-                print json.dumps(json.loads(response), indent=4, separators=(',', ': '))
-        else:
-            print response
-
+        command_ctl_response_print(response, oformat)
 
 
 ##
