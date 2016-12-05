@@ -25,12 +25,14 @@ def cli(ctx, norefresh):
 
     clear = lambda : os.system('tput reset')
     count = 0
+    slist = [ "rcv_requests", "fwd_requests", "rcv_replies", "fwd_replies",
+            "sent_replies", "tmx:", "usrloc:" ]
     if norefresh is True:
-        command_ctl(ctx, 'stats.get_statistics', [ "tm:", "sl:", "usrloc:" ])
+        command_ctl(ctx, 'stats.get_statistics', slist)
     else:
         while True:
             count = count + 1
-            command_ctl(ctx, 'stats.get_statistics', [ "tmx:", "sl:", "usrloc:" ])
+            command_ctl(ctx, 'stats.get_statistics', slist)
             print "[cycle #: " + str(count) + "; if constant make sure server is running]"
             time.sleep(2)
             clear()
