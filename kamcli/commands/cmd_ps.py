@@ -11,7 +11,7 @@ from kamcli.iorpc import command_ctl
 @click.command('ps', short_help='Print the list of kamailio processes')
 @pass_context
 def cli(ctx):
-    """Print details about running kamailio processes
+    """Show details about running kamailio processes
 
     \b
     """
