@@ -140,6 +140,7 @@ def global_read_config(ctx, param, value):
               default=None, help="Configuration file.")
 @click.option('nodefaultconfigs', '--no-default-configs', is_flag=True,
             help='Skip loading default configuration files.')
+@click.version_option()
 @pass_context
 def cli(ctx, debug, wdir, config, nodefaultconfigs):
     """Kamailio command line interface control tool.
