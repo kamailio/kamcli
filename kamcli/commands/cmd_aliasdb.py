@@ -70,9 +70,10 @@ def aliasdb_rm(ctx, table, matchalias, userid, aliasid):
             e.execute('delete from ' + table + ' where username=%s and domain=%s',
                     udata['username'], udata['domain'])
     else:
-        adata = parse_user_spec(ctx, aliasid)
-        e.execute('delete from ' + table + ' where username=%s and domain=%s and alias_username=%s and alias_domain=%s',
-                udata['username'], udata['domain'], adata['username'], adata['domain'])
+        for a in aliasid:
+            adata = parse_user_spec(ctx, a)
+            e.execute('delete from ' + table + ' where username=%s and domain=%s and alias_username=%s and alias_domain=%s',
+                    udata['username'], udata['domain'], adata['username'], adata['domain'])
 
 
 ##
