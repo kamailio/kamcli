@@ -80,30 +80,29 @@ def dispatcher_showdb(ctx, oformat, ostyle, setid):
 
     \b
     Parameters:
-        <setid> - dispatching set id
+        [<setid>] - dispatching set id
     """
     e = create_engine(ctx.gconfig.get('db', 'rwurl'))
     if not setid:
         ctx.vlog('Showing all dispatcher records')
         res = e.execute('select * from dispatcher')
+        ioutils_dbres_print(ctx, oformat, ostyle, res)
     else:
-        ctx.vlog('Showing dispatcher records for set id')
-        res = e.execute('select * from dispatcher where setid=%d', setid)
-    ioutils_dbres_print(ctx, oformat, ostyle, res)
+        for s in setid:
+            ctx.vlog('Showing dispatcher records for set id')
+            res = e.execute('select * from dispatcher where setid=%d', setid)
+            ioutils_dbres_print(ctx, oformat, ostyle, res)
 
 
 ##
 #
 #
 @cli.command('list', short_help='Show details for dispatcher records in memory')
-@click.argument('setid', nargs=-1, metavar='[<setid>]', type=int)
 @pass_context
-def dispatcher_list(ctx, setid):
+def dispatcher_list(ctx):
     """Show details for dispatcher records in memory
 
     \b
-    Parameters:
-        <setid> - dispatching set id
     """
     command_ctl(ctx, 'dispatcher.list', [ ])
 
@@ -115,6 +114,8 @@ def dispatcher_list(ctx, setid):
 @pass_context
 def dispatcher_reload(ctx):
     """Reload dispatcher records from database into memory
+
+    \b
     """
     command_ctl(ctx, 'dispatcher.reload', [ ])
 
