@@ -103,16 +103,32 @@ def command_ctl_response_print(response, oformat):
     else:
         print response
 
+def command_ctl_response(ctx, response, oformat, cbexec={}):
+    if not cbexec:
+        command_ctl_response_print(response, oformat)
+    else:
+        if "func" in cbexec:
+            if "params" in cbexec:
+                cbexec["func"](ctx, response, cbexec["params"])
+            else:
+                cbexec["func"](ctx, response)
+        else:
+            ctx.log("invalid callback structure - function is missing")
+
+
+
+
 
 # Thread to listen on a reply fifo file
 #
 class IOFifoThread (threading.Thread):
-    def __init__(self, rplpath, oformat, ctx):
+    def __init__(self, ctx, rplpath, oformat, cbexec={}):
         threading.Thread.__init__(self)
+        self.ctx = ctx
         self.rplpath = rplpath
         self.oformat = oformat
+        self.cbexec = cbexec
         self.stop_signal = False
-        self.ctx = ctx
 
     def run(self):
         self.ctx.vlog("Starting to wait for reply on: " + self.rplpath)
@@ -142,7 +158,7 @@ class IOFifoThread (threading.Thread):
         if rcount==0 :
             self.ctx.vlog("timeout - nothing read")
         else:
-            command_ctl_response_print(rdata, self.oformat)
+            command_ctl_response(self.ctx, rdata, self.oformat, self.cbexec)
 
 
 # :command:reply_fifo
@@ -151,7 +167,7 @@ class IOFifoThread (threading.Thread):
 # p3
 # _empty_line_
 #
-def command_mi_fifo(ctx, dryrun, sndpath, rcvname, oformat, cmd, params):
+def command_mi_fifo(ctx, dryrun, sndpath, rcvname, oformat, cmd, params=[], cbexec={}):
     scmd = ":" + cmd + ":" + rcvname + "\n"
     for p in params:
         if type(p) is int:
@@ -180,7 +196,7 @@ def command_mi_fifo(ctx, dryrun, sndpath, rcvname, oformat, cmd, params):
     os.mkfifo(rcvpath, 0666)
     os.chmod(rcvpath, 0666)
     # create new thread to read from reply fifo
-    tiofifo = IOFifoThread(rcvpath, oformat, ctx)
+    tiofifo = IOFifoThread(ctx, rcvpath, oformat)
     # start new threadd
     tiofifo.start()
 
@@ -209,7 +225,7 @@ def command_mi_fifo(ctx, dryrun, sndpath, rcvname, oformat, cmd, params):
 #  "id": 1
 #}
 #
-def command_jsonrpc_fifo(ctx, dryrun, sndpath, rcvname, oformat, cmd, params):
+def command_jsonrpc_fifo(ctx, dryrun, sndpath, rcvname, oformat, cmd, params=[], cbexec={}):
     scmd = '{\n  "jsonrpc": "2.0",\n  "method": "' + cmd + '",\n'
     if params:
         scmd += '  "params": ['
@@ -250,7 +266,7 @@ def command_jsonrpc_fifo(ctx, dryrun, sndpath, rcvname, oformat, cmd, params):
     os.mkfifo(rcvpath, 0666)
     os.chmod(rcvpath, 0666)
     # create new thread to read from reply fifo
-    tiofifo = IOFifoThread(rcvpath, oformat, ctx)
+    tiofifo = IOFifoThread(ctx, rcvpath, oformat)
     # start new threadd
     tiofifo.start()
 
@@ -281,7 +297,7 @@ def command_jsonrpc_fifo(ctx, dryrun, sndpath, rcvname, oformat, cmd, params):
 #  "id": 1
 #}
 #
-def command_jsonrpc_socket(ctx, dryrun, srvaddr, rcvaddr, oformat, cmd, params):
+def command_jsonrpc_socket(ctx, dryrun, srvaddr, rcvaddr, oformat, cmd, params=[], cbexec={}):
     scmd = '{\n  "jsonrpc": "2.0",\n  "method": "' + cmd + '",\n'
     if params:
         scmd += '  "params": ['
@@ -386,23 +402,24 @@ def command_jsonrpc_socket(ctx, dryrun, srvaddr, rcvaddr, oformat, cmd, params):
     if response is None :
         ctx.vlog("timeout - nothing read")
     else:
-        command_ctl_response_print(response, oformat)
+        command_ctl_response(ctx, response, oformat, cbexec)
 
 
 ##
 #
 #
-def command_ctl(ctx, cmd, params):
+def command_ctl(ctx, cmd, params=[], cbexec={}):
     if ctx.gconfig.get('ctl', 'type') == 'jsonrpc':
         if ctx.gconfig.get('jsonrpc', 'transport') == 'socket':
             command_jsonrpc_socket(ctx, False, ctx.gconfig.get('jsonrpc', 'srvaddr'),
                     ctx.gconfig.get('jsonrpc', 'rcvaddr'), ctx.gconfig.get('jsonrpc', 'outformat'),
-                    command_ctl_name(cmd, 'rpc'), params)
+                    command_ctl_name(cmd, 'rpc'), params, cbexec)
         else:
             command_jsonrpc_fifo(ctx, False, ctx.gconfig.get('jsonrpc', 'path'),
                     ctx.gconfig.get('jsonrpc', 'rplnamebase'), ctx.gconfig.get('jsonrpc', 'outformat'),
-                    command_ctl_name(cmd, 'rpc'), params)
+                    command_ctl_name(cmd, 'rpc'), params, cbexec)
     else:
         command_mi_fifo(ctx, False, ctx.gconfig.get('mi', 'path'),
-                ctx.gconfig.get('mi', 'rplnamebase'), "raw", command_ctl_name(cmd, 'mi'), params)
+                ctx.gconfig.get('mi', 'rplnamebase'), "raw",
+                command_ctl_name(cmd, 'mi'), params, cbexec)
 
