@@ -37,7 +37,7 @@ def domain_add(ctx, domain):
 #
 #
 @cli.command('rm', short_help='Remove a record from domain table')
-@click.argument('destination', metavar='<destination>')
+@click.argument('domain', metavar='<domain>')
 @pass_context
 def domain_rm(ctx, domain):
     """Remove a a record from db domain table
@@ -69,7 +69,7 @@ def domain_showdb(ctx, oformat, ostyle, domain):
         [<domain>] - domain value (optional)
     """
     e = create_engine(ctx.gconfig.get('db', 'rwurl'))
-    if not setid:
+    if not domain:
         ctx.vlog('Showing all domain records')
         res = e.execute('select * from domain')
         ioutils_dbres_print(ctx, oformat, ostyle, res)
