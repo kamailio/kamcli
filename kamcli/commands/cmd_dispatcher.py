@@ -1,6 +1,4 @@
 import click
-import hashlib
-import json
 from sqlalchemy import create_engine
 from kamcli.ioutils import ioutils_dbres_print
 from kamcli.cli import pass_context
@@ -90,7 +88,7 @@ def dispatcher_showdb(ctx, oformat, ostyle, setid):
     else:
         for s in setid:
             ctx.vlog('Showing dispatcher records for set id')
-            res = e.execute('select * from dispatcher where setid=%d', setid)
+            res = e.execute('select * from dispatcher where setid=%d', s)
             ioutils_dbres_print(ctx, oformat, ostyle, res)
 
 
