@@ -82,6 +82,12 @@ class Context(object):
                 msg %= args
             click.echo("(dbg): " + msg, file=sys.stderr)
 
+    def printf(self, msg, *args):
+        """Print a formated message to stdout."""
+        if args:
+            msg %= args
+        click.echo(msg)
+
     @property
     def gconfig(self):
         if self._gconfig is None:
