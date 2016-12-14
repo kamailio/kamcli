@@ -8,14 +8,17 @@ import threading
 import json
 from random import randint
 
+##
+# enable yaml output format if the lib can be loaded
 iorpc_yaml_format = True
 try:
     import yaml
 except ImportError, e:
     iorpc_yaml_format = False
-    pass # module doesn't exist, deal with it.
+    pass # yaml module doesn't exist, deal with it.
 
 
+##
 # RPC/MI commands aliases
 #
 # "alias" : {
@@ -81,7 +84,11 @@ COMMAND_NAMES = {
     }
 }
 
+
+##
+#
 def command_ctl_name(alias, ctype):
+    """Return the rpc command name by alias lookup"""
     v = COMMAND_NAMES.get(alias, None)
     if v == None:
         return alias
@@ -91,7 +98,20 @@ def command_ctl_name(alias, ctype):
     else:
         return COMMAND_NAMES[alias]['rpc']
 
+
+##
+#
 def command_ctl_response_print(response, oformat):
+    """Print the rpc control command response
+
+    \b
+    Parameters:
+      - response: the jsonrpc response
+      - oformat: output format:
+        * json: json pretty formating
+        * yaml: yaml pretty formating (list like, more compact)
+        * raw output - just print the response
+    """
     print
     if oformat == "json":
         print json.dumps(json.loads(response), indent=4, separators=(',', ': '))
@@ -103,7 +123,11 @@ def command_ctl_response_print(response, oformat):
     else:
         print response
 
+
+##
+#
 def command_ctl_response(ctx, response, oformat, cbexec={}):
+    """Process a rpc control command response"""
     if not cbexec:
         command_ctl_response_print(response, oformat)
     else:
@@ -116,11 +140,8 @@ def command_ctl_response(ctx, response, oformat, cbexec={}):
             ctx.log("invalid callback structure - function is missing")
 
 
-
-
-
+##
 # Thread to listen on a reply fifo file
-#
 class IOFifoThread (threading.Thread):
     def __init__(self, ctx, rplpath, oformat, cbexec={}):
         threading.Thread.__init__(self)
@@ -161,12 +182,12 @@ class IOFifoThread (threading.Thread):
             command_ctl_response(self.ctx, rdata, self.oformat, self.cbexec)
 
 
+##
 # :command:reply_fifo
 # p1
 # p2
 # p3
 # _empty_line_
-#
 def command_mi_fifo(ctx, dryrun, sndpath, rcvname, oformat, cmd, params=[], cbexec={}):
     scmd = ":" + cmd + ":" + rcvname + "\n"
     for p in params:
@@ -217,6 +238,7 @@ def command_mi_fifo(ctx, dryrun, sndpath, rcvname, oformat, cmd, params=[], cbex
     os.unlink(rcvpath)
 
 
+##
 #{
 # "jsonrpc": "2.0",
 #  "method": "command",
@@ -289,14 +311,12 @@ def command_jsonrpc_fifo(ctx, dryrun, sndpath, rcvname, oformat, cmd, params=[],
 
 ##
 #
-#
 #{
 # "jsonrpc": "2.0",
 #  "method": "command",
 #  "params": [p1, p2, p3],
 #  "id": 1
 #}
-#
 def command_jsonrpc_socket(ctx, dryrun, srvaddr, rcvaddr, oformat, cmd, params=[], cbexec={}):
     scmd = '{\n  "jsonrpc": "2.0",\n  "method": "' + cmd + '",\n'
     if params:
@@ -406,7 +426,6 @@ def command_jsonrpc_socket(ctx, dryrun, srvaddr, rcvaddr, oformat, cmd, params=[
 
 
 ##
-#
 #
 def command_ctl(ctx, cmd, params=[], cbexec={}):
     """Execute a rpc control command
