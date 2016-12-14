@@ -409,6 +409,21 @@ def command_jsonrpc_socket(ctx, dryrun, srvaddr, rcvaddr, oformat, cmd, params=[
 #
 #
 def command_ctl(ctx, cmd, params=[], cbexec={}):
+    """Execute a rpc control command
+
+    \b
+    Parameters:
+      - ctx: kamcli execution context
+      - cmd: the string with rpc control command
+      - params: an array with the parameters for the rpc control command
+      - cbexec: dictionary with callaback function and its parameters
+                to handle the response of the rpc control commands. If not
+                provided, the response will be printed with the function
+                command_ctl_response_print().
+                The callback function has to be provided by 'func' key in
+                the dictionary and its parameters by 'params' key.
+    """
+
     if ctx.gconfig.get('ctl', 'type') == 'jsonrpc':
         if ctx.gconfig.get('jsonrpc', 'transport') == 'socket':
             command_jsonrpc_socket(ctx, False, ctx.gconfig.get('jsonrpc', 'srvaddr'),
