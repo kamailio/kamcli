@@ -1,6 +1,54 @@
 ## KAMCLI
 
-Kamailio Command Line Interface Control Tool
+Kamailio Command Line Interface Control Tool.
+
+Kamailio is an open source SIP (RFC3261) server available at:
+
+  * https://www.kamailio.org
+
+**kamcli** is aiming at being a modern and extensible alternative to the shell script **kamctl**.
+
+### Features
+
+The prototype of using **kamcli** is:
+
+```
+kamcli [options] command [arguments]
+```
+
+New commands for **kamcli** can be implemented as plugins, each command being implemented in a file located in **kamcli/commands/**.
+
+Among implemented commands:
+
+  * **subscriber** - manage SIP subscribers
+  * **ul** - manage user location records
+  * **address** - manage permissions address records
+  * **aliasdb** - manage database aliases
+  * **speeddial** - manage speed dial records
+  * **group** - manage group membership records (acl)
+  * **rpc** - interact with kamailio via jsonrpc control commands
+  * **stats** - get kamailio internal statistics
+  * **db** - manage kamailio database content
+  * **dispatcher** - manage load balancer (dispatcher)
+  * **dialplan** - manage dialplan records
+  * **dialog** - manage active calls (dialog)
+  * **rpcmethods** - return the list of available RPC methods (commands)
+  * **ps** - print the details for kamailio running processes
+  * **uptime** - print the uptime for kamailio instance
+  * **moni** - continuous refresh of the values for a list of statistics
+  * **mtree** - manage memory trees (mtree)
+
+Each **kamcli command** can offer many subcommands. The help for each command can be seen with:
+
+```
+kamcli command --help
+```
+
+The help for each subcommand can be seen with:
+
+```
+kamcli command subcommand --help
+```
 
 ### Installation
 
