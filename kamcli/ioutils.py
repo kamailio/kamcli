@@ -14,7 +14,7 @@ except ImportError, e:
 ioutils_formats_list = ['raw', 'json', 'table', 'dict']
 
 ##
-#
+# print a database result using different formats and styles
 #
 def ioutils_dbres_print(ctx, oformat, ostyle, res):
     if oformat is None:

@@ -19,7 +19,7 @@ def cli(ctx):
 
 
 ##
-#
+# callback to print the result of the rpc command
 #
 def cmd_ps_result_print(ctx, response, params=None):
     ctx.vlog("formatting the response for command ps")
