@@ -185,10 +185,6 @@ kamcli -d --config=kamcli/kamcli.ini subscriber add -t no test02 test02
 kamcli -d --config=kamcli/kamcli.ini subscriber setattrs test01 rpid +123
 kamcli -d --config=kamcli/kamcli.ini subscriber setattrnull test01 rpid
 
-kamcli -d --config=kamcli/kamcli.ini mi
-kamcli -d --config=kamcli/kamcli.ini mi which
-kamcli -d --config=kamcli/kamcli.ini mi get_statistics all
-
 kamcli -d --config=kamcli/kamcli.ini jsonrpc --help
 kamcli -d --config=kamcli/kamcli.ini jsonrpc core.psx
 kamcli -d --config=kamcli/kamcli.ini jsonrpc system.listMethods

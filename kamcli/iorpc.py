@@ -22,64 +22,50 @@ except ImportError, e:
 # RPC/MI commands aliases
 #
 # "alias" : {
-#    "mi": "mi command",
 #    "rpc": "rpc command",
 # }
 #
 # - alias is used inside Python function
-# - command_ctl(...) will use mi or rpc variant
+# - command_ctl(...) will use rpc variant
 #   based on config options
 COMMAND_NAMES = {
     "dispatcher.list": {
-        "mi": "ds_list",
         "rpc": "dispatcher.list",
     },
     "dispatcher.reload": {
-        "mi": "ds_reload",
         "rpc": "dispatcher.reload",
     },
     "permissions.addressDump": {
-        "mi": "address_dump",
         "rpc": "permissions.addressDump",
     },
     "permissions.addressReload": {
-        "mi": "address_reload",
         "rpc": "permissions.addressReload",
     },
     "permissions.domainDump": {
-        "mi": "perm_domain_dump",
         "rpc": "permissions.domainDump",
     },
     "permissions.subnetDump": {
-        "mi": "subnet_dump",
         "rpc": "permissions.subnetDump",
     },
     "stats.clear_statistics": {
-        "mi": "clear_statistics",
         "rpc": "stats.clear_statistics",
     },
     "stats.get_statistics": {
-        "mi": "get_statistics",
         "rpc": "stats.get_statistics",
     },
     "stats.reset_statistics": {
-        "mi": "reset_statistics",
         "rpc": "stats.reset_statistics",
     },
     "ul.add": {
-        "mi": "ul_add",
         "rpc": "ul.add",
     },
     "ul.dump": {
-        "mi": "ul_dump",
         "rpc": "ul.dump",
     },
     "ul.rm": {
-        "mi": "ul_rm",
         "rpc": "ul.rm",
     },
     "ul.lookup": {
-        "mi": "ul_show_contact",
         "rpc": "ul.lookup",
     }
 }
@@ -93,10 +79,7 @@ def command_ctl_name(alias, ctype):
     if v == None:
         return alias
 
-    if ctype == "mi":
-        return COMMAND_NAMES[alias]['mi'];
-    else:
-        return COMMAND_NAMES[alias]['rpc']
+    return COMMAND_NAMES[alias]['rpc']
 
 
 ##
@@ -180,62 +163,6 @@ class IOFifoThread (threading.Thread):
             self.ctx.vlog("timeout - nothing read")
         else:
             command_ctl_response(self.ctx, rdata, self.oformat, self.cbexec)
-
-
-##
-# :command:reply_fifo
-# p1
-# p2
-# p3
-# _empty_line_
-def command_mi_fifo(ctx, dryrun, sndpath, rcvname, oformat, cmd, params=[], cbexec={}):
-    scmd = ":" + cmd + ":" + rcvname + "\n"
-    for p in params:
-        if type(p) is int:
-            scmd += str(p) + "\n"
-        elif type(p) is float:
-            scmd += str(p) + "\n"
-        else:
-            if p == '':
-                scmd += ".\n"
-            else:
-                scmd += p + "\n"
-    scmd += "\n"
-    if dryrun:
-        print
-        print scmd
-        return
-
-    rcvpath = ctx.gconfig.get('mi', 'rpldir') + "/" + rcvname
-    if os.path.exists(rcvpath):
-        if stat.S_ISFIFO(os.stat(rcvpath).st_mode):
-            os.unlink(rcvpath)
-        else:
-            ctx.log("File with same name as reply fifo exists")
-            sys.exit()
-
-    os.mkfifo(rcvpath, 0666)
-    os.chmod(rcvpath, 0666)
-    # create new thread to read from reply fifo
-    tiofifo = IOFifoThread(ctx, rcvpath, oformat)
-    # start new threadd
-    tiofifo.start()
-
-    w = os.open(sndpath, os.O_WRONLY)
-    os.write(w, scmd)
-
-    waitrun = True
-    while waitrun:
-        try:
-            tiofifo.join(500)
-            if not tiofifo.isAlive():
-                waitrun = False
-                break
-        except KeyboardInterrupt:
-            ctx.log("Ctrl-c received! Sending kill to threads...")
-            tiofifo.stop_signal = True
-
-    os.unlink(rcvpath)
 
 
 ##
@@ -443,17 +370,12 @@ def command_ctl(ctx, cmd, params=[], cbexec={}):
                 the dictionary and its parameters by 'params' key.
     """
 
-    if ctx.gconfig.get('ctl', 'type') == 'jsonrpc':
-        if ctx.gconfig.get('jsonrpc', 'transport') == 'socket':
-            command_jsonrpc_socket(ctx, False, ctx.gconfig.get('jsonrpc', 'srvaddr'),
-                    ctx.gconfig.get('jsonrpc', 'rcvaddr'), ctx.gconfig.get('jsonrpc', 'outformat'),
-                    command_ctl_name(cmd, 'rpc'), params, cbexec)
-        else:
-            command_jsonrpc_fifo(ctx, False, ctx.gconfig.get('jsonrpc', 'path'),
-                    ctx.gconfig.get('jsonrpc', 'rplnamebase'), ctx.gconfig.get('jsonrpc', 'outformat'),
-                    command_ctl_name(cmd, 'rpc'), params, cbexec)
+    if ctx.gconfig.get('jsonrpc', 'transport') == 'socket':
+        command_jsonrpc_socket(ctx, False, ctx.gconfig.get('jsonrpc', 'srvaddr'),
+                ctx.gconfig.get('jsonrpc', 'rcvaddr'), ctx.gconfig.get('jsonrpc', 'outformat'),
+                command_ctl_name(cmd, 'rpc'), params, cbexec)
     else:
-        command_mi_fifo(ctx, False, ctx.gconfig.get('mi', 'path'),
-                ctx.gconfig.get('mi', 'rplnamebase'), "raw",
-                command_ctl_name(cmd, 'mi'), params, cbexec)
+        command_jsonrpc_fifo(ctx, False, ctx.gconfig.get('jsonrpc', 'path'),
+                ctx.gconfig.get('jsonrpc', 'rplnamebase'), ctx.gconfig.get('jsonrpc', 'outformat'),
+                command_ctl_name(cmd, 'rpc'), params, cbexec)
 
