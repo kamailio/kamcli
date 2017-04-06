@@ -326,8 +326,10 @@ def command_jsonrpc_socket(ctx, dryrun, srvaddr, rcvaddr, oformat, cmd, params=[
             rcvaddr = rcvaddr + "." + str(os.getpid())
             ctx.vlog("unix socket reply: " + rcvaddr)
             sockclient.bind( rcvaddr )
-            sockclient.connect( srvaddr )
-            sockclient.send( scmd )
+            os.chmod(rcvaddr, 0660)
+            #sockclient.connect( srvaddr )
+            #sockclient.send( scmd )
+            sockclient.sendto( scmd, srvaddr )
 
             # receive the response (content, sockserver)
             response = sockclient.recv(84000)
