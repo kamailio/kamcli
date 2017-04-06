@@ -281,7 +281,7 @@ def command_jsonrpc_socket(ctx, dryrun, srvaddr, rcvaddr, oformat, cmd, params=[
     if srvaddr.startswith("udp:"):
         ctx.vlog("udp socket provided: " + srvaddr)
         sproto, saddr = srvaddr.split(":", 1)
-        if server.find("[", 0, 2) == -1:
+        if saddr.find("[", 0, 2) == -1:
             ctx.vlog("IPv4 socket address")
             host, port = saddr.split(':')
         else:
@@ -298,7 +298,7 @@ def command_jsonrpc_socket(ctx, dryrun, srvaddr, rcvaddr, oformat, cmd, params=[
                 sockclient = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
             sockclient.settimeout(4.0)
-            sockclient.sendto(scmd, (host, port))
+            sockclient.sendto(scmd, (host, int(port)))
 
             # receive the response (content, sockserver)
             data = sockclient.recvfrom(84000)
@@ -324,6 +324,7 @@ def command_jsonrpc_socket(ctx, dryrun, srvaddr, rcvaddr, oformat, cmd, params=[
             sockclient = socket.socket( socket.AF_UNIX, socket.SOCK_DGRAM )
             sockclient.settimeout( 4.0 )
             rcvaddr = rcvaddr + "." + str(os.getpid())
+            ctx.vlog("unix socket reply: " + rcvaddr)
             sockclient.bind( rcvaddr )
             sockclient.connect( srvaddr )
             sockclient.send( scmd )
