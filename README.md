@@ -8,6 +8,8 @@ Kamailio is an open source SIP (RFC3261) server available at:
 
 **kamcli** is aiming at being a modern and extensible alternative to the shell script **kamctl**.
 
+It requires that `jsonrpcs` module of Kamailio is loaded and configured to listen on an Unix domain socket or FIFO file. The way to interact with Kamailio has to be set inside `kamcli` config file (kamcli.ini).
+
 ### Features
 
 The prototype of using **kamcli** is:
@@ -24,19 +26,20 @@ Among implemented commands:
   * **ul** - manage user location records
   * **address** - manage permissions address records
   * **aliasdb** - manage database aliases
-  * **speeddial** - manage speed dial records
-  * **group** - manage group membership records (acl)
-  * **rpc** - interact with kamailio via jsonrpc control commands
-  * **stats** - get kamailio internal statistics
   * **db** - manage kamailio database content
-  * **dispatcher** - manage load balancer (dispatcher)
-  * **dialplan** - manage dialplan records
   * **dialog** - manage active calls (dialog)
-  * **rpcmethods** - return the list of available RPC methods (commands)
-  * **ps** - print the details for kamailio running processes
-  * **uptime** - print the uptime for kamailio instance
+  * **dialplan** - manage dialplan records
+  * **dispatcher** - manage load balancer (dispatcher)
+  * **group** - manage group membership records (acl)
   * **moni** - continuous refresh of the values for a list of statistics
   * **mtree** - manage memory trees (mtree)
+  * **ps** - print the details for kamailio running processes
+  * **rpc** - interact with kamailio via jsonrpc control commands (alias of jsonrpc)
+  * **rpcmethods** - return the list of available RPC methods (commands)
+  * **speeddial** - manage speed dial records
+  * **srv** - server management commands (sockets, aliases, ...)
+  * **stats** - get kamailio internal statistics
+  * **uptime** - print the uptime for kamailio instance
 
 Each **kamcli command** can offer many subcommands. The help for each command can be seen with:
 
@@ -154,9 +157,9 @@ Kamcli uses a configuration file with INI format. The name is kamcli.ini and it 
 
 The installation process doesn't deploy the configuration file yet.
 
-A sample kamailio.ini is available in sources, at kamcli/kamcli.ini
+A sample kamailio.ini is available in sources, at `kamcli/kamcli.ini`.
 
-Note that not all configuration file options in kamcli.ini are used at this moment, some
+Note: not all configuration file options in `kamcli.ini` are used at this moment, some
 values are hardcoded, being planned to be replaced with the configuration options.
 
 ### Usage
