@@ -28,4 +28,4 @@ def cmd_ps_result_print(ctx, response, params=None):
         for r in rdata["result"]:
             ctx.printf("%4d %5d %s", r["IDX"], r["PID"], r["DSC"])
     else:
-        print json.dumps(rdata, indent=4, separators=(',', ': '))
+        print(json.dumps(rdata, indent=4, separators=(',', ': ')))

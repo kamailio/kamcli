@@ -6,7 +6,7 @@ import json
 ioutils_tabulate_format = True
 try:
     from tabulate import tabulate
-except ImportError, e:
+except ImportError as e:
     ioutils_tabulate_format = False
     pass # module doesn't exist, deal with it.
 
@@ -33,13 +33,13 @@ def ioutils_dbres_print(ctx, oformat, ostyle, res):
 
     if oformat == 'json':
         for row in res:
-            print json.dumps(dict(row), indent=4)
-            print
+            print(json.dumps(dict(row), indent=4))
+            print()
     elif oformat == 'dict':
         for row in res:
-            print dict(row)
+            print (dict(row))
             # pprint.pprint(dict(row), indent=4)
-            print
+            print()
     elif oformat == 'table':
         allrows = res.fetchall()
         gstring = tabulate(allrows, headers=res.keys(), tablefmt=ostyle)
