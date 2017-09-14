@@ -13,7 +13,7 @@ from random import randint
 iorpc_yaml_format = True
 try:
     import yaml
-except ImportError, e:
+except ImportError as e:
     iorpc_yaml_format = False
     pass # yaml module doesn't exist, deal with it.
 
@@ -95,16 +95,16 @@ def command_ctl_response_print(response, oformat):
         * yaml: yaml pretty formating (list like, more compact)
         * raw output - just print the response
     """
-    print
+    print()
     if oformat == "json":
-        print json.dumps(json.loads(response), indent=4, separators=(',', ': '))
+        print(json.dumps(json.loads(response), indent=4, separators=(',', ': ')))
     elif oformat == "yaml":
         if iorpc_yaml_format is True:
-            print yaml.safe_dump(json.loads(response), default_flow_style=False)
+            print(yaml.safe_dump(json.loads(response), default_flow_style=False))
         else:
-            print json.dumps(json.loads(response), indent=4, separators=(',', ': '))
+            print(json.dumps(json.loads(response), indent=4, separators=(',', ': ')))
     else:
-        print response
+        print(response)
 
 
 ##
@@ -201,7 +201,7 @@ def command_jsonrpc_fifo(ctx, dryrun, sndpath, rcvname, oformat, cmd, params=[],
     scmd += '  "id": ' + str(randint(2,10000)) + '\n'
     scmd += "}\n"
     if dryrun:
-        print json.dumps(json.loads(scmd), indent=4, separators=(',', ': '))
+        print(json.dumps(json.loads(scmd), indent=4, separators=(',', ': ')))
         return
 
     rcvpath = ctx.gconfig.get('jsonrpc', 'rpldir') + "/" + rcvname
@@ -212,8 +212,8 @@ def command_jsonrpc_fifo(ctx, dryrun, sndpath, rcvname, oformat, cmd, params=[],
             ctx.log("File with same name as reply fifo exists")
             sys.exit()
 
-    os.mkfifo(rcvpath, 0666)
-    os.chmod(rcvpath, 0666)
+    os.mkfifo(rcvpath, 0o666)
+    os.chmod(rcvpath, 0o666)
     # create new thread to read from reply fifo
     tiofifo = IOFifoThread(ctx, rcvpath, oformat)
     # start new threadd
@@ -270,7 +270,7 @@ def command_jsonrpc_socket(ctx, dryrun, srvaddr, rcvaddr, oformat, cmd, params=[
     scmd += '  "id": ' + str(randint(2,10000)) + '\n'
     scmd += "}\n"
     if dryrun:
-        print json.dumps(json.loads(scmd), indent=4, separators=(',', ': '))
+        print(json.dumps(json.loads(scmd), indent=4, separators=(',', ': ')))
         return
 
     sockclient = None
@@ -307,10 +307,10 @@ def command_jsonrpc_socket(ctx, dryrun, srvaddr, rcvaddr, oformat, cmd, params=[
 
             ctx.vlog('Server response: ' + response)
 
-        except socket.timeout, emsg:
+        except socket.timeout as emsg:
             ctx.log('Timeout receiving response on udp socket')
             sys.exit()
-        except socket.error, emsg:
+        except socket.error as emsg:
             ctx.log('Error udp sock: ' + str(emsg[0]) + ' - ' + emsg[1])
             sys.exit()
     else:
@@ -326,7 +326,7 @@ def command_jsonrpc_socket(ctx, dryrun, srvaddr, rcvaddr, oformat, cmd, params=[
             rcvaddr = rcvaddr + "." + str(os.getpid())
             ctx.vlog("unix socket reply: " + rcvaddr)
             sockclient.bind( rcvaddr )
-            os.chmod(rcvaddr, 0660)
+            os.chmod(rcvaddr, 0o660)
             #sockclient.connect( srvaddr )
             #sockclient.send( scmd )
             sockclient.sendto( scmd, srvaddr )
@@ -338,12 +338,12 @@ def command_jsonrpc_socket(ctx, dryrun, srvaddr, rcvaddr, oformat, cmd, params=[
 
             ctx.vlog('Server response: ' + response)
 
-        except socket.timeout, emsg:
+        except socket.timeout as emsg:
             ctx.log('Timeout receiving response on unix sock')
             sockclient.close()
             os.remove( rcvaddr )
             sys.exit()
-        except socket.error, emsg:
+        except socket.error as emsg:
             ctx.log('Error unix sock: ' + str(emsg[0]) + ' - ' + emsg[1])
             sockclient.close()
             os.remove( rcvaddr )
