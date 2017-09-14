@@ -36,7 +36,7 @@ def config_show(ctx, sections):
 @pass_context
 def config_paths(ctx):
     """Show the patsh of configuration files for kamcli"""
-    print
-    print ctx.gconfig_paths
-    print
+    print()
+    print(ctx.gconfig_paths)
+    print()
 

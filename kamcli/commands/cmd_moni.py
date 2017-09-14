@@ -34,8 +34,8 @@ def cli(ctx, norefresh):
         while True:
             count = count + 1
             command_ctl(ctx, 'stats.get_statistics', slist, {"func": cmd_moni_result_print})
-            print
-            print "[cycle #: " + str(count) + "; if constant make sure server is running]"
+            print()
+            print("[cycle #: " + str(count) + "; if constant make sure server is running]")
             time.sleep(2)
             clear()
 
@@ -45,11 +45,11 @@ def cli(ctx, norefresh):
 #
 def cmd_moni_result_print(ctx, response, params=None):
     ctx.vlog("formatting the response for command ps")
-    print
+    print()
     rdata = json.loads(response)
     if "result" in rdata:
         rd = rdata["result"]
-        for a,b in zip(rd[::2],rd[1::2]):
-            print '{:<40}{:<}'.format(a,b)
+        for a, b in zip(rd[::2],rd[1::2]):
+            print('{:<40}{:<}'.format(a, b))
     else:
-        print json.dumps(rdata, indent=4, separators=(',', ': '))
+        print(json.dumps(rdata, indent=4, separators=(',', ': ')))
