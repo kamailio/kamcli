@@ -136,7 +136,7 @@ pip install sqlalchemy
 pip install mysql-python
 pip install tabulate
 pip install pyaml
-git clone https://github.com/asipto/kamcli.git
+git clone https://github.com/kamailio/kamcli.git
 cd kamcli
 pip install --editable .
 ```
