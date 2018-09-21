@@ -102,7 +102,7 @@ environment if activate to be available only there or without virtual
 environment to be installed in the system.
 
 ```
-  $ git clone https://github.com/asipto/kamcli.git
+  $ git clone https://github.com/kamailio/kamcli.git
   $ cd kamcli
   $ pip install --editable .
 ```
