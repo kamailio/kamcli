@@ -60,14 +60,20 @@ def tls_cfgprint(ctx, cfgpath):
                 and row["profile_name"] and row["profile_name"].strip() ):
             print("[{0:s}:{1:s}]".format(row["profile_type"],row["profile_name"]))
 
-            if row["method"] and row["method"].strip:
+            if row["method"] and row["method"].strip():
                 print("method={0:s}".format(row["method"]))
 
-            if row["certificate"] and row["certificate"].strip:
+            if row["certificate"] and row["certificate"].strip():
                 print("certificate={0:s}".format(row["certificate"]))
 
-            if row["private_key"] and row["private_key"].strip:
+            if row["private_key"] and row["private_key"].strip():
                 print("private_key={0:s}".format(row["private_key"]))
+
+            if row["ca_list"] and row["ca_list"].strip():
+                print("ca_list={0:s}".format(row["ca_list"]))
+
+            if row["crl"] and row["crl"].strip():
+                print("crl={0:s}".format(row["crl"]))
 
         pcount += 1
 
