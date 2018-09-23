@@ -93,12 +93,12 @@ def tls_list(ctx):
 ##
 #
 #
-@cli.command('reload', short_help='Reload domain records from database into memory')
+@cli.command('reload', short_help='Reload tls configuration file')
 @pass_context
-def domain_reload(ctx):
-    """Reload domain records from database into memory
+def tls_reload(ctx):
+    """Reload tls configuration file
 
     \b
     """
-    command_ctl(ctx, 'domain.reload', [ ])
+    command_ctl(ctx, 'tls.reload', [ ])
 
