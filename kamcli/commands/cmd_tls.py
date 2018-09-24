@@ -1,3 +1,5 @@
+import sys
+import os
 import click
 from sqlalchemy import create_engine
 from kamcli.ioutils import ioutils_dbres_print
@@ -40,9 +42,11 @@ def tls_showdb(ctx, oformat, ostyle):
 #
 #
 @cli.command('cfgprint', short_help='Print TLS config generated from database records')
-@click.argument('cfgpath', nargs=-1, metavar='[<cfgpath>]')
+@click.option('odir', '--odir', '-d',
+                default=None, help='Output directory path for certificates content')
+@click.argument('cfgpath', nargs=-1, metavar='[<cfgpath>]', type=click.Path())
 @pass_context
-def tls_cfgprint(ctx, cfgpath):
+def tls_cfgprint(ctx, odir, cfgpath):
     """Print TLS config generated from database records
 
     \b
@@ -51,6 +55,19 @@ def tls_cfgprint(ctx, cfgpath):
     e = create_engine(ctx.gconfig.get('db', 'rwurl'))
     ctx.vlog('Generating TLS config from database records')
     res = e.execute('select * from tlscfg')
+
+    if cfgpath:
+        cfgpath = cfgpath[0]
+
+    if not odir:
+        if cfgpath:
+            odir = os.path.dirname(str(cfgpath))
+
+    bstdout = sys.stdout
+    if cfgpath:
+        cfgsock = open(str(cfgpath), 'w')
+        sys.stdout = cfgsock
+
     pcount = 0
     for row in res:
         if pcount > 0:
@@ -90,6 +107,12 @@ def tls_cfgprint(ctx, cfgpath):
                 print("server_id={0:s}".format(row["server_id"]))
 
         pcount += 1
+
+    if cfgpath:
+        sys.stdout = bstdout
+        cfgsock.close()
+
+
 
 ##
 #
