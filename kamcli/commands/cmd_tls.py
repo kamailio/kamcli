@@ -116,3 +116,36 @@ def tls_reload(ctx):
     """
     command_ctl(ctx, 'tls.reload', [ ])
 
+
+
+##
+#
+#
+@cli.command('sqlprint', short_help='Print SQL statement to create the db table')
+@pass_context
+def tls_sqlprint(ctx):
+    """Print SQL statement to create the db table
+
+    \b
+    """
+    sqls = '''
+CREATE TABLE `tlscfg` (
+    `id` INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    `profile_type` VARCHAR(64) NOT NULL,
+    `profile_name` VARCHAR(128) NOT NULL,
+    `method` VARCHAR(128),
+    `verify_certificate` INT DEFAULT 0 NOT NULL,
+    `verify_depth` INT DEFAULT 9 NOT NULL,
+    `require_certificate` INT DEFAULT 0 NOT NULL,
+    `cipher_list` VARCHAR(256),
+    `server_name` VARCHAR(128),
+    `server_name_mode` INT DEFAULT 0 NOT NULL,
+    `server_id` VARCHAR(128),
+    `file_type` INT DEFAULT 0 NOT NULL,
+    `certificate` TEXT,
+    `private_key` TEXT,
+    `ca_list` TEXT,
+    `crl` TEXT
+);
+'''
+    print(sqls)
