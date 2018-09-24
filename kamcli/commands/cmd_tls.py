@@ -84,17 +84,46 @@ def tls_cfgprint(ctx, odir, cfgpath):
             print("verify_depth={0:d}".format(row["verify_depth"]))
             print("require_certificate={0:d}".format(row["require_certificate"]))
 
-            if row["certificate"] and row["certificate"].strip():
-                print("certificate={0:s}".format(row["certificate"]))
+            if row["file_type"] == 0:
+                if row["certificate"] and row["certificate"].strip():
+                    print("certificate={0:s}".format(row["certificate"]))
 
-            if row["private_key"] and row["private_key"].strip():
-                print("private_key={0:s}".format(row["private_key"]))
+                if row["private_key"] and row["private_key"].strip():
+                    print("private_key={0:s}".format(row["private_key"]))
 
-            if row["ca_list"] and row["ca_list"].strip():
-                print("ca_list={0:s}".format(row["ca_list"]))
+                if row["ca_list"] and row["ca_list"].strip():
+                    print("ca_list={0:s}".format(row["ca_list"]))
 
-            if row["crl"] and row["crl"].strip():
-                print("crl={0:s}".format(row["crl"]))
+                if row["crl"] and row["crl"].strip():
+                    print("crl={0:s}".format(row["crl"]))
+            else:
+                if row["certificate"] and row["certificate"].strip():
+                    fpath = os.path.join(odir, "certificate_"+str(row["id"])+".pem")
+                    fout = open(fpath, 'w')
+                    fout.write(row["certificate"])
+                    fout.close()
+                    print("certificate={0:s}".format(fpath))
+
+                if row["private_key"] and row["private_key"].strip():
+                    fpath = os.path.join(odir, "private_key_"+str(row["id"])+".pem")
+                    fout = open(fpath, 'w')
+                    fout.write(row["private_key"])
+                    fout.close()
+                    print("private_key={0:s}".format(fpath))
+
+                if row["ca_list"] and row["ca_list"].strip():
+                    fpath = os.path.join(odir, "ca_list_"+str(row["id"])+".pem")
+                    fout = open(fpath, 'w')
+                    fout.write(row["ca_list"])
+                    fout.close()
+                    print("ca_list={0:s}".format(fpath))
+
+                if row["crl"] and row["crl"].strip():
+                    fpath = os.path.join(odir, "crl_"+str(row["id"])+".pem")
+                    fout = open(fpath, 'w')
+                    fout.write(row["crl"])
+                    fout.close()
+                    print("crl={0:s}".format(fpath))
 
             if row["cipher_list"] and row["cipher_list"].strip():
                 print("cipher_list={0:s}".format(row["cipher_list"]))
@@ -111,6 +140,7 @@ def tls_cfgprint(ctx, odir, cfgpath):
     if cfgpath:
         sys.stdout = bstdout
         cfgsock.close()
+        print("done")
 
 
 
