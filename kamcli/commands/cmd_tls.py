@@ -63,6 +63,10 @@ def tls_cfgprint(ctx, cfgpath):
             if row["method"] and row["method"].strip():
                 print("method={0:s}".format(row["method"]))
 
+            print("verify_certificate={0:d}".format(row["verify_certificate"]))
+            print("verify_depth={0:d}".format(row["verify_depth"]))
+            print("require_certificate={0:d}".format(row["require_certificate"]))
+
             if row["certificate"] and row["certificate"].strip():
                 print("certificate={0:s}".format(row["certificate"]))
 
@@ -74,6 +78,16 @@ def tls_cfgprint(ctx, cfgpath):
 
             if row["crl"] and row["crl"].strip():
                 print("crl={0:s}".format(row["crl"]))
+
+            if row["cipher_list"] and row["cipher_list"].strip():
+                print("cipher_list={0:s}".format(row["cipher_list"]))
+
+            if row["server_name"] and row["server_name"].strip():
+                print("server_name={0:s}".format(row["server_name"]))
+                print("server_name_mode={0:d}".format(row["server_name_mode"]))
+
+            if row["server_id"] and row["server_id"].strip():
+                print("server_id={0:s}".format(row["server_id"]))
 
         pcount += 1
 
