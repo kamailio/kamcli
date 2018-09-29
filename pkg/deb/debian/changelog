@@ -1,0 +1,5 @@
+kamcli (1.1.0~dev0) unstable; urgency=medium
+
+  * Initial release (Closes: #910283)
+
+ -- Victor Seva <vseva@debian.org>  Sat, 29 Sep 2018 11:22:00 +0200

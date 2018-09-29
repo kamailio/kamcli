@@ -1,0 +1,23 @@
+Source: kamcli
+Maintainer: Victor Seva <vseva@debian.org>
+Section: misc
+Priority: optional
+Standards-Version: 4.2.1.1
+Build-Depends:
+ debhelper (>= 9~),
+ dh-python,
+ python-all,
+ python-setuptools,
+
+Package: kamcli
+Architecture: all
+Depends:
+ ${misc:Depends},
+ ${python:Depends},
+Description: Kamailio Command Line Interface Control Tool
+ kamcli is aiming at being a modern and extensible alternative to the shell
+ script kamctl.
+ .
+ It requires that jsonrpcs module of Kamailio is loaded and configured to
+ listen on an Unix domain socket or FIFO file. The way to interact with
+ Kamailio has to be set inside kamcli config file (kamcli.ini).
