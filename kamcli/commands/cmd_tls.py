@@ -147,10 +147,10 @@ def tls_cfgprint(ctx, odir, cfgpath):
 ##
 #
 #
-@cli.command('list', short_help='Show details for TLS config in memory')
+@cli.command('cfgoptions', short_help='Show details for TLS options in memory')
 @pass_context
-def tls_list(ctx):
-    """Show details for TLS config records in memory
+def tls_cfgoptions(ctx):
+    """Show details for TLS options in memory
 
     \b
     """
@@ -160,9 +160,9 @@ def tls_list(ctx):
 ##
 #
 #
-@cli.command('reload', short_help='Reload tls configuration file')
+@cli.command('cfgreload', short_help='Reload tls configuration file')
 @pass_context
-def tls_reload(ctx):
+def tls_cfgreload(ctx):
     """Reload tls configuration file
 
     \b
