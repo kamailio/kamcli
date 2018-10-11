@@ -170,6 +170,34 @@ def tls_cfgreload(ctx):
     command_ctl(ctx, 'tls.reload', [ ])
 
 
+##
+#
+#
+@cli.command('conlist', short_help='List current tls connections')
+@pass_context
+def tls_conlist(ctx):
+    """List current tls connections
+
+    \b
+    """
+    command_ctl(ctx, 'tls.list', [ ])
+
+
+
+##
+#
+#
+@cli.command('info', short_help='Summary of tls usage')
+@pass_context
+def tls_info(ctx):
+    """Summary of tls usage
+
+    \b
+    """
+    command_ctl(ctx, 'tls.info', [ ])
+
+
+
 
 ##
 #
