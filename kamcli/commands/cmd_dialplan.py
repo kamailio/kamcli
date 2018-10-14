@@ -139,3 +139,22 @@ def dialplan_reload(ctx):
     """
     command_ctl(ctx, 'dialplan.reload', [ ])
 
+
+##
+#
+#
+@cli.command('translate', short_help='Translate using the rules from dialplan applied to input value')
+@click.argument('dpid', metavar='<dpid>', type=int)
+@click.argument('ivalue', metavar='<ivalue>')
+@pass_context
+def dispatcher_list(ctx, dpid, ivalue):
+    """Translate using the rules from dialplan applied to input value
+
+    \b
+    Parameters:
+        <dpid> - dialplan id
+        <ivalue> - input value
+    """
+    command_ctl(ctx, 'dialplan.translate', [ dpid, ivalue ])
+
+
