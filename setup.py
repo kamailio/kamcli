@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='kamcli',
-    version='1.1.0',
+    version='1.2.0-dev0',
     packages=['kamcli', 'kamcli.commands'],
     include_package_data=True,
     install_requires=[
