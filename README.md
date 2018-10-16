@@ -39,6 +39,7 @@ Among implemented commands:
   * **speeddial** - manage speed dial records
   * **srv** - server management commands (sockets, aliases, ...)
   * **stats** - get kamailio internal statistics
+  * **tls** - management commands for TLS profiles and connections
   * **uptime** - print the uptime for kamailio instance
 
 Each **kamcli command** can offer many subcommands. The help for each command can be seen with:
