@@ -49,3 +49,22 @@ def dialog_list(ctx):
     command_ctl(ctx, 'dialog.list', [ ])
 
 
+##
+#
+#
+@cli.command('terminate', short_help='Send BYE to the dialog identified by call-id, from-tag and to-tag')
+@click.argument('callid', metavar='<domain>')
+@click.argument('fromtag', metavar='<fromtag>')
+@click.argument('totag', metavar='<totag>')
+@pass_context
+def dialog_list(ctx, callid, fromtag, totag):
+    """Send BYE to the dialog identified by callid, from-tag and to-tag
+
+    \b
+    Parameters:
+        <callid> - Call-Id value
+        <fromtag> - From-Tag value
+        <to-tag> - To-Tag value
+    """
+    command_ctl(ctx, 'dialog.terminate_dlg', [ callid, fromtag, totag ])
+
