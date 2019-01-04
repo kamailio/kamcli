@@ -68,3 +68,15 @@ def dialog_list(ctx, callid, fromtag, totag):
     """
     command_ctl(ctx, 'dialog.terminate_dlg', [ callid, fromtag, totag ])
 
+
+##
+#
+#
+@cli.command('stats_active', short_help='Show statistics for active dialogs')
+@pass_context
+def dialog_stats_active(ctx):
+    """Show statistics for active dialogs
+
+    \b
+    """
+    command_ctl(ctx, 'dialog.stats_active', [ ])
