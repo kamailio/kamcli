@@ -46,7 +46,7 @@ def dialog_list(ctx):
 
     \b
     """
-    command_ctl(ctx, 'dialog.list', [ ])
+    command_ctl(ctx, 'dlg.list', [ ])
 
 
 ##
@@ -66,7 +66,7 @@ def dialog_list(ctx, callid, fromtag, totag):
         <fromtag> - From-Tag value
         <to-tag> - To-Tag value
     """
-    command_ctl(ctx, 'dialog.terminate_dlg', [ callid, fromtag, totag ])
+    command_ctl(ctx, 'dlg.terminate_dlg', [ callid, fromtag, totag ])
 
 
 ##
@@ -79,4 +79,4 @@ def dialog_stats_active(ctx):
 
     \b
     """
-    command_ctl(ctx, 'dialog.stats_active', [ ])
+    command_ctl(ctx, 'dlg.stats_active', [ ])
