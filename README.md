@@ -39,6 +39,7 @@ Among implemented commands:
   * **speeddial** - manage speed dial records
   * **srv** - server management commands (sockets, aliases, ...)
   * **stats** - get kamailio internal statistics
+  * **tcp** - management commands for TCP connections
   * **tls** - management commands for TLS profiles and connections
   * **uptime** - print the uptime for kamailio instance
 
