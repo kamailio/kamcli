@@ -51,13 +51,13 @@ def mtree_add(ctx, tname, coltprefix, coltvalue, dbtname, tprefix, tvalue):
 ##
 #
 #
-@cli.command('rm', short_help='Remove a destination from dispatcher table')
+@cli.command('rm', short_help='Remove a record from mtree table')
 @click.option('coltprefix', '--coltprefix', default='tprefix',
             help='Column name for prefix (default: "tprefix")')
 @click.argument('dbtname', metavar='<dbtname>')
 @click.argument('tprefix', metavar='<tprefix>')
 @pass_context
-def dispatcher_rm(ctx, coltprefix, dbtname, tprefix):
+def mtree_rm(ctx, coltprefix, dbtname, tprefix):
     """Remove a record from tree database table
 
     \b
@@ -72,7 +72,7 @@ def dispatcher_rm(ctx, coltprefix, dbtname, tprefix):
 ##
 #
 #
-@cli.command('showdb', short_help='Show dispatcher records in database')
+@cli.command('showdb', short_help='Show mtree records in database')
 @click.option('oformat', '--output-format', '-F',
                 type=click.Choice(['raw', 'json', 'table', 'dict']),
                 default=None, help='Format the output')
@@ -83,7 +83,7 @@ def dispatcher_rm(ctx, coltprefix, dbtname, tprefix):
 @click.argument('dbtname', metavar='<dbtname>')
 @click.argument('tprefix', nargs=-1, metavar='[<tprefix>]')
 @pass_context
-def dispatcher_showdb(ctx, oformat, ostyle, coltprefix, dbtable, tprefix):
+def mtree_showdb(ctx, oformat, ostyle, coltprefix, dbtable, tprefix):
     """Show details for records in mtree database table
 
     \b
