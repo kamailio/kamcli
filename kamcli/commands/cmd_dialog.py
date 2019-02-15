@@ -80,3 +80,19 @@ def dialog_stats_active(ctx):
     \b
     """
     command_ctl(ctx, 'dlg.stats_active', [ ])
+
+
+##
+#
+#
+@cli.command('profile_list', short_help='List the content of a profile')
+@click.argument('profile', metavar='<profile>')
+@pass_context
+def dialog_profile_list(ctx, profile):
+    """List the dialogs groupped in a profile
+
+    \b
+    Parameters:
+        <profile> - the name of the profile
+    """
+    command_ctl(ctx, 'dlg.profile_list', [ profile ])
