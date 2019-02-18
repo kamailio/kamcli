@@ -47,3 +47,15 @@ def srv_rpclist(ctx):
     """
     command_ctl(ctx, 'system.listMethods')
 
+##
+#
+#
+@cli.command('info', short_help='Show server info')
+@pass_context
+def srv_info(ctx):
+    """Show server info
+
+    \b
+    """
+    command_ctl(ctx, 'core.info')
+
