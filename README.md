@@ -8,7 +8,9 @@ Kamailio is an open source SIP (RFC3261) server available at:
 
 **kamcli** is aiming at being a modern and extensible alternative to the shell script **kamctl**.
 
-It requires that `jsonrpcs` module of Kamailio is loaded and configured to listen on an Unix domain socket or FIFO file. The way to interact with Kamailio has to be set inside `kamcli` config file (kamcli.ini).
+It requires that `jsonrpcs` module of Kamailio is loaded and configured to listen
+on a Unix domain socket or FIFO file. The way to interact with Kamailio has to be set
+inside `kamcli` config file (kamcli.ini).
 
 ### Features
 
@@ -18,7 +20,8 @@ The prototype of using **kamcli** is:
 kamcli [options] command [arguments]
 ```
 
-New commands for **kamcli** can be implemented as plugins, each command being implemented in a file located in **kamcli/commands/**.
+New commands for **kamcli** can be implemented as plugins, each command being
+implemented in a file located in **kamcli/commands/**.
 
 Among implemented commands:
 
@@ -36,6 +39,7 @@ Among implemented commands:
   * **ps** - print the details for kamailio running processes
   * **rpc** - interact with kamailio via jsonrpc control commands (alias of jsonrpc)
   * **rpcmethods** - return the list of available RPC methods (commands)
+  * **rtpengine** - manage RTPEngine records and instances
   * **speeddial** - manage speed dial records
   * **srv** - server management commands (sockets, aliases, ...)
   * **stats** - get kamailio internal statistics
