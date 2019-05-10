@@ -228,6 +228,21 @@ kamcli -d --config=kamcli/kamcli.ini stats -s registered_users
 kamcli -d --config=kamcli/kamcli.ini stats usrloc:registered_users
 ```
 
+### Kamailio Configuration
+
+It requires to load the `jsnorpcs` module in `kamalilio.cfg` and enable the
+FIFO or UnixSocket transports (they should be enabled by default).
+
+```
+loadmodule "jsonrpcs.so"
+
+# ----- jsonrpcs params -----
+# - explicit enable of fifo and unixsocket transports
+modparam("jsonrpcs", "transport", 6)
+# - pretty format for output
+modparam("jsonrpcs", "pretty_format", 1)
+```
+
 ### License
 
 GPLv2
