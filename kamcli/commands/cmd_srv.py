@@ -59,3 +59,26 @@ def srv_info(ctx):
     """
     command_ctl(ctx, 'core.info')
 
+##
+#
+#
+@cli.command('modules', short_help='Show server loaded modules')
+@pass_context
+def srv_info(ctx):
+    """Show server loaded modules
+
+    \b
+    """
+    command_ctl(ctx, 'core.modules')
+
+##
+#
+#
+@cli.command('version', short_help='Show server version')
+@pass_context
+def srv_info(ctx):
+    """Show server version
+
+    \b
+    """
+    command_ctl(ctx, 'core.version')
