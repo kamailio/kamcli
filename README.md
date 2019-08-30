@@ -77,9 +77,9 @@ kamcli command subcommand --help
 
 OS Packages (install via apt, yum, ...):
 
-  * python
+  * python (version 3.x)
   * python-pip
-  * python-dev (optional - needed to install mysql-python via pip)
+  * python-dev (optional - needed to install mysqlclient via pip)
 
 PIP Packages (install via pip):
 
@@ -140,6 +140,9 @@ To deactivate the virtual environment, run:
 
 Should work on: Ubuntu or Mint
 
+Note: you may have to replace python with python3 and pip with pip3 in package
+names, installation and execution commands.
+
 To get kamcli completely installed on Debian with MySQL support,
 run following commands:
 
@@ -151,7 +154,7 @@ cd kamclienv
 virtualenv venv
 pip install click
 pip install sqlalchemy
-pip install mysql-python
+pip install mysqlclient
 pip install tabulate
 pip install pyaml
 git clone https://github.com/kamailio/kamcli.git
