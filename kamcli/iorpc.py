@@ -329,14 +329,14 @@ def command_jsonrpc_socket(ctx, dryrun, srvaddr, rcvaddr, oformat, cmd, params=[
             os.chmod(rcvaddr, 0o660)
             #sockclient.connect( srvaddr )
             #sockclient.send( scmd )
-            sockclient.sendto( scmd, srvaddr )
+            sockclient.sendto( scmd.encode(), srvaddr )
 
             # receive the response (content, sockserver)
             response = sockclient.recv(84000)
             sockclient.close()
             os.remove( rcvaddr )
 
-            ctx.vlog('Server response: ' + response)
+            ctx.vlog('Server response: ' + response.decode())
 
         except socket.timeout as emsg:
             ctx.log('Timeout receiving response on unix sock')
