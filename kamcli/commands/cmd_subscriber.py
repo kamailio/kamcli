@@ -36,8 +36,8 @@ def subscriber_add(ctx, pwtext, userid, password):
     """
     udata = parse_user_spec(ctx, userid)
     ctx.vlog('Adding subscriber [%s] in domain [%s] with password [%s]', udata['username'], udata['domain'], password)
-    ha1 = hashlib.md5(udata['username'] + ":" + udata['domain'] + ":" + password).hexdigest()
-    ha1b = hashlib.md5(udata['username'] + "@" + udata['domain'] + ":" + udata['domain'] + ":" + password).hexdigest()
+    ha1 = hashlib.md5((udata['username'] + ":" + udata['domain'] + ":" + password).encode()).hexdigest()
+    ha1b = hashlib.md5((udata['username'] + "@" + udata['domain'] + ":" + udata['domain'] + ":" + password).encode()).hexdigest()
     e = create_engine(ctx.gconfig.get('db', 'rwurl'))
     if pwtext == 'yes' :
         e.execute('insert into subscriber (username, domain, password, ha1, ha1b) values (%s, %s, %s, %s, %s)', udata['username'], udata['domain'], password, ha1, ha1b)
@@ -82,8 +82,8 @@ def subscriber_passwd(ctx, pwtext, userid, password):
     """
     udata = parse_user_spec(ctx, userid)
     ctx.log('Updating subscriber [%s@%s] with password [%s]', udata['username'], udata['domain'], password)
-    ha1 = hashlib.md5(udata['username'] + ":" + udata['domain'] + ":" + password).hexdigest()
-    ha1b = hashlib.md5(udata['username'] + "@" + udata['domain'] + ":" + udata['domain'] + ":" + password).hexdigest()
+    ha1 = hashlib.md5((udata['username'] + ":" + udata['domain'] + ":" + password).encode()).hexdigest()
+    ha1b = hashlib.md5((udata['username'] + "@" + udata['domain'] + ":" + udata['domain'] + ":" + password).encode()).hexdigest()
     e = create_engine(ctx.gconfig.get('db', 'rwurl'))
     if pwtext == 'yes' :
         e.execute('update subscriber set password=%s, ha1=%s, ha1b=%s where username=%s and domain=%s', password, ha1, ha1b, udata['username'], udata['domain'])
@@ -145,7 +145,7 @@ def subscriber_setattrs(ctx, userid, attr, val):
     udata = parse_user_spec(ctx, userid)
     ctx.log('Updating subscriber [%s@%s] with str attribute [%s]=[%s]', udata['username'], udata['domain'], attr, val)
     e = create_engine(ctx.gconfig.get('db', 'rwurl'))
-    e.execute('update subscriber set {0}={1!r} where username={2!r} and domain={3!r}'.format(attr.encode('ascii','ignore'), val.encode('ascii','ignore'), udata['username'], udata['domain']))
+    e.execute('update subscriber set {0}={1!r} where username={2!r} and domain={3!r}'.format(attr.encode('ascii','ignore').decode(), val.encode('ascii','ignore').decode(), udata['username'], udata['domain']))
 
 
 ##
@@ -168,7 +168,7 @@ def subscriber_setattri(ctx, userid, attr, val):
     udata = parse_user_spec(ctx, userid)
     ctx.log('Updating subscriber [%s@%s] with int attribute [%s]=[%s]', udata['username'], udata['domain'], attr, val)
     e = create_engine(ctx.gconfig.get('db', 'rwurl'))
-    e.execute('update subscriber set {0}={1} where username={2!r} and domain={3!r}'.format(attr.encode('ascii','ignore'), val.encode('ascii','ignore'), udata['username'], udata['domain']))
+    e.execute('update subscriber set {0}={1} where username={2!r} and domain={3!r}'.format(attr.encode('ascii','ignore').decode(), val.encode('ascii','ignore').decode(), udata['username'], udata['domain']))
 
 
 ##
@@ -189,6 +189,6 @@ def subscriber_setattrnull(ctx, userid, attr):
     udata = parse_user_spec(ctx, userid)
     ctx.log('Updating subscriber [%s@%s] with attribute [%s]=NULL', udata['username'], udata['domain'], attr)
     e = create_engine(ctx.gconfig.get('db', 'rwurl'))
-    e.execute('update subscriber set {0}=NULL where username={1!r} and domain={2!r}'.format(attr.encode('ascii','ignore'), udata['username'], udata['domain']))
+    e.execute('update subscriber set {0}=NULL where username={1!r} and domain={2!r}'.format(attr.encode('ascii','ignore').decode(), udata['username'], udata['domain']))
 
 
