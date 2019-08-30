@@ -46,8 +46,8 @@ def parse_user_spec(ctx, ustr):
     if udata['domain'] is None:
         ctx.log("Failed to get domain")
         sys.exit()
-    udata['username'] = udata['username'].encode('ascii','ignore')
-    udata['domain'] = udata['domain'].encode('ascii','ignore')
+    udata['username'] = udata['username'].encode('ascii','ignore').decode()
+    udata['domain'] = udata['domain'].encode('ascii','ignore').decode()
     return udata
 
 
