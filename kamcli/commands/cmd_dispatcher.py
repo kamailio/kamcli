@@ -40,7 +40,7 @@ def dispatcher_add(ctx, flags, priority, attrs, description, setid, destination)
     """
     ctx.vlog('Adding to setid [%d] destination [%s]', setid, destination)
     e = create_engine(ctx.gconfig.get('db', 'rwurl'))
-    e.execute('insert into dispatcher (setid, destination, flags, priority, attrs, description) values ({0}, {1!r}, {2}, {3}, {4!r}, {5!r})'.format(setid, destination.encode('ascii','ignore'), flags, priority, attrs.encode('ascii','ignore'), description.encode('ascii','ignore')))
+    e.execute('insert into dispatcher (setid, destination, flags, priority, attrs, description) values ({0}, {1!r}, {2}, {3}, {4!r}, {5!r})'.format(setid, destination.encode('ascii','ignore').decode(), flags, priority, attrs.encode('ascii','ignore').decode(), description.encode('ascii','ignore').decode()))
 
 
 ##
@@ -59,7 +59,7 @@ def dispatcher_rm(ctx, setid, destination):
         <destination> - SIP URI for destination
     """
     e = create_engine(ctx.gconfig.get('db', 'rwurl'))
-    e.execute('delete from dispatcher where setid={0} and destination={1!r}'.format(setid, destination.encode('ascii','ignore')))
+    e.execute('delete from dispatcher where setid={0} and destination={1!r}'.format(setid, destination.encode('ascii','ignore').decode()))
 
 
 ##
