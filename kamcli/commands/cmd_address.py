@@ -40,7 +40,7 @@ def address_add(ctx, mask, port, tag, group, address):
     """
     ctx.vlog('Adding to group id [%d] address [%s]', group, address)
     e = create_engine(ctx.gconfig.get('db', 'rwurl'))
-    e.execute('insert into address (grp, ip_addr, mask, port, tag) values ({0}, {1!r}, {2}, {3}, {4!r})'.format(group, address.encode('ascii','ignore'), mask, port, tag.encode('ascii','ignore')))
+    e.execute('insert into address (grp, ip_addr, mask, port, tag) values ({0}, {1!r}, {2}, {3}, {4!r})'.format(group, address.encode('ascii','ignore').decode(), mask, port, tag.encode('ascii','ignore').decode()))
 
 
 ##
@@ -65,14 +65,14 @@ def address_rm(ctx, mask, port, group, address):
     e = create_engine(ctx.gconfig.get('db', 'rwurl'))
     if not mask:
         if not port:
-            e.execute('delete from address where grp={0} and ip_addr={1!r}'.format(group, address.encode('ascii','ignore')))
+            e.execute('delete from address where grp={0} and ip_addr={1!r}'.format(group, address.encode('ascii','ignore').decode()))
         else:
-            e.execute('delete from address where grp={0} and ip_addr={1!r} and port={2}'.format(group, address.encode('ascii','ignore'),port))
+            e.execute('delete from address where grp={0} and ip_addr={1!r} and port={2}'.format(group, address.encode('ascii','ignore').decode(), port))
     else:
         if not port:
-            e.execute('delete from address where grp={0} and ip_addr={1!r} and mask={2}'.format(group, address.encode('ascii','ignore'),mask))
+            e.execute('delete from address where grp={0} and ip_addr={1!r} and mask={2}'.format(group, address.encode('ascii','ignore').decode(), mask))
         else:
-            e.execute('delete from address where setid={0} and destination={1!r} and mask={2} and port={3}'.format(group, address.encode('ascii','ignore'),mask, port))
+            e.execute('delete from address where setid={0} and destination={1!r} and mask={2} and port={3}'.format(group, address.encode('ascii','ignore').decode(), mask, port))
 
 
 ##
