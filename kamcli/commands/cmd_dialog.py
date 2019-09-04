@@ -31,7 +31,7 @@ def dialog_showdb(ctx, oformat, ostyle):
     \b
     """
     e = create_engine(ctx.gconfig.get('db', 'rwurl'))
-    ctx.vlog('Showing all dispatcher records')
+    ctx.vlog('Showing all dialog records')
     res = e.execute('select * from dialog')
     ioutils_dbres_print(ctx, oformat, ostyle, res)
 
