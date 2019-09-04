@@ -43,9 +43,9 @@ def mtree_add(ctx, tname, coltprefix, coltvalue, dbtname, tprefix, tvalue):
     ctx.vlog('Adding to tree [%s] record [%s] => [%s]', dbtname, tprefix, tvalue)
     e = create_engine(ctx.gconfig.get('db', 'rwurl'))
     if not tname:
-        e.execute('insert into {0!r} ({1!r}, {2!r}) values ({3!r}, {4!r})'.format(dbtname.encode('ascii','ignore'), coltprefix.encode('ascii','ignore'), coltvalue.encode('ascii','ignore'), tprefix.encode('ascii','ignore'), tvalue.encode('ascii','ignore')))
+        e.execute('insert into {0!r} ({1!r}, {2!r}) values ({3!r}, {4!r})'.format(dbtname.encode('ascii','ignore').decode(), coltprefix.encode('ascii','ignore').decode(), coltvalue.encode('ascii','ignore').decode(), tprefix.encode('ascii','ignore').decode(), tvalue.encode('ascii','ignore').decode()))
     else:
-        e.execute('insert into {0!r} (tname, {1!r}, {2!r}) values ({3!r}, {4!r}, {5!r})'.format(dbtname.encode('ascii','ignore'), tname.encode('ascii','ignore'), coltprefix.encode('ascii','ignore'), coltvalue.encode('ascii','ignore'), tprefix.encode('ascii','ignore'), tvalue.encode('ascii','ignore')))
+        e.execute('insert into {0!r} (tname, {1!r}, {2!r}) values ({3!r}, {4!r}, {5!r})'.format(dbtname.encode('ascii','ignore').decode(), tname.encode('ascii','ignore').decode(), coltprefix.encode('ascii','ignore').decode(), coltvalue.encode('ascii','ignore').decode(), tprefix.encode('ascii','ignore').decode(), tvalue.encode('ascii','ignore').decode()))
 
 
 ##
@@ -66,7 +66,7 @@ def mtree_rm(ctx, coltprefix, dbtname, tprefix):
         <tprefix> - tree prefix value to match the record
     """
     e = create_engine(ctx.gconfig.get('db', 'rwurl'))
-    e.execute('delete from {0!r} where {1!r}={2!r}'.format(dbtname.encode('ascii','ignore'), coltprefix.encode('ascii','ignore'), tprefix.encode('ascii','ignore')))
+    e.execute('delete from {0!r} where {1!r}={2!r}'.format(dbtname.encode('ascii','ignore').decode(), coltprefix.encode('ascii','ignore').decode(), tprefix.encode('ascii','ignore').decode()))
 
 
 ##
@@ -97,7 +97,7 @@ def mtree_showdb(ctx, oformat, ostyle, coltprefix, dbtable, tprefix):
         res = e.execute('select * from {0!r}'.format(dbtname.encode('ascii','ignore')))
     else:
         ctx.vlog('Showing tree database records for prefix')
-        res = e.execute('select * from {0!r} where {1!r}={2!r}'.format(dbtname.encode('ascii','ignore'), coltprefix.encode('ascii','ignore'), tprefix.encode('ascii','ignore')))
+        res = e.execute('select * from {0!r} where {1!r}={2!r}'.format(dbtname.encode('ascii','ignore').decode(), coltprefix.encode('ascii','ignore').decode(), tprefix.encode('ascii','ignore').decode()))
     ioutils_dbres_print(ctx, oformat, ostyle, res)
 
 
