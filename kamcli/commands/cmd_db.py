@@ -63,7 +63,7 @@ def db_clirun(ctx, query):
 #
 #
 @cli.command('clishow', help='Show content of table via cli')
-@click.argument('table', metavar='table>')
+@click.argument('table', metavar='<table>')
 @pass_context
 def db_clishow(ctx, table):
     dbtype = ctx.gconfig.get('db', 'type')
@@ -83,7 +83,7 @@ def db_clishow(ctx, table):
 #
 #
 @cli.command('clishowg', help='Show content of table via cli')
-@click.argument('table', metavar='table>')
+@click.argument('table', metavar='<table>')
 @pass_context
 def db_clishowg(ctx, table):
     dbtype = ctx.gconfig.get('db', 'type')
