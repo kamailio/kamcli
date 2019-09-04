@@ -57,7 +57,7 @@ def dialplan_add(ctx, priority, matchop, matchlen, attrs, dpid, matchexp, substr
 
     ctx.vlog('Adding to dialplan id [%d] match [%s] expression [%s]', dpid, matchop, matchexp)
     e = create_engine(ctx.gconfig.get('db', 'rwurl'))
-    e.execute('insert into dialplan (dpid, pr, match_op, match_exp, match_len, subst_exp, repl_exp, attrs) values ({0}, {1}, {2}, {3!r}, {4}, {5!r}, {6!r}, {7!r})'.format(dpid, priority, matchid, matchexp.encode('ascii','ignore'), matchlen, substexp.encode('ascii','ignore'), replexp.encode('ascii','ignore'), attrs.encode('ascii','ignore')))
+    e.execute('insert into dialplan (dpid, pr, match_op, match_exp, match_len, subst_exp, repl_exp, attrs) values ({0}, {1}, {2}, {3!r}, {4}, {5!r}, {6!r}, {7!r})'.format(dpid, priority, matchid, matchexp.encode('ascii','ignore').decode(), matchlen, substexp.encode('ascii','ignore').decode(), replexp.encode('ascii','ignore').decode(), attrs.encode('ascii','ignore').decode()))
 
 
 ##
@@ -80,7 +80,7 @@ def dialplan_rm(ctx, dpid, matchexp):
         e.execute('delete from dialplan where dpid={0}'.format(dpid))
     else:
         for m in matchexp:
-            e.execute('delete from dialplan where dpid={0} and match_exp={1!r}'.format(dpid, m.encode('ascii','ignore')))
+            e.execute('delete from dialplan where dpid={0} and match_exp={1!r}'.format(dpid, m.encode('ascii','ignore').decode()))
 
 
 ##
@@ -108,7 +108,7 @@ def dispatcher_showdb(ctx, oformat, ostyle, dpid):
         ioutils_dbres_print(ctx, oformat, ostyle, res)
     else:
         for d in dpid:
-            ctx.vlog('Showing dialplan records for set id:' + d)
+            ctx.vlog('Showing dialplan records for set id: ' + d)
             res = e.execute('select * from dialplan where dpid=%d', d)
             ioutils_dbres_print(ctx, oformat, ostyle, res)
 
