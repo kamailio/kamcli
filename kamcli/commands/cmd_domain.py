@@ -30,7 +30,7 @@ def domain_add(ctx, domain):
     """
     ctx.vlog('Adding a new domain [%s]', domain)
     e = create_engine(ctx.gconfig.get('db', 'rwurl'))
-    e.execute('insert into domain (domain) values ({0!r})'.format(domain.encode('ascii','ignore')))
+    e.execute('insert into domain (domain) values ({0!r})'.format(domain.encode('ascii','ignore').decode()))
 
 
 ##
@@ -47,7 +47,7 @@ def domain_rm(ctx, domain):
         <domain> - domain value
     """
     e = create_engine(ctx.gconfig.get('db', 'rwurl'))
-    e.execute('delete from domain where domain={0!r}'.format(domain.encode('ascii','ignore')))
+    e.execute('delete from domain where domain={0!r}'.format(domain.encode('ascii','ignore').decode()))
 
 
 ##
