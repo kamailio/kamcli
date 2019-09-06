@@ -79,7 +79,7 @@ def dialplan_rm(ctx, dpid, matchexp):
         e.execute('delete from dialplan where dpid={0}'.format(dpid))
     else:
         for m in matchexp:
-            e.execute('delete from dialplan where dpid={0} and match_exp={1!r}'.format(dpid, m.encode('ascii','ignore').decode()))
+            e.execute('delete from dialplan where dpid={0} and match_exp={1!r}'.format(dpid, matchexp.encode('ascii','ignore').decode()))
 
 
 ##
