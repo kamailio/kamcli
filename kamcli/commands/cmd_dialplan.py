@@ -32,7 +32,6 @@ def cli(ctx):
 @click.argument('matchexp', metavar='<matchexp>')
 @click.argument('substrepl', nargs=-1, metavar='<substrepl>')
 @pass_context
-@pass_context
 def dialplan_add(ctx, priority, matchop, matchlen, attrs, dpid, matchexp, substrepl):
     """Add a new translation rule in dialplan table
 
