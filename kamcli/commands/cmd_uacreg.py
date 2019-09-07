@@ -68,6 +68,35 @@ def uacreg_add(ctx, realm, authha1, flags, regdelay, socket, l_uuid, l_username,
 ##
 #
 #
+@cli.command('showdb', short_help='Show dialplan records in database')
+@click.option('oformat', '--output-format', '-F',
+                type=click.Choice(['raw', 'json', 'table', 'dict']),
+                default=None, help='Format the output')
+@click.option('ostyle', '--output-style', '-S',
+                default=None, help='Style of the output (tabulate table format)')
+@click.argument('l_uuid', nargs=-1, metavar='[<l_uuid>]')
+@pass_context
+def dispatcher_showdb(ctx, oformat, ostyle, l_uuid):
+    """Show details for records in uacreg database table
+
+    \b
+    Parameters:
+        [<l_uuid>] - local user unique id
+    """
+    e = create_engine(ctx.gconfig.get('db', 'rwurl'))
+    if not l_uuid:
+        ctx.vlog('Showing all uacreg records')
+        res = e.execute('select * from uacreg')
+        ioutils_dbres_print(ctx, oformat, ostyle, res)
+    else:
+        for l in l_uuid:
+            ctx.vlog('Showing uacreg records for l_uuid: ' + l)
+            res = e.execute('select * from uacreg where l_uuid="%s"', l)
+            ioutils_dbres_print(ctx, oformat, ostyle, res)
+
+##
+#
+#
 @cli.command('list', short_help='Show details for remote registration records in memory')
 @pass_context
 def uacreg_list(ctx):
