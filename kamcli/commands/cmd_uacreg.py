@@ -64,6 +64,33 @@ def uacreg_add(ctx, realm, authha1, flags, regdelay, socket, l_uuid, l_username,
     e = create_engine(ctx.gconfig.get('db', 'rwurl'))
     e.execute('insert into uacreg (l_uuid, l_username, l_domain, r_username, r_domain, realm, auth_username, auth_password, auth_ha1, auth_proxy, expires, flags, reg_delay, socket) values ({0!r}, {1!r}, {2!r}, {3!r}, {4!r}, {5!r}, {6!r}, {7!r}, {8!r}, {9!r}, {10}, {11}, {12}, {13!r})'.format(l_uuid.encode('ascii','ignore').decode(), l_username.encode('ascii','ignore').decode(), l_domain.encode('ascii','ignore').decode(), r_username.encode('ascii','ignore').decode(), r_domain.encode('ascii','ignore').decode(), realm.encode('ascii','ignore').decode(), auth_username.encode('ascii','ignore').decode(), pwval.encode('ascii','ignore').decode(), ha1val.encode('ascii','ignore').decode(), auth_proxy.encode('ascii','ignore').decode(), expires, flags, regdelay, socket.encode('ascii','ignore').decode()))
 
+##
+#
+#
+@cli.command('passwd', short_help='Set the password for a remote registration account')
+@click.option('authha1', '--auth-ha1', is_flag=True,
+            help='Auth password in HA1 format')
+@click.argument('l_uuid', metavar='<l_uuid>')
+@click.argument('auth_password', metavar='<auth_password>')
+@pass_context
+def uacreg_passwd(ctx, realm, authha1, l_uuid, auth_password):
+    """Set password for a remote registration account
+
+    \b
+    Parameters:
+        <l_uuid> - local user unique id
+        <auth_password> - auth password
+    """
+    ctx.vlog('Adding a new uac remote registration account - local uuid: [%s]', l_uuid)
+    pwval = ""
+    ha1val = ""
+    if authha1:
+        ha1val = auth_password
+    else:
+        pwval = auth_password
+    e = create_engine(ctx.gconfig.get('db', 'rwurl'))
+    e.execute('update uacreg set auth_password={0!r}, auth_ha1={1!r} where l_uuid={2!r}'.format(pwval.encode('ascii','ignore').decode(), ha1val.encode('ascii','ignore').decode(), l_uuid.encode('ascii','ignore').decode(), ))
+
 
 ##
 #
