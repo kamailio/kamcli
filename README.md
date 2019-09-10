@@ -37,14 +37,14 @@ implemented in a file located in **kamcli/commands/**.
 
 Among implemented commands:
 
-  * **subscriber** - manage SIP subscribers
-  * **ul** - manage user location records
   * **address** - manage permissions address records
   * **aliasdb** - manage database aliases
+  * **config** - manage configuration file for kamcli
   * **db** - manage kamailio database content
   * **dialog** - manage active calls (dialog)
   * **dialplan** - manage dialplan records
   * **dispatcher** - manage load balancer (dispatcher)
+  * **domain** - manage domain records
   * **group** - manage group membership records (acl)
   * **moni** - continuous refresh of the values for a list of statistics
   * **mtree** - manage memory trees (mtree)
@@ -55,8 +55,11 @@ Among implemented commands:
   * **speeddial** - manage speed dial records
   * **srv** - server management commands (sockets, aliases, ...)
   * **stats** - get kamailio internal statistics
+  * **subscriber** - manage SIP subscribers
   * **tcp** - management commands for TCP connections
   * **tls** - management commands for TLS profiles and connections
+  * **uacreg** - manage uac remote registration records
+  * **ul** - manage user location records
   * **uptime** - print the uptime for kamailio instance
 
 Each **kamcli command** can offer many subcommands. The help for each command can be seen with:
