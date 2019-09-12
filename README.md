@@ -80,14 +80,13 @@ kamcli command subcommand --help
 
 OS Packages (install via apt, yum, ...):
 
-  * python (version 3.x)
-  * python-pip
-  * python-dev (optional - needed to install mysqlclient via pip)
+  * python3 (python version 3.x)
+  * python3-pip
+  * python3-dev (optional - needed to install mysqlclient via pip)
+  * python3-venv (optional - needed to install virtual environment)
 
-PIP Packages (install via pip):
+PIP Packages (install via pip3):
 
-  * _to install in a virtual environment (see next)_
-    * virtualenv
   * _extra packages requied by kamcli (part of OS or  virtual environment)_
     * click
     * sqlalchemy
@@ -95,7 +94,7 @@ PIP Packages (install via pip):
     * tabulate (optional - needed if you want to have table-formatted output for various commands)
     * pyaml (optional - needed if you want to print json result as yaml (more compact))
 
-#### Install VirtualEnv
+#### Install Virtual Environment
 
 It is recommended to install in a virtual environment at least for development.
 Some useful details about installing Click in virtual environament are
@@ -103,13 +102,13 @@ available at:
 
   * http://click.pocoo.org/4/quickstart/#virtualenv
 
-For example, create the virtual environemnt in the folder kamclienv
+For example, create the virtual environemnt in the folder venv:
 
 ```
-  $ pip install virtualenv
+  $ apt install python3-venv
   $ mkdir kamclienv
   $ cd kamclienv
-  $ virtualenv venv
+  $ python3 -m venv venv
 ```
 
 To activate the virtual environment:
@@ -125,10 +124,10 @@ environment to be installed in the system.
 ```
   $ git clone https://github.com/kamailio/kamcli.git
   $ cd kamcli
-  $ pip install --editable .
+  $ pip3 install --editable .
 ```
 
-The *pip install* command installs the dependencies appart of the
+The *pip3 install* command installs the dependencies appart of the
 database connector module needed on top of sqlalchemy. You need to
 install your wanted database module -- e.g., for MySQL use pip to
 install *mysql-python*.
@@ -150,19 +149,19 @@ To get kamcli completely installed on Debian with MySQL support,
 run following commands:
 
 ```
-apt-get install python python-pip python-dev
-pip install virtualenv
+apt-get install python3 python3-pip python3-venv python3-dev
 mkdir kamclienv
 cd kamclienv
-virtualenv venv
-pip install click
-pip install sqlalchemy
-pip install mysqlclient
-pip install tabulate
-pip install pyaml
+python3 -m venv venv
+. venv/bin/activate
+pip3 install click
+pip3 install sqlalchemy
+pip3 install mysqlclient
+pip3 install tabulate
+pip3 install pyaml
 git clone https://github.com/kamailio/kamcli.git
 cd kamcli
-pip install --editable .
+pip3 install --editable .
 ```
 
 To see if all was installed properly, run:
