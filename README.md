@@ -129,8 +129,8 @@ environment to be installed in the system.
 
 The *pip3 install* command installs the dependencies appart of the
 database connector module needed on top of sqlalchemy. You need to
-install your wanted database module -- e.g., for MySQL use pip to
-install *mysql-python*.
+install your wanted database module -- e.g., for MySQL use pip3 to
+install *mysqlclient*.
 
 To deactivate the virtual environment, run:
 
