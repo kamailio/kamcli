@@ -134,4 +134,38 @@ def db_showcreate(ctx, oformat, ostyle, table):
     res = e.execute('show create table {0}'.format(table))
     ioutils_dbres_print(ctx, oformat, ostyle, res)
 
+##
+#
+#
+def db_engine_exec_file(ctx, sqlengine, fname):
+    sql_file = open(fname, 'r')
+    sql_command = ''
+    for line in sql_file:
+        if not line.startswith('--') and line.strip('\n'):
+            sql_command += line.strip('\n')
+            if sql_command.endswith(';'):
+                try:
+                    sqlengine.execute(text(sql_command))
+                    sqlengine.commit()
+                except:
+                    ctx.log("failed to execute sql statements from file [%s]", fname)
+                finally:
+                    sql_command = ''
 
+
+##
+#
+#
+@cli.command('runfile', help='Run SQL statements in a file')
+@click.argument('fname', metavar='<fname>')
+@pass_context
+def db_runfile(ctx, fname):
+    """Run SQL statements in a file
+
+    \b
+    Parameters:
+        <fname> - name to the file with the SQL statements
+    """
+    ctx.vlog('Run statements in the file [%s]', fname)
+    e = create_engine(ctx.gconfig.get('db', 'rwurl'))
+    db_engine_exec_file(ctx, e, fname)
