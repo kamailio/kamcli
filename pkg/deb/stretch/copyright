@@ -4,11 +4,11 @@ Upstream-Contact: Daniel-Constantin Mierla <daniel@asipto.com>
 Source: https://github.com/kamailio/kamcli
 
 Files: *
-Copyright: 2015-2018 Daniel-Constantin Mierla <daniel@asipto.com>
+Copyright: 2015-2019 Daniel-Constantin Mierla <daniel@asipto.com>
 License: GPL-2
 
 Files: pkg/deb/*
-Copyright: 2018 Victor Seva <vseva@debian.org>
+Copyright: 2018-2019 Victor Seva <vseva@debian.org>
 License: GPL-2
 
 License: GPL-2

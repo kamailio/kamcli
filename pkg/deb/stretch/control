@@ -6,8 +6,8 @@ Standards-Version: 4.2.1.1
 Build-Depends:
  debhelper (>= 9~),
  dh-python,
- python-all,
- python-setuptools,
+ python3-all,
+ python3-setuptools,
 
 Package: kamcli
 Architecture: all
