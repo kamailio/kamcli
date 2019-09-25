@@ -2,4 +2,4 @@
 include /usr/share/dpkg/pkg-info.mk
 
 %:
-	dh "$@" --with python2
+	dh "$@" --with python3
