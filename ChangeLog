@@ -1,0 +1,14 @@
+Release: Kamcli v2.0.0 (Sep 30, 2019)
+
+New features:
+  * support for Python 3.x
+  * run sql statements from a file
+  * print command aliases
+  * cmd uacreg: management of uacreg records
+  * cmd srv: server info
+  * cmd rtpengine: management of rtpengine module
+  * cmd tcp: management of tcp connections
+
+Release: Kamcli v1.1.0 (Oct 16, 2018)
+
+For more detailed list of changes, see the git log.
