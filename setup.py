@@ -6,6 +6,7 @@ setup(
     packages=['kamcli', 'kamcli.commands'],
     include_package_data=True,
     install_requires=[
+        'setuptools',
         'click',
         'pyaml',
         'sqlalchemy',
