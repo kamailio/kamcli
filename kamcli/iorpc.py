@@ -1,12 +1,14 @@
 import os
 import os.path
 import sys
+import shutil
 import socket
 import stat
 import time
 import threading
 import json
 from random import randint
+from configparser import NoOptionError
 
 ##
 # enable yaml output format if the lib can be loaded
@@ -214,6 +216,10 @@ def command_jsonrpc_fifo(ctx, dryrun, sndpath, rcvname, oformat, cmd, params=[],
 
     os.mkfifo(rcvpath, 0o666)
     os.chmod(rcvpath, 0o666)
+    try:
+        shutil.chown(rcvpath, group=ctx.gconfig.get('jsonrpc', 'kamgroup'))
+    except NoOptionError:
+        pass
     # create new thread to read from reply fifo
     tiofifo = IOFifoThread(ctx, rcvpath, oformat)
     # start new threadd
@@ -327,6 +333,11 @@ def command_jsonrpc_socket(ctx, dryrun, srvaddr, rcvaddr, oformat, cmd, params=[
             ctx.vlog("unix socket reply: " + rcvaddr)
             sockclient.bind( rcvaddr )
             os.chmod(rcvaddr, 0o660)
+            try:
+                shutil.chown(
+                    rcvaddr, group=ctx.gconfig.get('jsonrpc', 'kamgroup'))
+            except NoOptionError:
+                pass
             #sockclient.connect( srvaddr )
             #sockclient.send( scmd )
             sockclient.sendto( scmd.encode(), srvaddr )
