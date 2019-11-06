@@ -57,7 +57,7 @@ def dialog_list(ctx):
 @click.argument('fromtag', metavar='<fromtag>')
 @click.argument('totag', metavar='<totag>')
 @pass_context
-def dialog_list(ctx, callid, fromtag, totag):
+def dialog_terminate(ctx, callid, fromtag, totag):
     """Send BYE to the dialog identified by callid, from-tag and to-tag
 
     \b
