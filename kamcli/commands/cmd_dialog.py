@@ -52,6 +52,26 @@ def dialog_list(ctx):
 ##
 #
 #
+@cli.command('match', short_help='Show the details for the matching dialogs')
+@click.argument('mkey', metavar='<mkey>')
+@click.argument('mop', metavar='<mkey>')
+@click.argument('mval', metavar='<mval>')
+@pass_context
+def dialog_match(ctx, mkey, mop, mval):
+    """Show the details for the matching dialogs
+
+    \b
+    Parameters:
+        <mkey> - matching key: ruri - use R-URI; furi - use From-URI; turi - use To-URI; callid - use Call-Id
+        <mop> - matching operator: eq - string comparison; re - regular expression; sw - starts-with
+        <mval> - matching value
+    """
+    command_ctl(ctx, 'dlg.list_match', [ mkey, mop, tval ])
+
+
+##
+#
+#
 @cli.command('terminate', short_help='Send BYE to the dialog identified by call-id, from-tag and to-tag')
 @click.argument('callid', metavar='<domain>')
 @click.argument('fromtag', metavar='<fromtag>')
