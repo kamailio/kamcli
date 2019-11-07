@@ -117,3 +117,43 @@ def dispatcher_reload(ctx):
     """
     command_ctl(ctx, 'dispatcher.reload', [ ])
 
+
+##
+#
+#
+@cli.command('memadd', short_help='Add a new dispatcher destination in memory')
+@click.option('flags', '--flags', type=int, default=0,
+            help='Flags value')
+@click.argument('setid', metavar='<setid>', type=int)
+@click.argument('destination', metavar='<destination>')
+@pass_context
+def dispatcher_memadd(ctx, flags, setid, destination):
+    """Add a new destination in a set of dispatcher memory
+
+    \b
+    Parameters:
+        <setid> - dispatching set id
+        <destination> - SIP URI for destination
+    """
+    ctx.vlog('Adding to setid [%d] destination [%s]', setid, destination)
+    command_ctl(ctx, 'dispatcher.add', [ setid, destination, flags ])
+
+
+##
+#
+#
+@cli.command('memrm', short_help='Remove a destination from dispatcher memory')
+@click.argument('setid', metavar='<setid>', type=int)
+@click.argument('destination', metavar='<destination>')
+@pass_context
+def dispatcher_memrm(ctx, setid, destination):
+    """Remove a destination from dispatcher memory
+
+    \b
+    Parameters:
+        <setid> - dispatching set id
+        <destination> - SIP URI for destination
+    """
+    command_ctl(ctx, 'dispatcher.remove', [ setid, destination ])
+
+
