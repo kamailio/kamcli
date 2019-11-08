@@ -82,3 +82,20 @@ def srv_info(ctx):
     \b
     """
     command_ctl(ctx, 'core.version')
+
+##
+#
+#
+@cli.command('ppdefines', short_help='Show pre-processor defines')
+@click.option('full', '--full', is_flag=True,
+            help='Show full format of the records.')
+@pass_context
+def srv_ppdefines(ctx, full):
+    """Show pre-processor defines
+
+    \b
+    """
+    if full:
+        command_ctl(ctx, 'core.ppdefines_full')
+    else:
+        command_ctl(ctx, 'core.ppdefines')
