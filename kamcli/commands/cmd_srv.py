@@ -3,17 +3,12 @@ from kamcli.cli import pass_context
 from kamcli.iorpc import command_ctl
 
 
-##
-#
-#
 @click.group('srv', help='Common server interaction commands')
 @pass_context
 def cli(ctx):
     pass
 
-##
-#
-#
+
 @cli.command('sockets', short_help='Show the list of listen sockets')
 @pass_context
 def srv_sockets(ctx):
@@ -23,9 +18,7 @@ def srv_sockets(ctx):
     """
     command_ctl(ctx, 'corex.list_sockets')
 
-##
-#
-#
+
 @cli.command('aliases', short_help='Show the list of server domain aliases')
 @pass_context
 def srv_aliases(ctx):
@@ -35,9 +28,7 @@ def srv_aliases(ctx):
     """
     command_ctl(ctx, 'corex.list_aliases')
 
-##
-#
-#
+
 @cli.command('rpclist', short_help='Show the list of server rpc commands')
 @pass_context
 def srv_rpclist(ctx):
@@ -47,9 +38,7 @@ def srv_rpclist(ctx):
     """
     command_ctl(ctx, 'system.listMethods')
 
-##
-#
-#
+
 @cli.command('info', short_help='Show server info')
 @pass_context
 def srv_info(ctx):
@@ -59,9 +48,7 @@ def srv_info(ctx):
     """
     command_ctl(ctx, 'core.info')
 
-##
-#
-#
+
 @cli.command('modules', short_help='Show server loaded modules')
 @pass_context
 def srv_modules(ctx):
@@ -71,9 +58,7 @@ def srv_modules(ctx):
     """
     command_ctl(ctx, 'core.modules')
 
-##
-#
-#
+
 @cli.command('version', short_help='Show server version')
 @pass_context
 def srv_version(ctx):
@@ -83,12 +68,10 @@ def srv_version(ctx):
     """
     command_ctl(ctx, 'core.version')
 
-##
-#
-#
+
 @cli.command('ppdefines', short_help='Show pre-processor defines')
 @click.option('full', '--full', is_flag=True,
-            help='Show full format of the records.')
+              help='Show full format of the records.')
 @pass_context
 def srv_ppdefines(ctx, full):
     """Show pre-processor defines

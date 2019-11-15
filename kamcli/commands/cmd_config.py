@@ -1,8 +1,8 @@
-import os
 import sys
 import click
 from kamcli.cli import pass_context
 from kamcli.cli import COMMAND_ALIASES
+
 
 @click.group('config', help='Manage the config file')
 @pass_context
@@ -19,7 +19,10 @@ def config_raw(ctx):
     ctx.log('\n---')
 
 
-@cli.command('show', short_help='Show expanded content of configuration file sections')
+@cli.command(
+    'show',
+    short_help='Show expanded content of configuration file sections'
+)
 @click.argument('sections', nargs=-1, metavar='<sections>')
 @pass_context
 def config_show(ctx, sections):

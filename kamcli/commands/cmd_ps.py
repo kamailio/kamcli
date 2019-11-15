@@ -1,13 +1,9 @@
-import sys
 import click
 import json
 from kamcli.cli import pass_context
 from kamcli.iorpc import command_ctl
 
 
-##
-#
-#
 @click.command('ps', short_help='Print the list of kamailio processes')
 @pass_context
 def cli(ctx):
@@ -18,9 +14,7 @@ def cli(ctx):
     command_ctl(ctx, 'core.psx', [], {"func": cmd_ps_result_print})
 
 
-##
 # callback to print the result of the rpc command
-#
 def cmd_ps_result_print(ctx, response, params=None):
     ctx.vlog("formatting the response for command ps")
     rdata = json.loads(response)

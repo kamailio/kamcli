@@ -1,14 +1,10 @@
-import os
-import time
 import click
 from kamcli.cli import pass_context
 from kamcli.iorpc import command_ctl
 
 
-##
-#
-#
-@click.command('rpcmethods', short_help='Print the list of available raw RPC methods')
+@click.command(
+    'rpcmethods', short_help='Print the list of available raw RPC methods')
 @pass_context
 def cli(ctx):
     """Print the list of available raw RPC methods

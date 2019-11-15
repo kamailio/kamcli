@@ -2,28 +2,21 @@ import click
 from sqlalchemy import create_engine
 from kamcli.ioutils import ioutils_dbres_print
 from kamcli.cli import pass_context
-from kamcli.cli import parse_user_spec
 from kamcli.iorpc import command_ctl
 
 
-##
-#
-#
 @click.group('dialog', help='Manage dialog module (active calls tracking)')
 @pass_context
 def cli(ctx):
     pass
 
 
-##
-#
-#
 @cli.command('showdb', short_help='Show dialog records in database')
 @click.option('oformat', '--output-format', '-F',
-                type=click.Choice(['raw', 'json', 'table', 'dict']),
-                default=None, help='Format the output')
+              type=click.Choice(['raw', 'json', 'table', 'dict']),
+              default=None, help='Format the output')
 @click.option('ostyle', '--output-style', '-S',
-                default=None, help='Style of the output (tabulate table format)')
+              default=None, help='Style of the output (tabulate table format)')
 @pass_context
 def dialog_showdb(ctx, oformat, ostyle):
     """Show details for records in dialog table
@@ -36,9 +29,6 @@ def dialog_showdb(ctx, oformat, ostyle):
     ioutils_dbres_print(ctx, oformat, ostyle, res)
 
 
-##
-#
-#
 @cli.command('list', short_help='Show details for dialog records in memory')
 @pass_context
 def dialog_list(ctx):
@@ -46,12 +36,9 @@ def dialog_list(ctx):
 
     \b
     """
-    command_ctl(ctx, 'dlg.list', [ ])
+    command_ctl(ctx, 'dlg.list', [])
 
 
-##
-#
-#
 @cli.command('match', short_help='Show the details for the matching dialogs')
 @click.argument('mkey', metavar='<mkey>')
 @click.argument('mop', metavar='<mkey>')
@@ -62,17 +49,25 @@ def dialog_match(ctx, mkey, mop, mval):
 
     \b
     Parameters:
-        <mkey> - matching key: ruri - use R-URI; furi - use From-URI; turi - use To-URI; callid - use Call-Id
-        <mop> - matching operator: eq - string comparison; re - regular expression; sw - starts-with
+        <mkey> - matching key:
+          ruri - use R-URI;
+          furi - use From-URI;
+          turi - use To-URI;
+          callid - use Call-Id
+        <mop> - matching operator:
+          eq - string comparison;
+          re - regular expression;
+          sw - starts-with
         <mval> - matching value
     """
-    command_ctl(ctx, 'dlg.list_match', [ mkey, mop, mval ])
+    command_ctl(ctx, 'dlg.list_match', [mkey, mop, mval])
 
 
-##
-#
-#
-@cli.command('terminate', short_help='Send BYE to the dialog identified by call-id, from-tag and to-tag')
+@cli.command(
+    'terminate',
+    short_help='Send BYE to the dialog identified by call-id,'
+               ' from-tag and to-tag'
+)
 @click.argument('callid', metavar='<domain>')
 @click.argument('fromtag', metavar='<fromtag>')
 @click.argument('totag', metavar='<totag>')
@@ -86,12 +81,9 @@ def dialog_terminate(ctx, callid, fromtag, totag):
         <fromtag> - From-Tag value
         <to-tag> - To-Tag value
     """
-    command_ctl(ctx, 'dlg.terminate_dlg', [ callid, fromtag, totag ])
+    command_ctl(ctx, 'dlg.terminate_dlg', [callid, fromtag, totag])
 
 
-##
-#
-#
 @cli.command('stats_active', short_help='Show statistics for active dialogs')
 @pass_context
 def dialog_stats_active(ctx):
@@ -99,12 +91,9 @@ def dialog_stats_active(ctx):
 
     \b
     """
-    command_ctl(ctx, 'dlg.stats_active', [ ])
+    command_ctl(ctx, 'dlg.stats_active', [])
 
 
-##
-#
-#
 @cli.command('profile_list', short_help='List the content of a profile')
 @click.argument('profile', metavar='<profile>')
 @pass_context
@@ -115,4 +104,4 @@ def dialog_profile_list(ctx, profile):
     Parameters:
         <profile> - the name of the profile
     """
-    command_ctl(ctx, 'dlg.profile_list', [ profile ])
+    command_ctl(ctx, 'dlg.profile_list', [profile])

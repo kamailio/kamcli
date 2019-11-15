@@ -1,14 +1,13 @@
-import os
-import sys
 import click
 from kamcli.cli import pass_context
 from kamcli.iorpc import command_ctl_name
 from kamcli.iorpc import command_jsonrpc_fifo
 from kamcli.iorpc import command_jsonrpc_socket
 
+
 @click.command('jsonrpc', short_help='Execute JSONRPC command')
 @click.option('dryrun', '--dry-run', is_flag=True,
-            help='Do not execute the command, only print it')
+              help='Do not execute the command, only print it')
 @click.argument('cmd', nargs=1, metavar='[<command>]')
 @click.argument('params', nargs=-1, metavar='[<params>]')
 @pass_context
@@ -22,7 +21,8 @@ def cli(ctx, dryrun, cmd, params):
             - <params>  - parameters for JSONRPC command
                         - by default the value of a parameter is considered
                           of type string
-                        - to enforce integer value prefix with 'i:' (e.g., i:10)
+                        - to enforce integer value prefix with 'i:'
+                          (e.g., i:10)
                         - string values can be also prefixed with 's:'
                         - if a parameter starts with 's:', prefix it with 's:'
         Examples:
@@ -33,11 +33,14 @@ def cli(ctx, dryrun, cmd, params):
     """
     ctx.log("Running JSONRPC command: [%s]", cmd)
     if ctx.gconfig.get('jsonrpc', 'transport') == 'socket':
-        command_jsonrpc_socket(ctx, dryrun, ctx.gconfig.get('jsonrpc', 'srvaddr'),
-                ctx.gconfig.get('jsonrpc', 'rcvaddr'), ctx.gconfig.get('jsonrpc', 'outformat'),
-                command_ctl_name(cmd, 'rpc'), params)
+        command_jsonrpc_socket(
+            ctx, dryrun, ctx.gconfig.get('jsonrpc', 'srvaddr'),
+            ctx.gconfig.get('jsonrpc', 'rcvaddr'), ctx.gconfig.get(
+                'jsonrpc', 'outformat'),
+            command_ctl_name(cmd, 'rpc'), params)
     else:
-        command_jsonrpc_fifo(ctx, dryrun, ctx.gconfig.get('jsonrpc', 'path'),
-                ctx.gconfig.get('jsonrpc', 'rplnamebase'), ctx.gconfig.get('jsonrpc', 'outformat'),
-                command_ctl_name(cmd, 'rpc'), params)
-
+        command_jsonrpc_fifo(
+            ctx, dryrun, ctx.gconfig.get('jsonrpc', 'path'),
+            ctx.gconfig.get('jsonrpc', 'rplnamebase'), ctx.gconfig.get(
+                'jsonrpc', 'outformat'),
+            command_ctl_name(cmd, 'rpc'), params)
