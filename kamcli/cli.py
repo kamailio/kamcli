@@ -7,6 +7,7 @@ try:
 except ImportError:
     import configparser
 
+
 def read_global_config(config_paths):
     """Get config."""
     parser = configparser.SafeConfigParser()
@@ -25,7 +26,7 @@ def read_global_config(config_paths):
 
 def parse_user_spec(ctx, ustr):
     """Get details of the user from ustr (username, aor or sip uri)"""
-    udata = { }
+    udata = {}
     if ":" in ustr:
         uaor = ustr.split(":")[1]
     else:
@@ -46,19 +47,18 @@ def parse_user_spec(ctx, ustr):
     if udata['domain'] is None:
         ctx.log("Failed to get domain")
         sys.exit()
-    udata['username'] = udata['username'].encode('ascii','ignore').decode()
-    udata['domain'] = udata['domain'].encode('ascii','ignore').decode()
+    udata['username'] = udata['username'].encode('ascii', 'ignore').decode()
+    udata['domain'] = udata['domain'].encode('ascii', 'ignore').decode()
     return udata
-
-
 
 
 CONTEXT_SETTINGS = dict(auto_envvar_prefix='KAMCLI')
 
 COMMAND_ALIASES = {
     "subs": "subscriber",
-    "rpc":  "jsonrpc",
+    "rpc": "jsonrpc",
 }
+
 
 class Context(object):
 
@@ -98,6 +98,7 @@ pass_context = click.make_pass_decorator(Context, ensure=True)
 cmd_folder = os.path.abspath(os.path.join(os.path.dirname(__file__),
                                           'commands'))
 
+
 class KamCLI(click.MultiCommand):
 
     def list_commands(self, ctx):
@@ -135,7 +136,7 @@ def global_read_config(ctx, param, value):
 
 
 @click.command(cls=KamCLI, context_settings=CONTEXT_SETTINGS,
-                short_help='Kamailio command line interface control tool')
+               short_help='Kamailio command line interface control tool')
 @click.option('--wdir', type=click.Path(exists=True, file_okay=False,
                                         resolve_path=True),
               help='Working directory.')
@@ -144,7 +145,7 @@ def global_read_config(ctx, param, value):
 @click.option('--config', '-c',
               default=None, help="Configuration file.")
 @click.option('nodefaultconfigs', '--no-default-configs', is_flag=True,
-            help='Skip loading default configuration files.')
+              help='Skip loading default configuration files.')
 @click.version_option()
 @pass_context
 def cli(ctx, debug, wdir, config, nodefaultconfigs):
@@ -174,4 +175,3 @@ def cli(ctx, debug, wdir, config, nodefaultconfigs):
             ctx.gconfig_paths.append(tpath)
     if config is not None:
         ctx.gconfig_paths.append(os.path.expanduser(config))
-

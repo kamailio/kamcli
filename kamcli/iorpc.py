@@ -17,7 +17,7 @@ try:
     import yaml
 except ImportError as e:
     iorpc_yaml_format = False
-    pass # yaml module doesn't exist, deal with it.
+    pass  # yaml module doesn't exist, deal with it.
 
 
 ##
@@ -78,7 +78,7 @@ COMMAND_NAMES = {
 def command_ctl_name(alias, ctype):
     """Return the rpc command name by alias lookup"""
     v = COMMAND_NAMES.get(alias, None)
-    if v == None:
+    if v is None:
         return alias
 
     return COMMAND_NAMES[alias]['rpc']
@@ -99,12 +99,16 @@ def command_ctl_response_print(response, oformat):
     """
     print()
     if oformat == "json":
-        print(json.dumps(json.loads(response), indent=4, separators=(',', ': ')))
+        print(json.dumps(
+            json.loads(response), indent=4, separators=(',', ': ')))
     elif oformat == "yaml":
         if iorpc_yaml_format is True:
-            print(yaml.safe_dump(json.loads(response), default_flow_style=False))
+            print(
+                yaml.safe_dump(json.loads(response),
+                               default_flow_style=False))
         else:
-            print(json.dumps(json.loads(response), indent=4, separators=(',', ': ')))
+            print(json.dumps(json.loads(response),
+                             indent=4, separators=(',', ': ')))
     else:
         print(response)
 
@@ -138,7 +142,7 @@ class IOFifoThread (threading.Thread):
 
     def run(self):
         self.ctx.vlog("Starting to wait for reply on: " + self.rplpath)
-        r = os.open( self.rplpath, os.O_RDONLY|os.O_NONBLOCK )
+        r = os.open(self.rplpath, os.O_RDONLY | os.O_NONBLOCK)
         scount = 0
         rcount = 0
         wcount = 0
@@ -146,7 +150,7 @@ class IOFifoThread (threading.Thread):
         while not self.stop_signal:
             rbuf = os.read(r, 4096)
             if rbuf == "":
-                if rcount != 0 :
+                if rcount != 0:
                     wcount += 1
                     if wcount == 8:
                         break
@@ -161,22 +165,23 @@ class IOFifoThread (threading.Thread):
                 wcount = 0
                 rdata += rbuf
 
-        if rcount==0 :
+        if rcount == 0:
             self.ctx.vlog("timeout - nothing read")
         else:
             command_ctl_response(self.ctx, rdata, self.oformat, self.cbexec)
 
 
 ##
-#{
-# "jsonrpc": "2.0",
-#  "method": "command",
-#  "params": [p1, p2, p3],
-#  "reply_name": "kamailio_jsonrpc_reply_fifo",
-#  "id": 1
-#}
+# {
+#   "jsonrpc": "2.0",
+#   "method": "command",
+#   "params": [p1, p2, p3],
+#   "reply_name": "kamailio_jsonrpc_reply_fifo",
+#   "id": 1
+# }
 #
-def command_jsonrpc_fifo(ctx, dryrun, sndpath, rcvname, oformat, cmd, params=[], cbexec={}):
+def command_jsonrpc_fifo(
+        ctx, dryrun, sndpath, rcvname, oformat, cmd, params=[], cbexec={}):
     scmd = '{\n  "jsonrpc": "2.0",\n  "method": "' + cmd + '",\n'
     if params:
         scmd += '  "params": ['
@@ -191,16 +196,16 @@ def command_jsonrpc_fifo(ctx, dryrun, sndpath, rcvname, oformat, cmd, params=[],
             elif type(p) is float:
                 scmd += str(p)
             else:
-                if p.startswith("i:") :
+                if p.startswith("i:"):
                     scmd += p[2:]
-                elif p.startswith("s:") :
+                elif p.startswith("s:"):
                     scmd += '"' + p[2:] + '"'
-                else :
+                else:
                     scmd += '"' + p + '"'
         scmd += '],\n'
 
     scmd += '  "reply_name": "' + rcvname + '",\n'
-    scmd += '  "id": ' + str(randint(2,10000)) + '\n'
+    scmd += '  "id": ' + str(randint(2, 10000)) + '\n'
     scmd += "}\n"
     if dryrun:
         print(json.dumps(json.loads(scmd), indent=4, separators=(',', ': ')))
@@ -244,13 +249,14 @@ def command_jsonrpc_fifo(ctx, dryrun, sndpath, rcvname, oformat, cmd, params=[],
 
 ##
 #
-#{
-# "jsonrpc": "2.0",
-#  "method": "command",
-#  "params": [p1, p2, p3],
-#  "id": 1
-#}
-def command_jsonrpc_socket(ctx, dryrun, srvaddr, rcvaddr, oformat, cmd, params=[], cbexec={}):
+# {
+#   "jsonrpc": "2.0",
+#   "method": "command",
+#   "params": [p1, p2, p3],
+#   "id": 1
+# }
+def command_jsonrpc_socket(
+        ctx, dryrun, srvaddr, rcvaddr, oformat, cmd, params=[], cbexec={}):
     scmd = '{\n  "jsonrpc": "2.0",\n  "method": "' + cmd + '",\n'
     if params:
         scmd += '  "params": ['
@@ -265,15 +271,15 @@ def command_jsonrpc_socket(ctx, dryrun, srvaddr, rcvaddr, oformat, cmd, params=[
             elif type(p) is float:
                 scmd += str(p)
             else:
-                if p.startswith("i:") :
+                if p.startswith("i:"):
                     scmd += p[2:]
-                elif p.startswith("s:") :
+                elif p.startswith("s:"):
                     scmd += '"' + p[2:] + '"'
-                else :
+                else:
                     scmd += '"' + p + '"'
         scmd += '],\n'
 
-    scmd += '  "id": ' + str(randint(2,10000)) + '\n'
+    scmd += '  "id": ' + str(randint(2, 10000)) + '\n'
     scmd += "}\n"
     if dryrun:
         print(json.dumps(json.loads(scmd), indent=4, separators=(',', ': ')))
@@ -309,7 +315,7 @@ def command_jsonrpc_socket(ctx, dryrun, srvaddr, rcvaddr, oformat, cmd, params=[
             # receive the response (content, sockserver)
             data = sockclient.recvfrom(84000)
             response = data[0]
-            sockserver = data[1]
+            # sockserver = data[1]
 
             ctx.vlog('Server response: ' + response)
 
@@ -321,46 +327,47 @@ def command_jsonrpc_socket(ctx, dryrun, srvaddr, rcvaddr, oformat, cmd, params=[
             sys.exit()
     else:
         ctx.vlog("unix socket provided: " + srvaddr)
-        if not os.path.exists( srvaddr ):
+        if not os.path.exists(srvaddr):
             ctx.vlog("server unix socket file not found")
-            ctx.vlog("be sure kamailio is running and listening on: " + srvaddr)
+            ctx.vlog(
+                "be sure kamailio is running and listening on: " + srvaddr)
             return
         # create datagram udp socket
         try:
-            sockclient = socket.socket( socket.AF_UNIX, socket.SOCK_DGRAM )
-            sockclient.settimeout( 4.0 )
+            sockclient = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
+            sockclient.settimeout(4.0)
             rcvaddr = rcvaddr + "." + str(os.getpid())
             ctx.vlog("unix socket reply: " + rcvaddr)
-            sockclient.bind( rcvaddr )
+            sockclient.bind(rcvaddr)
             os.chmod(rcvaddr, 0o660)
             try:
                 shutil.chown(
                     rcvaddr, group=ctx.gconfig.get('jsonrpc', 'kamgroup'))
             except NoOptionError:
                 pass
-            #sockclient.connect( srvaddr )
-            #sockclient.send( scmd )
-            sockclient.sendto( scmd.encode(), srvaddr )
+            # sockclient.connect( srvaddr )
+            # sockclient.send( scmd )
+            sockclient.sendto(scmd.encode(), srvaddr)
 
             # receive the response (content, sockserver)
             response = sockclient.recv(84000)
             sockclient.close()
-            os.remove( rcvaddr )
+            os.remove(rcvaddr)
 
             ctx.vlog('Server response: ' + response.decode())
 
         except socket.timeout as emsg:
             ctx.log('Timeout receiving response on unix sock')
             sockclient.close()
-            os.remove( rcvaddr )
+            os.remove(rcvaddr)
             sys.exit()
         except socket.error as emsg:
             ctx.log('Error unix sock: ' + str(emsg[0]) + ' - ' + emsg[1])
             sockclient.close()
-            os.remove( rcvaddr )
+            os.remove(rcvaddr)
             sys.exit()
 
-    if response is None :
+    if response is None:
         ctx.vlog("timeout - nothing read")
     else:
         command_ctl_response(ctx, response, oformat, cbexec)
@@ -385,11 +392,14 @@ def command_ctl(ctx, cmd, params=[], cbexec={}):
     """
 
     if ctx.gconfig.get('jsonrpc', 'transport') == 'socket':
-        command_jsonrpc_socket(ctx, False, ctx.gconfig.get('jsonrpc', 'srvaddr'),
-                ctx.gconfig.get('jsonrpc', 'rcvaddr'), ctx.gconfig.get('jsonrpc', 'outformat'),
-                command_ctl_name(cmd, 'rpc'), params, cbexec)
+        command_jsonrpc_socket(
+            ctx, False, ctx.gconfig.get('jsonrpc', 'srvaddr'),
+            ctx.gconfig.get('jsonrpc', 'rcvaddr'), ctx.gconfig.get(
+                'jsonrpc', 'outformat'),
+            command_ctl_name(cmd, 'rpc'), params, cbexec)
     else:
-        command_jsonrpc_fifo(ctx, False, ctx.gconfig.get('jsonrpc', 'path'),
-                ctx.gconfig.get('jsonrpc', 'rplnamebase'), ctx.gconfig.get('jsonrpc', 'outformat'),
-                command_ctl_name(cmd, 'rpc'), params, cbexec)
-
+        command_jsonrpc_fifo(
+            ctx, False, ctx.gconfig.get('jsonrpc', 'path'),
+            ctx.gconfig.get('jsonrpc', 'rplnamebase'), ctx.gconfig.get(
+                'jsonrpc', 'outformat'),
+            command_ctl_name(cmd, 'rpc'), params, cbexec)
