@@ -83,7 +83,7 @@ def mtree_rm(ctx, coltprefix, dbtname, tprefix):
 @click.argument('dbtname', metavar='<dbtname>')
 @click.argument('tprefix', nargs=-1, metavar='[<tprefix>]')
 @pass_context
-def mtree_showdb(ctx, oformat, ostyle, coltprefix, dbtable, tprefix):
+def mtree_showdb(ctx, oformat, ostyle, coltprefix, dbtname, tprefix):
     """Show details for records in mtree database table
 
     \b
