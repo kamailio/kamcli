@@ -66,7 +66,7 @@ def dialog_match(ctx, mkey, mop, mval):
         <mop> - matching operator: eq - string comparison; re - regular expression; sw - starts-with
         <mval> - matching value
     """
-    command_ctl(ctx, 'dlg.list_match', [ mkey, mop, tval ])
+    command_ctl(ctx, 'dlg.list_match', [ mkey, mop, mval ])
 
 
 ##
