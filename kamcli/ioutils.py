@@ -6,7 +6,7 @@ import json
 ioutils_tabulate_format = True
 try:
     from tabulate import tabulate
-except ImportError as e:
+except ImportError:
     ioutils_tabulate_format = False
     pass  # module doesn't exist, deal with it.
 
