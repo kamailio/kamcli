@@ -2,6 +2,7 @@ import os
 import sys
 import click
 from sqlalchemy import create_engine
+from sqlalchemy.sql import text
 from sqlalchemy.exc import SQLAlchemyError
 from kamcli.cli import pass_context
 from kamcli.ioutils import ioutils_dbres_print
@@ -37,9 +38,6 @@ def db_connect(ctx):
     os.system(scmd)
 
 
-##
-#
-#
 @cli.command("clirun", help="Run SQL statement via cli")
 @click.argument("query", metavar="<query>")
 @pass_context
@@ -90,7 +88,7 @@ def db_clishow(ctx, table):
 def db_clishowg(ctx, table):
     dbtype = ctx.gconfig.get("db", "type")
     if dbtype == "mysql":
-        scmd = (CMD_BASE + '-e "select * from {3} \G" {4}').format(
+        scmd = (CMD_BASE + r'-e "select * from {3} \G" {4}').format(
             ctx.gconfig.get("db", "host"),
             ctx.gconfig.get("db", "rwuser"),
             ctx.gconfig.get("db", "rwpassword"),
