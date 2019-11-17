@@ -9,7 +9,7 @@ Kamailio Command Line Interface Control Tool
 
   * apt install build-essentials python3-dev python3-virtualenvwrapper
   * mkvirtualenv kamcli --python=python3
-  * pip install -r requirements_dev.txt
+  * pip install -r requirements/requirements_dev.txt
   * pre-commit install
 
 #### Used Frameworks

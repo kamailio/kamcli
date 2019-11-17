@@ -85,14 +85,14 @@ OS Packages (install via apt, yum, ...):
   * python3-dev (optional - needed to install mysqlclient via pip)
   * python3-venv (optional - needed to install virtual environment)
 
-PIP Packages (install via pip3):
+PIP Packages:
+
+   * pip install -r requirements/requirements.txt
+
+Extra PIP Packages (install via pip3):
 
   * _extra packages requied by kamcli (part of OS or  virtual environment)_
-    * click
-    * sqlalchemy
     * mysql-python (optional - needed if you want to connect to MySQL database)
-    * tabulate (optional - needed if you want to have table-formatted output for various commands)
-    * pyaml (optional - needed if you want to print json result as yaml (more compact))
 
 #### Install Virtual Environment
 
