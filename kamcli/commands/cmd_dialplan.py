@@ -127,7 +127,7 @@ def dialplan_rm(ctx, dpid, matchexp):
 )
 @click.argument("dpid", nargs=-1, metavar="[<dpid>]", type=int)
 @pass_context
-def dispatcher_showdb(ctx, oformat, ostyle, dpid):
+def dialplan_showdb(ctx, oformat, ostyle, dpid):
     """Show details for records in dialplan
 
     \b
@@ -149,7 +149,7 @@ def dispatcher_showdb(ctx, oformat, ostyle, dpid):
 @cli.command("list", short_help="Show details for dialplan records in memory")
 @click.argument("dpid", metavar="[<dpid>]", type=int)
 @pass_context
-def dispatcher_list(ctx, dpid):
+def dialplan_list(ctx, dpid):
     """Show details for dialplan records in memory
 
     \b
@@ -177,7 +177,7 @@ def dialplan_reload(ctx):
 @click.argument("dpid", metavar="<dpid>", type=int)
 @click.argument("ivalue", metavar="<ivalue>")
 @pass_context
-def dispatcher_list(ctx, dpid, ivalue):
+def dialplan_translate(ctx, dpid, ivalue):
     """Translate using the rules from dialplan applied to input value
 
     \b
