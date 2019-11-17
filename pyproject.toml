@@ -1,0 +1,10 @@
+[tool.black]
+target-version = ['py37']
+line-length = 79
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.tox
+)/
+'''
