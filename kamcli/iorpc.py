@@ -15,7 +15,7 @@ from configparser import NoOptionError
 iorpc_yaml_format = True
 try:
     import yaml
-except ImportError as e:
+except ImportError:
     iorpc_yaml_format = False
     pass  # yaml module doesn't exist, deal with it.
 
@@ -47,8 +47,6 @@ COMMAND_NAMES = {
 }
 
 
-##
-#
 def command_ctl_name(alias, ctype):
     """Return the rpc command name by alias lookup"""
     v = COMMAND_NAMES.get(alias, None)
@@ -58,8 +56,6 @@ def command_ctl_name(alias, ctype):
     return COMMAND_NAMES[alias]["rpc"]
 
 
-##
-#
 def command_ctl_response_print(response, oformat):
     """Print the rpc control command response
 
@@ -91,8 +87,6 @@ def command_ctl_response_print(response, oformat):
         print(response)
 
 
-##
-#
 def command_ctl_response(ctx, response, oformat, cbexec={}):
     """Process a rpc control command response"""
     if not cbexec:
@@ -107,9 +101,9 @@ def command_ctl_response(ctx, response, oformat, cbexec={}):
             ctx.log("invalid callback structure - function is missing")
 
 
-##
-# Thread to listen on a reply fifo file
 class IOFifoThread(threading.Thread):
+    """ Thread to listen on a reply fifo file """
+
     def __init__(self, ctx, rplpath, oformat, cbexec={}):
         threading.Thread.__init__(self)
         self.ctx = ctx
@@ -246,9 +240,7 @@ def command_jsonrpc_socket(
                 scmd += ",\n"
             else:
                 comma = 1
-            if type(p) is int:
-                scmd += str(p)
-            elif type(p) is float:
+            if type(p) in [int, float]:
                 scmd += str(p)
             else:
                 if p.startswith("i:"):
@@ -299,7 +291,7 @@ def command_jsonrpc_socket(
 
             ctx.vlog("Server response: " + response)
 
-        except socket.timeout as emsg:
+        except socket.timeout:
             ctx.log("Timeout receiving response on udp socket")
             sys.exit()
         except socket.error as emsg:
@@ -338,7 +330,7 @@ def command_jsonrpc_socket(
 
             ctx.vlog("Server response: " + response.decode())
 
-        except socket.timeout as emsg:
+        except socket.timeout:
             ctx.log("Timeout receiving response on unix sock")
             sockclient.close()
             os.remove(rcvaddr)
@@ -355,8 +347,6 @@ def command_jsonrpc_socket(
         command_ctl_response(ctx, response, oformat, cbexec)
 
 
-##
-#
 def command_ctl(ctx, cmd, params=[], cbexec={}):
     """Execute a rpc control command
 
