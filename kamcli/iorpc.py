@@ -31,45 +31,19 @@ except ImportError as e:
 # - command_ctl(...) will use rpc variant
 #   based on config options
 COMMAND_NAMES = {
-    "dispatcher.list": {
-        "rpc": "dispatcher.list",
-    },
-    "dispatcher.reload": {
-        "rpc": "dispatcher.reload",
-    },
-    "permissions.addressDump": {
-        "rpc": "permissions.addressDump",
-    },
-    "permissions.addressReload": {
-        "rpc": "permissions.addressReload",
-    },
-    "permissions.domainDump": {
-        "rpc": "permissions.domainDump",
-    },
-    "permissions.subnetDump": {
-        "rpc": "permissions.subnetDump",
-    },
-    "stats.clear_statistics": {
-        "rpc": "stats.clear_statistics",
-    },
-    "stats.get_statistics": {
-        "rpc": "stats.get_statistics",
-    },
-    "stats.reset_statistics": {
-        "rpc": "stats.reset_statistics",
-    },
-    "ul.add": {
-        "rpc": "ul.add",
-    },
-    "ul.dump": {
-        "rpc": "ul.dump",
-    },
-    "ul.rm": {
-        "rpc": "ul.rm",
-    },
-    "ul.lookup": {
-        "rpc": "ul.lookup",
-    }
+    "dispatcher.list": {"rpc": "dispatcher.list",},
+    "dispatcher.reload": {"rpc": "dispatcher.reload",},
+    "permissions.addressDump": {"rpc": "permissions.addressDump",},
+    "permissions.addressReload": {"rpc": "permissions.addressReload",},
+    "permissions.domainDump": {"rpc": "permissions.domainDump",},
+    "permissions.subnetDump": {"rpc": "permissions.subnetDump",},
+    "stats.clear_statistics": {"rpc": "stats.clear_statistics",},
+    "stats.get_statistics": {"rpc": "stats.get_statistics",},
+    "stats.reset_statistics": {"rpc": "stats.reset_statistics",},
+    "ul.add": {"rpc": "ul.add",},
+    "ul.dump": {"rpc": "ul.dump",},
+    "ul.rm": {"rpc": "ul.rm",},
+    "ul.lookup": {"rpc": "ul.lookup",},
 }
 
 
@@ -81,7 +55,7 @@ def command_ctl_name(alias, ctype):
     if v is None:
         return alias
 
-    return COMMAND_NAMES[alias]['rpc']
+    return COMMAND_NAMES[alias]["rpc"]
 
 
 ##
@@ -99,16 +73,20 @@ def command_ctl_response_print(response, oformat):
     """
     print()
     if oformat == "json":
-        print(json.dumps(
-            json.loads(response), indent=4, separators=(',', ': ')))
+        print(
+            json.dumps(json.loads(response), indent=4, separators=(",", ": "))
+        )
     elif oformat == "yaml":
         if iorpc_yaml_format is True:
             print(
-                yaml.safe_dump(json.loads(response),
-                               default_flow_style=False))
+                yaml.safe_dump(json.loads(response), default_flow_style=False)
+            )
         else:
-            print(json.dumps(json.loads(response),
-                             indent=4, separators=(',', ': ')))
+            print(
+                json.dumps(
+                    json.loads(response), indent=4, separators=(",", ": ")
+                )
+            )
     else:
         print(response)
 
@@ -131,7 +109,7 @@ def command_ctl_response(ctx, response, oformat, cbexec={}):
 
 ##
 # Thread to listen on a reply fifo file
-class IOFifoThread (threading.Thread):
+class IOFifoThread(threading.Thread):
     def __init__(self, ctx, rplpath, oformat, cbexec={}):
         threading.Thread.__init__(self)
         self.ctx = ctx
@@ -181,14 +159,15 @@ class IOFifoThread (threading.Thread):
 # }
 #
 def command_jsonrpc_fifo(
-        ctx, dryrun, sndpath, rcvname, oformat, cmd, params=[], cbexec={}):
+    ctx, dryrun, sndpath, rcvname, oformat, cmd, params=[], cbexec={}
+):
     scmd = '{\n  "jsonrpc": "2.0",\n  "method": "' + cmd + '",\n'
     if params:
         scmd += '  "params": ['
         comma = 0
         for p in params:
             if comma == 1:
-                scmd += ',\n'
+                scmd += ",\n"
             else:
                 comma = 1
             if type(p) is int:
@@ -202,16 +181,16 @@ def command_jsonrpc_fifo(
                     scmd += '"' + p[2:] + '"'
                 else:
                     scmd += '"' + p + '"'
-        scmd += '],\n'
+        scmd += "],\n"
 
     scmd += '  "reply_name": "' + rcvname + '",\n'
-    scmd += '  "id": ' + str(randint(2, 10000)) + '\n'
+    scmd += '  "id": ' + str(randint(2, 10000)) + "\n"
     scmd += "}\n"
     if dryrun:
-        print(json.dumps(json.loads(scmd), indent=4, separators=(',', ': ')))
+        print(json.dumps(json.loads(scmd), indent=4, separators=(",", ": ")))
         return
 
-    rcvpath = ctx.gconfig.get('jsonrpc', 'rpldir') + "/" + rcvname
+    rcvpath = ctx.gconfig.get("jsonrpc", "rpldir") + "/" + rcvname
     if os.path.exists(rcvpath):
         if stat.S_ISFIFO(os.stat(rcvpath).st_mode):
             os.unlink(rcvpath)
@@ -222,7 +201,7 @@ def command_jsonrpc_fifo(
     os.mkfifo(rcvpath, 0o666)
     os.chmod(rcvpath, 0o666)
     try:
-        shutil.chown(rcvpath, group=ctx.gconfig.get('jsonrpc', 'kamgroup'))
+        shutil.chown(rcvpath, group=ctx.gconfig.get("jsonrpc", "kamgroup"))
     except NoOptionError:
         pass
     # create new thread to read from reply fifo
@@ -256,14 +235,15 @@ def command_jsonrpc_fifo(
 #   "id": 1
 # }
 def command_jsonrpc_socket(
-        ctx, dryrun, srvaddr, rcvaddr, oformat, cmd, params=[], cbexec={}):
+    ctx, dryrun, srvaddr, rcvaddr, oformat, cmd, params=[], cbexec={}
+):
     scmd = '{\n  "jsonrpc": "2.0",\n  "method": "' + cmd + '",\n'
     if params:
         scmd += '  "params": ['
         comma = 0
         for p in params:
             if comma == 1:
-                scmd += ',\n'
+                scmd += ",\n"
             else:
                 comma = 1
             if type(p) is int:
@@ -277,12 +257,12 @@ def command_jsonrpc_socket(
                     scmd += '"' + p[2:] + '"'
                 else:
                     scmd += '"' + p + '"'
-        scmd += '],\n'
+        scmd += "],\n"
 
-    scmd += '  "id": ' + str(randint(2, 10000)) + '\n'
+    scmd += '  "id": ' + str(randint(2, 10000)) + "\n"
     scmd += "}\n"
     if dryrun:
-        print(json.dumps(json.loads(scmd), indent=4, separators=(',', ': ')))
+        print(json.dumps(json.loads(scmd), indent=4, separators=(",", ": ")))
         return
 
     sockclient = None
@@ -295,11 +275,11 @@ def command_jsonrpc_socket(
         sproto, saddr = srvaddr.split(":", 1)
         if saddr.find("[", 0, 2) == -1:
             ctx.vlog("IPv4 socket address")
-            host, port = saddr.split(':')
+            host, port = saddr.split(":")
         else:
             ctx.vlog("IPv6 socket address")
-            ehost, port = saddr.rsplit(':', 1)
-            host = ehost.strip('[]')
+            ehost, port = saddr.rsplit(":", 1)
+            host = ehost.strip("[]")
             socktype = "IPv6"
 
         # create datagram udp socket
@@ -317,20 +297,21 @@ def command_jsonrpc_socket(
             response = data[0]
             # sockserver = data[1]
 
-            ctx.vlog('Server response: ' + response)
+            ctx.vlog("Server response: " + response)
 
         except socket.timeout as emsg:
-            ctx.log('Timeout receiving response on udp socket')
+            ctx.log("Timeout receiving response on udp socket")
             sys.exit()
         except socket.error as emsg:
-            ctx.log('Error udp sock: ' + str(emsg[0]) + ' - ' + emsg[1])
+            ctx.log("Error udp sock: " + str(emsg[0]) + " - " + emsg[1])
             sys.exit()
     else:
         ctx.vlog("unix socket provided: " + srvaddr)
         if not os.path.exists(srvaddr):
             ctx.vlog("server unix socket file not found")
             ctx.vlog(
-                "be sure kamailio is running and listening on: " + srvaddr)
+                "be sure kamailio is running and listening on: " + srvaddr
+            )
             return
         # create datagram udp socket
         try:
@@ -342,7 +323,8 @@ def command_jsonrpc_socket(
             os.chmod(rcvaddr, 0o660)
             try:
                 shutil.chown(
-                    rcvaddr, group=ctx.gconfig.get('jsonrpc', 'kamgroup'))
+                    rcvaddr, group=ctx.gconfig.get("jsonrpc", "kamgroup")
+                )
             except NoOptionError:
                 pass
             # sockclient.connect( srvaddr )
@@ -354,15 +336,15 @@ def command_jsonrpc_socket(
             sockclient.close()
             os.remove(rcvaddr)
 
-            ctx.vlog('Server response: ' + response.decode())
+            ctx.vlog("Server response: " + response.decode())
 
         except socket.timeout as emsg:
-            ctx.log('Timeout receiving response on unix sock')
+            ctx.log("Timeout receiving response on unix sock")
             sockclient.close()
             os.remove(rcvaddr)
             sys.exit()
         except socket.error as emsg:
-            ctx.log('Error unix sock: ' + str(emsg[0]) + ' - ' + emsg[1])
+            ctx.log("Error unix sock: " + str(emsg[0]) + " - " + emsg[1])
             sockclient.close()
             os.remove(rcvaddr)
             sys.exit()
@@ -391,15 +373,25 @@ def command_ctl(ctx, cmd, params=[], cbexec={}):
                 the dictionary and its parameters by 'params' key.
     """
 
-    if ctx.gconfig.get('jsonrpc', 'transport') == 'socket':
+    if ctx.gconfig.get("jsonrpc", "transport") == "socket":
         command_jsonrpc_socket(
-            ctx, False, ctx.gconfig.get('jsonrpc', 'srvaddr'),
-            ctx.gconfig.get('jsonrpc', 'rcvaddr'), ctx.gconfig.get(
-                'jsonrpc', 'outformat'),
-            command_ctl_name(cmd, 'rpc'), params, cbexec)
+            ctx,
+            False,
+            ctx.gconfig.get("jsonrpc", "srvaddr"),
+            ctx.gconfig.get("jsonrpc", "rcvaddr"),
+            ctx.gconfig.get("jsonrpc", "outformat"),
+            command_ctl_name(cmd, "rpc"),
+            params,
+            cbexec,
+        )
     else:
         command_jsonrpc_fifo(
-            ctx, False, ctx.gconfig.get('jsonrpc', 'path'),
-            ctx.gconfig.get('jsonrpc', 'rplnamebase'), ctx.gconfig.get(
-                'jsonrpc', 'outformat'),
-            command_ctl_name(cmd, 'rpc'), params, cbexec)
+            ctx,
+            False,
+            ctx.gconfig.get("jsonrpc", "path"),
+            ctx.gconfig.get("jsonrpc", "rplnamebase"),
+            ctx.gconfig.get("jsonrpc", "outformat"),
+            command_ctl_name(cmd, "rpc"),
+            params,
+            cbexec,
+        )

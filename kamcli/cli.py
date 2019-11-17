@@ -32,27 +32,27 @@ def parse_user_spec(ctx, ustr):
     else:
         uaor = ustr
     if "@" in uaor:
-        udata['username'] = uaor.split("@")[0]
-        udata['domain'] = uaor.split("@")[1]
+        udata["username"] = uaor.split("@")[0]
+        udata["domain"] = uaor.split("@")[1]
     else:
-        udata['username'] = uaor.split("@")[0]
+        udata["username"] = uaor.split("@")[0]
         try:
-            udata['domain'] = ctx.gconfig.get('main', 'domain')
+            udata["domain"] = ctx.gconfig.get("main", "domain")
         except configparser.NoOptionError:
             ctx.log("Default domain not set in config file")
             sys.exit()
-    if udata['username'] is None:
+    if udata["username"] is None:
         ctx.log("Failed to get username")
         sys.exit()
-    if udata['domain'] is None:
+    if udata["domain"] is None:
         ctx.log("Failed to get domain")
         sys.exit()
-    udata['username'] = udata['username'].encode('ascii', 'ignore').decode()
-    udata['domain'] = udata['domain'].encode('ascii', 'ignore').decode()
+    udata["username"] = udata["username"].encode("ascii", "ignore").decode()
+    udata["domain"] = udata["domain"].encode("ascii", "ignore").decode()
     return udata
 
 
-CONTEXT_SETTINGS = dict(auto_envvar_prefix='KAMCLI')
+CONTEXT_SETTINGS = dict(auto_envvar_prefix="KAMCLI")
 
 COMMAND_ALIASES = {
     "subs": "subscriber",
@@ -61,7 +61,6 @@ COMMAND_ALIASES = {
 
 
 class Context(object):
-
     def __init__(self):
         self.debug = False
         self.wdir = os.getcwd()
@@ -95,17 +94,16 @@ class Context(object):
 
 
 pass_context = click.make_pass_decorator(Context, ensure=True)
-cmd_folder = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                          'commands'))
+cmd_folder = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "commands")
+)
 
 
 class KamCLI(click.MultiCommand):
-
     def list_commands(self, ctx):
         rv = []
         for filename in os.listdir(cmd_folder):
-            if filename.endswith('.py') and \
-               filename.startswith('cmd_'):
+            if filename.endswith(".py") and filename.startswith("cmd_"):
                 rv.append(filename[4:-3])
         rv.sort()
         return rv
@@ -115,9 +113,10 @@ class KamCLI(click.MultiCommand):
             name = COMMAND_ALIASES[name]
         try:
             if sys.version_info[0] == 2:
-                name = name.encode('ascii', 'replace')
-            mod = __import__('kamcli.commands.cmd_' + name,
-                             None, None, ['cli'])
+                name = name.encode("ascii", "replace")
+            mod = __import__(
+                "kamcli.commands.cmd_" + name, None, None, ["cli"]
+            )
         except ImportError:
             return
         return mod.cli
@@ -130,22 +129,29 @@ def global_read_config(ctx, param, value):
     available.
     """
     if value is None:
-        value = os.path.join(os.path.dirname(__file__), 'kamcli.ini')
+        value = os.path.join(os.path.dirname(__file__), "kamcli.ini")
     ctx.read_config(value)
     return value
 
 
-@click.command(cls=KamCLI, context_settings=CONTEXT_SETTINGS,
-               short_help='Kamailio command line interface control tool')
-@click.option('--wdir', type=click.Path(exists=True, file_okay=False,
-                                        resolve_path=True),
-              help='Working directory.')
-@click.option('--debug', '-d', is_flag=True,
-              help='Enable debug mode.')
-@click.option('--config', '-c',
-              default=None, help="Configuration file.")
-@click.option('nodefaultconfigs', '--no-default-configs', is_flag=True,
-              help='Skip loading default configuration files.')
+@click.command(
+    cls=KamCLI,
+    context_settings=CONTEXT_SETTINGS,
+    short_help="Kamailio command line interface control tool",
+)
+@click.option(
+    "--wdir",
+    type=click.Path(exists=True, file_okay=False, resolve_path=True),
+    help="Working directory.",
+)
+@click.option("--debug", "-d", is_flag=True, help="Enable debug mode.")
+@click.option("--config", "-c", default=None, help="Configuration file.")
+@click.option(
+    "nodefaultconfigs",
+    "--no-default-configs",
+    is_flag=True,
+    help="Skip loading default configuration files.",
+)
 @click.version_option()
 @pass_context
 def cli(ctx, debug, wdir, config, nodefaultconfigs):

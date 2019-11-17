@@ -5,11 +5,15 @@ from kamcli.iorpc import command_jsonrpc_fifo
 from kamcli.iorpc import command_jsonrpc_socket
 
 
-@click.command('jsonrpc', short_help='Execute JSONRPC command')
-@click.option('dryrun', '--dry-run', is_flag=True,
-              help='Do not execute the command, only print it')
-@click.argument('cmd', nargs=1, metavar='[<command>]')
-@click.argument('params', nargs=-1, metavar='[<params>]')
+@click.command("jsonrpc", short_help="Execute JSONRPC command")
+@click.option(
+    "dryrun",
+    "--dry-run",
+    is_flag=True,
+    help="Do not execute the command, only print it",
+)
+@click.argument("cmd", nargs=1, metavar="[<command>]")
+@click.argument("params", nargs=-1, metavar="[<params>]")
 @pass_context
 def cli(ctx, dryrun, cmd, params):
     """Execute JSONRPC command
@@ -32,15 +36,23 @@ def cli(ctx, dryrun, cmd, params):
             - jsonrpc pv.shvSet counter i:123
     """
     ctx.log("Running JSONRPC command: [%s]", cmd)
-    if ctx.gconfig.get('jsonrpc', 'transport') == 'socket':
+    if ctx.gconfig.get("jsonrpc", "transport") == "socket":
         command_jsonrpc_socket(
-            ctx, dryrun, ctx.gconfig.get('jsonrpc', 'srvaddr'),
-            ctx.gconfig.get('jsonrpc', 'rcvaddr'), ctx.gconfig.get(
-                'jsonrpc', 'outformat'),
-            command_ctl_name(cmd, 'rpc'), params)
+            ctx,
+            dryrun,
+            ctx.gconfig.get("jsonrpc", "srvaddr"),
+            ctx.gconfig.get("jsonrpc", "rcvaddr"),
+            ctx.gconfig.get("jsonrpc", "outformat"),
+            command_ctl_name(cmd, "rpc"),
+            params,
+        )
     else:
         command_jsonrpc_fifo(
-            ctx, dryrun, ctx.gconfig.get('jsonrpc', 'path'),
-            ctx.gconfig.get('jsonrpc', 'rplnamebase'), ctx.gconfig.get(
-                'jsonrpc', 'outformat'),
-            command_ctl_name(cmd, 'rpc'), params)
+            ctx,
+            dryrun,
+            ctx.gconfig.get("jsonrpc", "path"),
+            ctx.gconfig.get("jsonrpc", "rplnamebase"),
+            ctx.gconfig.get("jsonrpc", "outformat"),
+            command_ctl_name(cmd, "rpc"),
+            params,
+        )

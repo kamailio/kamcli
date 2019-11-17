@@ -4,7 +4,8 @@ from kamcli.iorpc import command_ctl
 
 
 @click.command(
-    'rpcmethods', short_help='Print the list of available raw RPC methods')
+    "rpcmethods", short_help="Print the list of available raw RPC methods"
+)
 @pass_context
 def cli(ctx):
     """Print the list of available raw RPC methods
@@ -15,4 +16,4 @@ def cli(ctx):
         - kamcli rpcmethods
         - kamcli rpc <method> <params>
     """
-    command_ctl(ctx, 'system.listMethods', [])
+    command_ctl(ctx, "system.listMethods", [])

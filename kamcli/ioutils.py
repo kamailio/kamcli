@@ -1,5 +1,6 @@
 import sys
 import json
+
 # import pprint
 
 ioutils_tabulate_format = True
@@ -10,35 +11,35 @@ except ImportError as e:
     pass  # module doesn't exist, deal with it.
 
 
-ioutils_formats_list = ['raw', 'json', 'table', 'dict']
+ioutils_formats_list = ["raw", "json", "table", "dict"]
 
 
 def ioutils_dbres_print(ctx, oformat, ostyle, res):
     """ print a database result using different formats and styles """
     if oformat is None:
         if ioutils_tabulate_format is True:
-            oformat = 'table'
+            oformat = "table"
         else:
-            oformat = 'json'
+            oformat = "json"
     else:
-        if oformat == 'table':
+        if oformat == "table":
             if ioutils_tabulate_format is False:
                 ctx.log("Package tabulate is not installed")
                 sys.exit()
 
     if ostyle is None:
-        ostyle = 'grid'
+        ostyle = "grid"
 
-    if oformat == 'json':
+    if oformat == "json":
         for row in res:
             print(json.dumps(dict(row), indent=4))
             print()
-    elif oformat == 'dict':
+    elif oformat == "dict":
         for row in res:
-            print (dict(row))
+            print(dict(row))
             # pprint.pprint(dict(row), indent=4)
             print()
-    elif oformat == 'table':
+    elif oformat == "table":
         allrows = res.fetchall()
         gstring = tabulate(allrows, headers=res.keys(), tablefmt=ostyle)
         print(gstring)

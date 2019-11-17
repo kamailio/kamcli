@@ -6,9 +6,13 @@ from kamcli.cli import pass_context
 from kamcli.iorpc import command_ctl
 
 
-@click.command('moni', short_help='Monitor relevant statistics')
-@click.option('norefresh', '--no-refresh', is_flag=True,
-              help='Do not refresh (execute once)')
+@click.command("moni", short_help="Monitor relevant statistics")
+@click.option(
+    "norefresh",
+    "--no-refresh",
+    is_flag=True,
+    help="Do not refresh (execute once)",
+)
 @pass_context
 def cli(ctx, norefresh):
     """Monitor relevant statistics on display
@@ -21,21 +25,38 @@ def cli(ctx, norefresh):
     """
 
     def clear():
-        return os.system('tput reset')
+        return os.system("tput reset")
+
     count = 0
-    slist = ["rcv_requests", "fwd_requests", "rcv_replies", "fwd_replies",
-             "free_size", "sent_replies", "tmx:", "usrloc:"]
+    slist = [
+        "rcv_requests",
+        "fwd_requests",
+        "rcv_replies",
+        "fwd_replies",
+        "free_size",
+        "sent_replies",
+        "tmx:",
+        "usrloc:",
+    ]
     if norefresh is True:
-        command_ctl(ctx, 'stats.get_statistics', slist,
-                    {"func": cmd_moni_result_print})
+        command_ctl(
+            ctx, "stats.get_statistics", slist, {"func": cmd_moni_result_print}
+        )
     else:
         while True:
             count = count + 1
-            command_ctl(ctx, 'stats.get_statistics', slist,
-                        {"func": cmd_moni_result_print})
+            command_ctl(
+                ctx,
+                "stats.get_statistics",
+                slist,
+                {"func": cmd_moni_result_print},
+            )
             print()
-            print("[cycle #: " + str(count) +
-                  "; if constant make sure server is running]")
+            print(
+                "[cycle #: "
+                + str(count)
+                + "; if constant make sure server is running]"
+            )
             time.sleep(2)
             clear()
 
@@ -47,6 +68,6 @@ def cmd_moni_result_print(ctx, response, params=None):
     if "result" in rdata:
         rd = rdata["result"]
         for a, b in zip(rd[::2], rd[1::2]):
-            print('{:<40}{:<}'.format(a, b))
+            print("{:<40}{:<}".format(a, b))
     else:
-        print(json.dumps(rdata, indent=4, separators=(',', ': ')))
+        print(json.dumps(rdata, indent=4, separators=(",", ": ")))
