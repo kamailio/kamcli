@@ -87,7 +87,7 @@ OS Packages (install via apt, yum, ...):
 
 PIP Packages:
 
-   * pip install -r requirements/requirements.txt
+   * pip3 install -r requirements/requirements.txt
 
 Extra PIP Packages (install via pip3):
 
@@ -154,11 +154,8 @@ mkdir kamclienv
 cd kamclienv
 python3 -m venv venv
 . venv/bin/activate
-pip3 install click
-pip3 install sqlalchemy
+pip3 install -r requirements/requirements.txt
 pip3 install mysqlclient
-pip3 install tabulate
-pip3 install pyaml
 git clone https://github.com/kamailio/kamcli.git
 cd kamcli
 pip3 install --editable .
@@ -247,7 +244,7 @@ kamcli -d --config=kamcli/kamcli.ini stats usrloc:registered_users
 
 ### Kamailio Configuration
 
-It requires to load the `jsnorpcs` module in `kamalilio.cfg` and enable the
+It requires to load the `jsonrpcs` module in `kamalilio.cfg` and enable the
 FIFO or UnixSocket transports (they should be enabled by default).
 
 ```
