@@ -83,3 +83,13 @@ def srv_ppdefines(ctx, full):
         command_ctl(ctx, "core.ppdefines_full")
     else:
         command_ctl(ctx, "core.ppdefines")
+
+
+@cli.command("shm", short_help="Show shared memory details")
+@pass_context
+def srv_version(ctx):
+    """Show shared memory details
+
+    \b
+    """
+    command_ctl(ctx, "core.shmmem")
