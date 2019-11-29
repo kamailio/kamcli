@@ -87,7 +87,7 @@ def srv_ppdefines(ctx, full):
 
 @cli.command("shm", short_help="Show shared memory details")
 @pass_context
-def srv_version(ctx):
+def srv_shm(ctx):
     """Show shared memory details
 
     \b
