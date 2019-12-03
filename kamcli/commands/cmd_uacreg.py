@@ -162,7 +162,7 @@ def uacreg_passwd(ctx, realm, authha1, l_uuid, auth_password):
 )
 @click.argument("l_uuid", nargs=-1, metavar="[<l_uuid>]")
 @pass_context
-def dispatcher_showdb(ctx, oformat, ostyle, l_uuid):
+def uacreg_showdb(ctx, oformat, ostyle, l_uuid):
     """Show details for records in uacreg database table
 
     \b
