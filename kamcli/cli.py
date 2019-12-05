@@ -86,6 +86,13 @@ class Context(object):
             msg %= args
         click.echo(msg)
 
+    def printnlf(self, msg, *args):
+        """Print a formated message to stdout without new line."""
+        if args:
+            msg %= args
+        click.echo(msg, nl=False)
+
+
     @property
     def gconfig(self):
         if self._gconfig is None:
