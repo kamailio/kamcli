@@ -92,7 +92,6 @@ class Context(object):
             msg %= args
         click.echo(msg, nl=False)
 
-
     @property
     def gconfig(self):
         if self._gconfig is None:
