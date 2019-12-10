@@ -173,6 +173,25 @@ def db_engine_exec_file(ctx, sqlengine, fname):
                     sql_command = ""
 
 
+def db_engine_exec_sqltext(ctx, sqlengine, sqltext):
+    sql_command = ""
+    for line in sqltext.splitlines():
+        tline = line.strip(" \t\r\n")
+        if len(tline) > 0 and not tline.startswith("--"):
+            sql_command += " " + tline
+            if sql_command.endswith(";"):
+                try:
+                    sqlengine.execute(text(sql_command))
+                    sqlengine.commit()
+                except SQLAlchemyError:
+                    ctx.log(
+                        "failed to execute sql statements [%s]",
+                        sql_command,
+                    )
+                finally:
+                    sql_command = ""
+
+
 @cli.command("runfile", help="Run SQL statements in a file")
 @click.argument("fname", metavar="<fname>")
 @pass_context
@@ -186,3 +205,27 @@ def db_runfile(ctx, fname):
     ctx.vlog("Run statements in the file [%s]", fname)
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     db_engine_exec_file(ctx, e, fname)
+
+
+@cli.command("acc-struct-update", help="Run SQL statements to update acc table structure")
+@pass_context
+def db_acc_struct_update(ctx):
+    """Run SQL statements to update acc table structure
+    """
+    ctx.vlog("Run statements to update acc and missed_calls tables structures")
+    e = create_engine(ctx.gconfig.get("db", "rwurl"))
+    sqltext = """
+      ALTER TABLE acc ADD COLUMN src_user VARCHAR(64) NOT NULL DEFAULT '';
+      ALTER TABLE acc ADD COLUMN src_domain VARCHAR(128) NOT NULL DEFAULT '';
+      ALTER TABLE acc ADD COLUMN src_ip varchar(64) NOT NULL default '';
+      ALTER TABLE acc ADD COLUMN dst_ouser VARCHAR(64) NOT NULL DEFAULT '';
+      ALTER TABLE acc ADD COLUMN dst_user VARCHAR(64) NOT NULL DEFAULT '';
+      ALTER TABLE acc ADD COLUMN dst_domain VARCHAR(128) NOT NULL DEFAULT '';
+      ALTER TABLE missed_calls ADD COLUMN src_user VARCHAR(64) NOT NULL DEFAULT '';
+      ALTER TABLE missed_calls ADD COLUMN src_domain VARCHAR(128) NOT NULL DEFAULT '';
+      ALTER TABLE missed_calls ADD COLUMN src_ip varchar(64) NOT NULL default '';
+      ALTER TABLE missed_calls ADD COLUMN dst_ouser VARCHAR(64) NOT NULL DEFAULT '';
+      ALTER TABLE missed_calls ADD COLUMN dst_user VARCHAR(64) NOT NULL DEFAULT '';
+      ALTER TABLE missed_calls ADD COLUMN dst_domain VARCHAR(128) NOT NULL DEFAULT '';
+    """
+    db_engine_exec_sqltext(ctx, e, sqltext)
