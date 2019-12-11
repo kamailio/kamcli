@@ -185,8 +185,7 @@ def db_engine_exec_sqltext(ctx, sqlengine, sqltext):
                     sqlengine.commit()
                 except SQLAlchemyError:
                     ctx.log(
-                        "failed to execute sql statements [%s]",
-                        sql_command,
+                        "failed to execute sql statements [%s]", sql_command,
                     )
                 finally:
                     sql_command = ""
@@ -207,7 +206,10 @@ def db_runfile(ctx, fname):
     db_engine_exec_file(ctx, e, fname)
 
 
-@cli.command("acc-struct-update", help="Run SQL statements to update acc table structure")
+@cli.command(
+    "acc-struct-update",
+    help="Run SQL statements to update acc table structure",
+)
 @pass_context
 def db_acc_struct_update(ctx):
     """Run SQL statements to update acc table structure
