@@ -107,7 +107,7 @@ def acc_cdrs_table_create(ctx):
       UNIQUE KEY `uk_cft` (`sip_call_id`,`sip_from_tag`,`sip_to_tag`)
       );
     """
-    dbutils_exec_sqltext(ctx, e, sqltext)
+    e.execute(sqltext)
 
 
 @cli.command(
@@ -122,7 +122,6 @@ def acc_cdrs_proc_create(ctx):
         "Run SQL statements to create the stored procedure to generate cdrs"
     )
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
-    e.execute("DELIMITER @@")
     sqltext = """
       CREATE PROCEDURE `kamailio_cdrs`()
       BEGIN
@@ -160,7 +159,6 @@ def acc_cdrs_proc_create(ctx):
             SET done = 0;
           END IF;
         UNTIL done END REPEAT;
-      END @@
+      END
     """
-    dbutils_exec_sqltext(ctx, e, sqltext)
-    e.execute("DELIMITER ;")
+    e.execute(sqltext)
