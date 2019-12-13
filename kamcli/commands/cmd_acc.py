@@ -74,3 +74,39 @@ def acc_tables_struct_update(ctx):
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     acc_acc_struct_update_exec(ctx, e)
     acc_mc_struct_update_exec(ctx, e)
+
+
+cli.command(
+    "cdrs-table-create",
+    help="Run SQL statements to create cdrs table structure",
+)
+
+
+@pass_context
+def acc_cdrs_table_create(ctx):
+    """Run SQL statements to create cdrs table structure
+    """
+    ctx.vlog("Run SQL statements to create cdrs table structure")
+    e = create_engine(ctx.gconfig.get("db", "rwurl"))
+    sqltext = """
+      CREATE TABLE `cdrs` (
+      `cdr_id` bigint(20) NOT NULL auto_increment,
+      `src_username` varchar(64) NOT NULL default '',
+      `src_domain` varchar(128) NOT NULL default '',
+      `dst_username` varchar(64) NOT NULL default '',
+      `dst_domain` varchar(128) NOT NULL default '',
+      `dst_ousername` varchar(64) NOT NULL default '',
+      `call_start_time` datetime NOT NULL default '2000-01-01 00:00:00',
+      `duration` int(10) unsigned NOT NULL default '0',
+      `sip_call_id` varchar(128) NOT NULL default '',
+      `sip_from_tag` varchar(128) NOT NULL default '',
+      `sip_to_tag` varchar(128) NOT NULL default '',
+      `src_ip` varchar(64) NOT NULL default '',
+      `cost` integer NOT NULL default '0',
+      `rated` integer NOT NULL default '0',
+      `created` datetime NOT NULL,
+      PRIMARY KEY  (`cdr_id`),
+      UNIQUE KEY `uk_cft` (`sip_call_id`,`sip_from_tag`,`sip_to_tag`)
+      );
+    """
+    dbutils_exec_sqltext(ctx, e, sqltext)
