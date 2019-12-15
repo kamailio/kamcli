@@ -92,7 +92,7 @@ PIP Packages:
 Extra PIP Packages (install via pip3):
 
   * _extra packages requied by kamcli (part of OS or  virtual environment)_
-    * mysql-python (optional - needed if you want to connect to MySQL database)
+    * mysqlclient (optional - needed if you want to connect to MySQL database)
 
 #### Install Virtual Environment
 
