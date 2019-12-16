@@ -162,3 +162,27 @@ def acc_cdrs_proc_create(ctx):
       END
     """
     e.execute(sqltext)
+
+
+@cli.command(
+    "rating-table-create",
+    help="Run SQL statements to create billing_rates table structure",
+)
+@pass_context
+def acc_rating_table_create(ctx):
+    """Run SQL statements to create billing_rates table structure
+    """
+    ctx.vlog("Run SQL statements to create billing_rates table structure")
+    e = create_engine(ctx.gconfig.get("db", "rwurl"))
+    sqltext = """
+      CREATE TABLE `billing_rates` (
+      `rate_id` bigint(20) NOT NULL auto_increment,
+      `rate_group` varchar(64) NOT NULL default 'default',
+      `prefix` varchar(64) NOT NULL default '',
+      `rate_unit` integer NOT NULL default '0',
+      `time_unit` integer NOT NULL default '60',
+      PRIMARY KEY  (`rate_id`),
+      UNIQUE KEY `uk_rp` (`rate_group`,`prefix`)
+      );
+    """
+    e.execute(sqltext)
