@@ -12,6 +12,59 @@ from kamcli.dbutils import dbutils_exec_sqlfile
 
 CMD_BASE = "mysql -h {0} -u {1} -p{2} "
 
+KDB_GROUP_BASIC = ["standard"]
+
+KDB_GROUP_STANDARD = [
+    "acc",
+    "lcr",
+    "domain",
+    "group",
+    "permissions",
+    "registrar",
+    "usrloc",
+    "msilo",
+    "alias_db",
+    "uri_db",
+    "speeddial",
+    "avpops",
+    "auth_db",
+    "pdt",
+    "dialog",
+    "dispatcher",
+    "dialplan",
+    "topos",
+]
+
+KDB_GROUP_EXTRA = [
+    "imc",
+    "cpl",
+    "siptrace",
+    "domainpolicy",
+    "carrierroute",
+    "drouting",
+    "userblacklist",
+    "htable",
+    "purple",
+    "uac",
+    "pipelimit",
+    "mtree",
+    "sca",
+    "mohqueue",
+    "rtpproxy",
+    "rtpengine",
+    "secfilter",
+]
+
+KDB_GROUP_PRESENCE = ["presence", "rls"]
+
+KDB_GROUP_UID = [
+    "uid_auth_db",
+    "uid_avp_db",
+    "uid_domain",
+    "uid_gflags",
+    "uid_uri_db",
+]
+
 
 @click.group("db", help="Raw database operations")
 @pass_context
@@ -168,3 +221,57 @@ def db_runfile(ctx, fname):
     ctx.vlog("Run statements in the file [%s]", fname)
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     dbutils_exec_sqlfile(ctx, e, fname)
+
+
+def db_create_group(ctx, e, dir, dbgroup):
+    for t in dbgroup:
+        fname = dir + "/" + t + "-create.sql"
+        dbutils_exec_sqlfile(ctx, e, fname)
+
+
+@cli.command("create", help="Create database structure")
+@click.option(
+    "dbname",
+    "--dbname",
+    default="",
+    help="Database name or path to the folder for database",
+)
+@click.option(
+    "directory",
+    "--directory",
+    default="",
+    help="Path to the directory with db schema files",
+)
+@pass_context
+def db_create(ctx, dbname, directory):
+    """Create database structure
+
+    \b
+    """
+    dbtype = ctx.gconfig.get("db", "type")
+    if dbtype == "mysql":
+        ctx.vlog("Database type [%s]", dbtype)
+    ldbname = ctx.gconfig.get("db", "dbname")
+    if len(dbname) > 0:
+        ldbname = dbname
+    ldirectory = ""
+    if len(directory) > 0:
+        ldirectory = directory
+    ctx.vlog("Creating database [%s]", ldbname)
+    e = create_engine(ctx.gconfig.get("db", "adminurl"))
+    e.execute("create database {0}".format(dbname))
+    e.execute("use {0}".format(dbname))
+    db_create_group(ctx, e, ldirectory, KDB_GROUP_BASIC)
+    db_create_group(ctx, e, ldirectory, KDB_GROUP_STANDARD)
+    print("Do you want to create extra tables? (y/n):", end=" ")
+    option = input()
+    if option == "y":
+        db_create_group(ctx, e, ldirectory, KDB_GROUP_EXTRA)
+    print("Do you want to create presence tables? (y/n):", end=" ")
+    option = input()
+    if option == "y":
+        db_create_group(ctx, e, ldirectory, KDB_GROUP_PRESENCE)
+    print("Do you want to create uid tables? (y/n):", end=" ")
+    option = input()
+    if option == "y":
+        db_create_group(ctx, e, ldirectory, KDB_GROUP_UID)
