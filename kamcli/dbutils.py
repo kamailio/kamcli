@@ -12,7 +12,6 @@ def dbutils_exec_sqlfile(ctx, sqlengine, fname):
             if sql_command.endswith(";"):
                 try:
                     sqlengine.execute(text(sql_command))
-                    sqlengine.commit()
                 except SQLAlchemyError:
                     ctx.log(
                         "failed to execute sql statements from file [%s]",
