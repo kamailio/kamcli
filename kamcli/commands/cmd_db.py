@@ -223,6 +223,65 @@ def db_runfile(ctx, fname):
     dbutils_exec_sqlfile(ctx, e, fname)
 
 
+def db_create_host_users(
+    ctx, e, dbname, dbhost, dbrwuser, dbrwpassword, dbrouser, dbropassword
+):
+    e.execute(
+        "CREATE USER {0!r}@{1!r} IDENTIFIED BY {2!r}".format(
+            dbrwuser, dbhost, dbrwpassword
+        )
+    )
+    e.execute(
+        "GRANT ALL PRIVILEGES ON {0}.* TO {1!r}@{2!r}".format(
+            dbname, dbrwuser, dbhost
+        )
+    )
+    e.execute(
+        "CREATE USER {0!r}@{1!r} IDENTIFIED BY {2!r}".format(
+            dbrouser, dbhost, dbropassword
+        )
+    )
+    e.execute(
+        "GRANT SELECT PRIVILEGES ON {0}.* TO {1!r}@{2!r}".format(
+            dbname, dbrouser, dbhost
+        )
+    )
+
+
+def db_create_users(ctx, e, dbname):
+    dbhost = ctx.gconfig.get("db", "host")
+    dbrwuser = ctx.gconfig.get("db", "rwuser")
+    dbrwpassword = ctx.gconfig.get("db", "rwpassword")
+    dbrouser = ctx.gconfig.get("db", "rouser")
+    dbropassword = ctx.gconfig.get("db", "ropassword")
+    dbaccesshost = ctx.gconfig.get("db", "accesshost")
+    db_create_host_users(
+        ctx, e, dbname, dbhost, dbrwuser, dbrwpassword, dbrouser, dbropassword
+    )
+    if dbhost != "localhost":
+        db_create_host_users(
+            ctx,
+            e,
+            dbname,
+            "localhost",
+            dbrwuser,
+            dbrwpassword,
+            dbrouser,
+            dbropassword,
+        )
+    if len(dbaccesshost) > 0:
+        db_create_host_users(
+            ctx,
+            e,
+            dbname,
+            dbaccesshost,
+            dbrwuser,
+            dbrwpassword,
+            dbrouser,
+            dbropassword,
+        )
+
+
 def db_create_database(ctx, e, dbname):
     e.execute("create database {0}".format(dbname))
 
@@ -306,3 +365,25 @@ def db_create_dbonly(ctx, dbname):
     e = create_engine(ctx.gconfig.get("db", "adminurl"))
     db_create_database(ctx, e, ldbname)
     e.execute("use {0}".format(ldbname))
+
+
+@cli.command("grant", help="Create db access users and grant privileges")
+@click.option(
+    "dbname", "--dbname", default="", help="Database name",
+)
+@pass_context
+def db_grant(ctx, dbname):
+    """Create db access users and grant privileges
+
+    \b
+    """
+    dbtype = ctx.gconfig.get("db", "type")
+    if dbtype != "mysql":
+        ctx.vlog("Database type [%s] not supported yet", dbtype)
+        return
+    ldbname = ctx.gconfig.get("db", "dbname")
+    if len(dbname) > 0:
+        ldbname = dbname
+    ctx.vlog("Creating only database [%s]", ldbname)
+    e = create_engine(ctx.gconfig.get("db", "adminurl"))
+    db_create_users(ctx, e, ldbname)
