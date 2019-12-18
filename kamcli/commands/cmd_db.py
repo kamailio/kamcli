@@ -223,6 +223,10 @@ def db_runfile(ctx, fname):
     dbutils_exec_sqlfile(ctx, e, fname)
 
 
+def db_create_database(ctx, e, dbname):
+    e.execute("create database {0}".format(dbname))
+
+
 def db_create_group(ctx, e, dir, dbgroup):
     for t in dbgroup:
         fname = dir + "/" + t + "-create.sql"
@@ -249,18 +253,19 @@ def db_create(ctx, dbname, directory):
     \b
     """
     dbtype = ctx.gconfig.get("db", "type")
-    if dbtype == "mysql":
-        ctx.vlog("Database type [%s]", dbtype)
+    if dbtype != "mysql":
+        ctx.vlog("Database type [%s] not supported yet", dbtype)
+        return
     ldbname = ctx.gconfig.get("db", "dbname")
     if len(dbname) > 0:
         ldbname = dbname
     ldirectory = ""
     if len(directory) > 0:
         ldirectory = directory
-    ctx.vlog("Creating database [%s]", ldbname)
+    ctx.vlog("Creating database [%s] structure", ldbname)
     e = create_engine(ctx.gconfig.get("db", "adminurl"))
-    e.execute("create database {0}".format(dbname))
-    e.execute("use {0}".format(dbname))
+    db_create_database(ctx, e, ldbname)
+    e.execute("use {0}".format(ldbname))
     db_create_group(ctx, e, ldirectory, KDB_GROUP_BASIC)
     db_create_group(ctx, e, ldirectory, KDB_GROUP_STANDARD)
     print("Do you want to create extra tables? (y/n):", end=" ")
@@ -275,3 +280,29 @@ def db_create(ctx, dbname, directory):
     option = input()
     if option == "y":
         db_create_group(ctx, e, ldirectory, KDB_GROUP_UID)
+
+
+@cli.command("create-dbonly", help="Create database only")
+@click.option(
+    "dbname",
+    "--dbname",
+    default="",
+    help="Database name or path to the folder for database",
+)
+@pass_context
+def db_create_dbonly(ctx, dbname):
+    """Create database only
+
+    \b
+    """
+    dbtype = ctx.gconfig.get("db", "type")
+    if dbtype != "mysql":
+        ctx.vlog("Database type [%s] not supported yet", dbtype)
+        return
+    ldbname = ctx.gconfig.get("db", "dbname")
+    if len(dbname) > 0:
+        ldbname = dbname
+    ctx.vlog("Creating only database [%s]", ldbname)
+    e = create_engine(ctx.gconfig.get("db", "adminurl"))
+    db_create_database(ctx, e, ldbname)
+    e.execute("use {0}".format(ldbname))
