@@ -286,9 +286,9 @@ def db_create_database(ctx, e, dbname):
     e.execute("create database {0}".format(dbname))
 
 
-def db_create_group(ctx, e, dir, dbgroup):
+def db_create_group(ctx, e, dirpath, dbgroup):
     for t in dbgroup:
-        fname = dir + "/" + t + "-create.sql"
+        fname = dirpath + "/" + t + "-create.sql"
         dbutils_exec_sqlfile(ctx, e, fname)
 
 
@@ -457,6 +457,33 @@ def db_create_tables_uid(ctx, directory):
     \b
     """
     db_create_tables_list(ctx, directory, KDB_GROUP_UID)
+
+
+@cli.command(
+    "create-tables-group",
+    short_help="Create the group of database tables for a specific extension",
+)
+@click.option(
+    "directory",
+    "--directory",
+    default="",
+    help="Path to the directory with db schema files",
+)
+@click.argument("gname", metavar="<gname>")
+@pass_context
+def db_create_tables_group(ctx, directory, gname):
+    """Create the group of database tables for a specific extension
+
+    \b
+    Parameters:
+        <gname> - the name of the group of tables
+    """
+    ldirectory = ""
+    if len(directory) > 0:
+        ldirectory = directory
+    e = create_engine(ctx.gconfig.get("db", "rwurl"))
+    fpath = ldirectory + "/" + gname + "-create.sql"
+    dbutils_exec_sqlfile(ctx, e, fpath)
 
 
 @cli.command("grant", help="Create db access users and grant privileges")
