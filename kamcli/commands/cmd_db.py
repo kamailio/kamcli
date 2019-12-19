@@ -72,7 +72,7 @@ def cli(ctx):
     pass
 
 
-@cli.command("connect", help="Launch db cli and connect to database")
+@cli.command("connect", short_help="Launch db cli and connect to database")
 @pass_context
 def db_connect(ctx):
     dbtype = ctx.gconfig.get("db", "type")
@@ -92,7 +92,7 @@ def db_connect(ctx):
     os.system(scmd)
 
 
-@cli.command("clirun", help="Run SQL statement via cli")
+@cli.command("clirun", short_help="Run SQL statement via cli")
 @click.argument("query", metavar="<query>")
 @pass_context
 def db_clirun(ctx, query):
@@ -114,7 +114,7 @@ def db_clirun(ctx, query):
     os.system(scmd)
 
 
-@cli.command("clishow", help="Show content of table via cli")
+@cli.command("clishow", short_help="Show content of table via cli")
 @click.argument("table", metavar="<table>")
 @pass_context
 def db_clishow(ctx, table):
@@ -136,7 +136,7 @@ def db_clishow(ctx, table):
     os.system(scmd)
 
 
-@cli.command("clishowg", help="Show content of table via cli")
+@cli.command("clishowg", short_help="Show content of table via cli")
 @click.argument("table", metavar="<table>")
 @pass_context
 def db_clishowg(ctx, table):
@@ -158,7 +158,7 @@ def db_clishowg(ctx, table):
     os.system(scmd)
 
 
-@cli.command("show", help="Show content of a table")
+@cli.command("show", short_help="Show content of a table")
 @click.option(
     "oformat",
     "--output-format",
@@ -183,7 +183,7 @@ def db_show(ctx, oformat, ostyle, table):
     ioutils_dbres_print(ctx, oformat, ostyle, res)
 
 
-@cli.command("showcreate", help="Show content of a table")
+@cli.command("showcreate", short_help="Show content of a table")
 @click.option(
     "oformat",
     "--output-format",
@@ -208,7 +208,7 @@ def db_showcreate(ctx, oformat, ostyle, table):
     ioutils_dbres_print(ctx, oformat, ostyle, res)
 
 
-@cli.command("runfile", help="Run SQL statements in a file")
+@cli.command("runfile", short_help="Run SQL statements in a file")
 @click.argument("fname", metavar="<fname>")
 @pass_context
 def db_runfile(ctx, fname):
@@ -292,7 +292,7 @@ def db_create_group(ctx, e, dirpath, dbgroup):
         dbutils_exec_sqlfile(ctx, e, fname)
 
 
-@cli.command("create", help="Create database structure")
+@cli.command("create", short_help="Create database structure")
 @click.option(
     "dbname",
     "--dbname",
@@ -341,7 +341,7 @@ def db_create(ctx, dbname, directory):
         db_create_group(ctx, e, ldirectory, KDB_GROUP_UID)
 
 
-@cli.command("create-dbonly", help="Create database only")
+@cli.command("create-dbonly", short_help="Create database only")
 @click.option(
     "dbname",
     "--dbname",
@@ -379,7 +379,7 @@ def db_create_tables_list(ctx, directory, group):
     db_create_group(ctx, e, ldirectory, group)
 
 
-@cli.command("create-tables-basic", help="Create basic database tables")
+@cli.command("create-tables-basic", short_help="Create basic database tables")
 @click.option(
     "directory",
     "--directory",
@@ -395,7 +395,9 @@ def db_create_tables_basic(ctx, directory):
     db_create_tables_list(ctx, directory, KDB_GROUP_BASIC)
 
 
-@cli.command("create-tables-standard", help="Create standard database tables")
+@cli.command(
+    "create-tables-standard", short_help="Create standard database tables"
+)
 @click.option(
     "directory",
     "--directory",
@@ -411,7 +413,7 @@ def db_create_tables_standard(ctx, directory):
     db_create_tables_list(ctx, directory, KDB_GROUP_STANDARD)
 
 
-@cli.command("create-tables-extra", help="Create extra database tables")
+@cli.command("create-tables-extra", short_help="Create extra database tables")
 @click.option(
     "directory",
     "--directory",
@@ -427,7 +429,9 @@ def db_create_tables_extra(ctx, directory):
     db_create_tables_list(ctx, directory, KDB_GROUP_EXTRA)
 
 
-@cli.command("create-tables-presence", help="Create presence database tables")
+@cli.command(
+    "create-tables-presence", short_help="Create presence database tables"
+)
 @click.option(
     "directory",
     "--directory",
@@ -443,7 +447,7 @@ def db_create_tables_presence(ctx, directory):
     db_create_tables_list(ctx, directory, KDB_GROUP_PRESENCE)
 
 
-@cli.command("create-tables-uid", help="Create uid database tables")
+@cli.command("create-tables-uid", short_help="Create uid database tables")
 @click.option(
     "directory",
     "--directory",
@@ -486,7 +490,7 @@ def db_create_tables_group(ctx, directory, gname):
     dbutils_exec_sqlfile(ctx, e, fpath)
 
 
-@cli.command("grant", help="Create db access users and grant privileges")
+@cli.command("grant", short_help="Create db access users and grant privileges")
 @click.option(
     "dbname", "--dbname", default="", help="Database name",
 )
