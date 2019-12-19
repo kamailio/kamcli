@@ -367,6 +367,98 @@ def db_create_dbonly(ctx, dbname):
     e.execute("use {0}".format(ldbname))
 
 
+def db_create_tables_list(ctx, directory, group):
+    dbtype = ctx.gconfig.get("db", "type")
+    if dbtype != "mysql":
+        ctx.vlog("Database type [%s] not supported yet", dbtype)
+        return
+    ldirectory = ""
+    if len(directory) > 0:
+        ldirectory = directory
+    e = create_engine(ctx.gconfig.get("db", "rwurl"))
+    db_create_group(ctx, e, ldirectory, group)
+
+
+@cli.command("create-tables-basic", help="Create basic database tables")
+@click.option(
+    "directory",
+    "--directory",
+    default="",
+    help="Path to the directory with db schema files",
+)
+@pass_context
+def db_create_tables_basic(ctx, directory):
+    """Create basic database tables
+
+    \b
+    """
+    db_create_tables_list(ctx, directory, KDB_GROUP_BASIC)
+
+
+@cli.command("create-tables-standard", help="Create standard database tables")
+@click.option(
+    "directory",
+    "--directory",
+    default="",
+    help="Path to the directory with db schema files",
+)
+@pass_context
+def db_create_tables_standard(ctx, directory):
+    """Create standard database tables
+
+    \b
+    """
+    db_create_tables_list(ctx, directory, KDB_GROUP_STANDARD)
+
+
+@cli.command("create-tables-extra", help="Create extra database tables")
+@click.option(
+    "directory",
+    "--directory",
+    default="",
+    help="Path to the directory with db schema files",
+)
+@pass_context
+def db_create_tables_extra(ctx, directory):
+    """Create extra database tables
+
+    \b
+    """
+    db_create_tables_list(ctx, directory, KDB_GROUP_EXTRA)
+
+
+@cli.command("create-tables-presence", help="Create presence database tables")
+@click.option(
+    "directory",
+    "--directory",
+    default="",
+    help="Path to the directory with db schema files",
+)
+@pass_context
+def db_create_tables_presence(ctx, directory):
+    """Create presence database tables
+
+    \b
+    """
+    db_create_tables_list(ctx, directory, KDB_GROUP_PRESENCE)
+
+
+@cli.command("create-tables-uid", help="Create uid database tables")
+@click.option(
+    "directory",
+    "--directory",
+    default="",
+    help="Path to the directory with db schema files",
+)
+@pass_context
+def db_create_tables_uid(ctx, directory):
+    """Create uid database tables
+
+    \b
+    """
+    db_create_tables_list(ctx, directory, KDB_GROUP_UID)
+
+
 @cli.command("grant", help="Create db access users and grant privileges")
 @click.option(
     "dbname", "--dbname", default="", help="Database name",
