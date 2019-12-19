@@ -324,6 +324,7 @@ def db_create(ctx, dbname, directory):
     ctx.vlog("Creating database [%s] structure", ldbname)
     e = create_engine(ctx.gconfig.get("db", "adminurl"))
     db_create_database(ctx, e, ldbname)
+    db_create_users(ctx, e, ldbname)
     e.execute("use {0}".format(ldbname))
     db_create_group(ctx, e, ldirectory, KDB_GROUP_BASIC)
     db_create_group(ctx, e, ldirectory, KDB_GROUP_STANDARD)
