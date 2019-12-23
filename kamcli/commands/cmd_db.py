@@ -368,6 +368,31 @@ def db_create_dbonly(ctx, dbname):
     e.execute("use {0}".format(ldbname))
 
 
+@cli.command("drop", short_help="Drop database")
+@click.option(
+    "dbname",
+    "--dbname",
+    default="",
+    help="Database name or path to the folder for database",
+)
+@pass_context
+def db_drop(ctx, dbname):
+    """Drop database
+
+    \b
+    """
+    dbtype = ctx.gconfig.get("db", "type")
+    if dbtype != "mysql":
+        ctx.vlog("Database type [%s] not supported yet", dbtype)
+        return
+    ldbname = ctx.gconfig.get("db", "dbname")
+    if len(dbname) > 0:
+        ldbname = dbname
+    ctx.vlog("Dropping database [%s]", ldbname)
+    e = create_engine(ctx.gconfig.get("db", "adminurl"))
+    e.execute("drop database {0}".format(dbname))
+
+
 def db_create_tables_list(ctx, directory, group):
     dbtype = ctx.gconfig.get("db", "type")
     if dbtype != "mysql":
