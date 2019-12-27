@@ -536,3 +536,58 @@ def db_grant(ctx, dbname):
     ctx.vlog("Creating only database [%s]", ldbname)
     e = create_engine(ctx.gconfig.get("db", "adminurl"))
     db_create_users(ctx, e, ldbname)
+
+
+def db_revoke_host_users(ctx, e, dbname, dbhost, dbrwuser, dbrouser):
+    e.execute(
+        "REVOKE ALL PRIVILEGES ON {0}.* TO {1!r}@{2!r}".format(
+            dbname, dbrwuser, dbhost
+        )
+    )
+    e.execute("DROP USER {0!r}@{1!r}".format(dbrwuser, dbhost))
+    e.execute(
+        "REVOKE SELECT PRIVILEGES ON {0}.* TO {1!r}@{2!r}".format(
+            dbname, dbrouser, dbhost
+        )
+    )
+    e.execute("DROP USER {0!r}@{1!r}".format(dbrouser, dbhost))
+
+
+def db_revoke_users(ctx, e, dbname):
+    dbhost = ctx.gconfig.get("db", "host")
+    dbrwuser = ctx.gconfig.get("db", "rwuser")
+    dbrouser = ctx.gconfig.get("db", "rouser")
+    dbaccesshost = ctx.gconfig.get("db", "accesshost")
+    db_revoke_host_users(ctx, e, dbname, dbhost, dbrwuser, dbrouser)
+    if dbhost != "localhost":
+        db_revoke_host_users(
+            ctx, e, dbname, "localhost", dbrwuser, dbrouser,
+        )
+    if len(dbaccesshost) > 0:
+        db_revoke_host_users(
+            ctx, e, dbname, dbaccesshost, dbrwuser, dbrouser,
+        )
+
+
+@cli.command(
+    "revoke", short_help="Create db access users and grant privileges"
+)
+@click.option(
+    "dbname", "--dbname", default="", help="Database name",
+)
+@pass_context
+def db_revoke(ctx, dbname):
+    """Revoke db access privileges
+
+    \b
+    """
+    dbtype = ctx.gconfig.get("db", "type")
+    if dbtype != "mysql":
+        ctx.vlog("Database type [%s] not supported yet", dbtype)
+        return
+    ldbname = ctx.gconfig.get("db", "dbname")
+    if len(dbname) > 0:
+        ldbname = dbname
+    ctx.vlog("Revoke access to database [%s]", ldbname)
+    e = create_engine(ctx.gconfig.get("db", "adminurl"))
+    db_revoke_users(ctx, e, ldbname)
