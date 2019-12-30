@@ -183,7 +183,9 @@ def db_show(ctx, oformat, ostyle, table):
     ioutils_dbres_print(ctx, oformat, ostyle, res)
 
 
-@cli.command("showcreate", short_help="Show content of a table")
+@cli.command(
+    "showcreate", short_help="Show create statement of of a database table"
+)
 @click.option(
     "oformat",
     "--output-format",
@@ -569,9 +571,7 @@ def db_revoke_users(ctx, e, dbname):
         )
 
 
-@cli.command(
-    "revoke", short_help="Create db access users and grant privileges"
-)
+@cli.command("revoke", short_help="Revoke db access privileges")
 @click.option(
     "dbname", "--dbname", default="", help="Database name",
 )
@@ -591,3 +591,39 @@ def db_revoke(ctx, dbname):
     ctx.vlog("Revoke access to database [%s]", ldbname)
     e = create_engine(ctx.gconfig.get("db", "adminurl"))
     db_revoke_users(ctx, e, ldbname)
+
+
+@cli.command(
+    "version-set", short_help="Set the version number for a table structure"
+)
+@click.option(
+    "vertable",
+    "--version-table",
+    default="version",
+    help="Name of the table with version records",
+)
+@click.argument("table", metavar="<table>")
+@click.argument("version", metavar="<version>", type=int)
+@pass_context
+def db_version_set(ctx, vertable, table, version):
+    """Set the version number for a table structure
+
+    \b
+    Parameters:
+        <table> - Name of the table to set the version for
+        <version> - Version number
+    """
+    e = create_engine(ctx.gconfig.get("db", "adminurl"))
+    e.execute(
+        "delete from {0!r} where table_name={1!r} and destination={1!r}".format(
+            vertable.encode("ascii", "ignore").decode(),
+            table.encode("ascii", "ignore").decode(),
+        )
+    )
+    e.execute(
+        "insert into {0!r} (table_name, table_version) values ({1!r}, {0})".format(
+            vertable.encode("ascii", "ignore").decode(),
+            table.encode("ascii", "ignore").decode(),
+            version,
+        )
+    )
