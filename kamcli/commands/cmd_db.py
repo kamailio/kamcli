@@ -627,3 +627,46 @@ def db_version_set(ctx, vertable, table, version):
             version,
         )
     )
+
+
+@cli.command(
+    "version-get", short_help="Get the version number for a table structure"
+)
+@click.option(
+    "vertable",
+    "--version-table",
+    default="version",
+    help="Name of the table with version records",
+)
+@click.option(
+    "oformat",
+    "--output-format",
+    "-F",
+    type=click.Choice(["raw", "json", "table", "dict"]),
+    default=None,
+    help="Format the output",
+)
+@click.option(
+    "ostyle",
+    "--output-style",
+    "-S",
+    default=None,
+    help="Style of the output (tabulate table format)",
+)
+@click.argument("table", metavar="<table>")
+@pass_context
+def db_version_get(ctx, vertable, oformat, ostyle, table):
+    """Get the version number for a table structure
+
+    \b
+    Parameters:
+        <table> - Name of the table to get the version for
+    """
+    e = create_engine(ctx.gconfig.get("db", "adminurl"))
+    res = e.execute(
+        "select * from {0} where table_name={1!r}".format(
+            vertable.encode("ascii", "ignore").decode(),
+            table.encode("ascii", "ignore").decode(),
+        )
+    )
+    ioutils_dbres_print(ctx, oformat, ostyle, res)
