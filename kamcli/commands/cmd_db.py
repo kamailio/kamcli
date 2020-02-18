@@ -615,13 +615,13 @@ def db_version_set(ctx, vertable, table, version):
     """
     e = create_engine(ctx.gconfig.get("db", "adminurl"))
     e.execute(
-        "delete from {0!r} where table_name={1!r} and destination={1!r}".format(
+        "delete from {0} where table_name={1!r}".format(
             vertable.encode("ascii", "ignore").decode(),
             table.encode("ascii", "ignore").decode(),
         )
     )
     e.execute(
-        "insert into {0!r} (table_name, table_version) values ({1!r}, {0})".format(
+        "insert into {0} (table_name, table_version) values ({1!r}, {2})".format(
             vertable.encode("ascii", "ignore").decode(),
             table.encode("ascii", "ignore").decode(),
             version,
