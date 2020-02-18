@@ -282,7 +282,7 @@ def command_jsonrpc_socket(
                 sockclient = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
             sockclient.settimeout(4.0)
-            sockclient.sendto(scmd, (host, int(port)))
+            sockclient.sendto(scmd.encode(), (host, int(port)))
 
             # receive the response (content, sockserver)
             data = sockclient.recvfrom(84000)
