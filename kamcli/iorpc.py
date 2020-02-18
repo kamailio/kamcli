@@ -289,7 +289,7 @@ def command_jsonrpc_socket(
             response = data[0]
             # sockserver = data[1]
 
-            ctx.vlog("Server response: " + response)
+            ctx.vlog("Server response: " + response.decode())
 
         except socket.timeout:
             ctx.log("Timeout receiving response on udp socket")
