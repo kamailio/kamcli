@@ -27,16 +27,16 @@ def cli(ctx, single, names):
         for n in names:
             if n.endswith(":"):
                 # enforce group name by ending with ':'
-                command_ctl(ctx, "stats.get_statistics", [n])
+                command_ctl(ctx, "stats.fetch", [n])
             elif n.find(":") > 0:
                 # get only stat name, when providing 'group:stat'
-                command_ctl(ctx, "stats.get_statistics", [n.split(":")[1]])
+                command_ctl(ctx, "stats.fetch", [n.split(":")[1]])
             elif single:
                 # single stat name flag
-                command_ctl(ctx, "stats.get_statistics", [n])
+                command_ctl(ctx, "stats.fetch", [n])
             else:
                 # default is group name
-                command_ctl(ctx, "stats.get_statistics", [n + ":"])
+                command_ctl(ctx, "stats.fetch", [n + ":"])
     else:
         # no name, print all
-        command_ctl(ctx, "stats.get_statistics", ["all"])
+        command_ctl(ctx, "stats.fetch", ["all"])
