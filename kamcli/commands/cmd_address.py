@@ -122,7 +122,7 @@ def address_showdb(ctx, oformat, ostyle, group):
 
 @cli.command("list", short_help="Show details for address records in memory")
 @click.option(
-    "tag",
+    "mode",
     "--mode",
     default="all",
     help="What to be printed (all, addresses, subnets, domains)",
