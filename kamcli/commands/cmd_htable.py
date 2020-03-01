@@ -19,7 +19,7 @@ def htable_list(ctx, htname):
     Parameters:
         <htname> - the name of hash table
     """
-    command_ctl(ctx, "htable.dump"[htname])
+    command_ctl(ctx, "htable.dump", [htname])
 
 
 @cli.command("get", short_help="Get the value for $sht(htname=>itname)")
@@ -73,3 +73,18 @@ def htable_seti(ctx, htname, itname, ival):
         <ival> - the int value
     """
     command_ctl(ctx, "htable.seti", [htname, itname, ival])
+
+
+@cli.command(
+    "flush", short_help="Remove all the content of hash table named htname"
+)
+@click.argument("htname", metavar="<htname>")
+@pass_context
+def htable_flush(ctx, htname):
+    """Remove all the content of hash table named htname
+
+    \b
+    Parameters:
+        <htname> - the name of hash table
+    """
+    command_ctl(ctx, "htable.flush", [htname])
