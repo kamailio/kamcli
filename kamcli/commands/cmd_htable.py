@@ -75,6 +75,21 @@ def htable_seti(ctx, htname, itname, ival):
     command_ctl(ctx, "htable.seti", [htname, itname, ival])
 
 
+@cli.command("rm", short_help="Remove the item $sht(htname=>itname)")
+@click.argument("htname", metavar="<htname>")
+@click.argument("itname", metavar="<itname>")
+@pass_context
+def htable_rm(ctx, htname, itname):
+    """Remove the item $sht(htname=>itname)
+
+    \b
+    Parameters:
+        <htname> - the name of hash table
+        <itname> - the name of item
+    """
+    command_ctl(ctx, "htable.delete", [htname, itname])
+
+
 @cli.command(
     "flush", short_help="Remove all the content of hash table named htname"
 )
