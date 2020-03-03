@@ -169,6 +169,8 @@ def cli(ctx, debug, wdir, config, nodefaultconfigs):
     \b
     Default configuration files:
         - /etc/kamcli/kamcli.ini
+        - ./kamcli.ini
+        - ./kamcli/kamcli.ini
         - ~/.kamcli/kamctli.ini
     Configs loading order: default configs, then --config option
 
@@ -182,6 +184,10 @@ def cli(ctx, debug, wdir, config, nodefaultconfigs):
     if not nodefaultconfigs:
         if os.path.isfile("/etc/kamcli/kamcli.ini"):
             ctx.gconfig_paths.append("/etc/kamcli/kamcli.ini")
+        if os.path.isfile("./kamcli.ini"):
+            ctx.gconfig_paths.append("./kamcli.ini")
+        if os.path.isfile("./kamcli/kamcli.ini"):
+            ctx.gconfig_paths.append("./kamcli/kamcli.ini")
         tpath = os.path.expanduser("~/.kamcli/kamcli.ini")
         if os.path.isfile(tpath):
             ctx.gconfig_paths.append(tpath)
