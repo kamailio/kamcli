@@ -57,6 +57,7 @@ CONTEXT_SETTINGS = dict(auto_envvar_prefix="KAMCLI")
 COMMAND_ALIASES = {
     "subs": "subscriber",
     "rpc": "jsonrpc",
+    "sht": "htable",
 }
 
 
