@@ -103,3 +103,19 @@ def htable_flush(ctx, htname):
         <htname> - the name of hash table
     """
     command_ctl(ctx, "htable.flush", [htname])
+
+
+@cli.command(
+    "reload",
+    short_help="Reload the content from database for hash table named htname",
+)
+@click.argument("htname", metavar="<htname>")
+@pass_context
+def htable_reload(ctx, htname):
+    """Remove the content from database for hash table named htname
+
+    \b
+    Parameters:
+        <htname> - the name of hash table
+    """
+    command_ctl(ctx, "htable.reload", [htname])
