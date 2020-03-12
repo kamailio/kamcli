@@ -7,6 +7,8 @@ try:
 except ImportError:
     import configparser
 
+kamcli_formats_list = ["raw", "json", "table", "dict"]
+
 
 def read_global_config(config_paths):
     """Get config."""
@@ -64,6 +66,7 @@ COMMAND_ALIASES = {
 class Context(object):
     def __init__(self):
         self.debug = False
+        self.oformat = None
         self.wdir = os.getcwd()
         self.gconfig_paths = []
         self._gconfig = None
@@ -159,9 +162,17 @@ def global_read_config(ctx, param, value):
     is_flag=True,
     help="Skip loading default configuration files.",
 )
+@click.option(
+    "oformat",
+    "--output-format",
+    "-F",
+    type=click.Choice(kamcli_formats_list),
+    default=None,
+    help="Format the output",
+)
 @click.version_option()
 @pass_context
-def cli(ctx, debug, wdir, config, nodefaultconfigs):
+def cli(ctx, debug, wdir, config, nodefaultconfigs, oformat):
     """Kamailio command line interface control tool.
 
     \b
@@ -182,6 +193,8 @@ def cli(ctx, debug, wdir, config, nodefaultconfigs):
     ctx.debug = debug
     if wdir is not None:
         ctx.wdir = wdir
+    if oformat is not None:
+        ctx.oformat = oformat
     if not nodefaultconfigs:
         if os.path.isfile("/etc/kamcli/kamcli.ini"):
             ctx.gconfig_paths.append("/etc/kamcli/kamcli.ini")
