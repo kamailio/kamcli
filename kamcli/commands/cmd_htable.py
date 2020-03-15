@@ -131,3 +131,15 @@ def htable_list_tables(ctx):
     \b
     """
     command_ctl(ctx, "htable.listTables", [])
+
+
+@cli.command(
+    "stats", short_help="Print statistics for hash tables",
+)
+@pass_context
+def htable_stats(ctx):
+    """Print statistics for hash tables
+
+    \b
+    """
+    command_ctl(ctx, "htable.stats", [])
