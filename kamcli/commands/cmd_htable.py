@@ -119,3 +119,15 @@ def htable_reload(ctx, htname):
         <htname> - the name of hash table
     """
     command_ctl(ctx, "htable.reload", [htname])
+
+
+@cli.command(
+    "list-tables", short_help="List the hash tables",
+)
+@pass_context
+def htable_list_tables(ctx):
+    """List the hash tables
+
+    \b
+    """
+    command_ctl(ctx, "htable.listTables", [])
