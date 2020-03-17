@@ -1,5 +1,7 @@
+import os
 import sys
 import click
+import shutil
 from kamcli.cli import pass_context
 from kamcli.cli import COMMAND_ALIASES
 
@@ -51,3 +53,19 @@ def config_cmdaliases(ctx):
     print()
     print(COMMAND_ALIASES)
     print()
+
+
+@cli.command("install", short_help="Install the config file")
+@pass_context
+def config_install(ctx):
+    if os.path.isfile("./kamcli/kamcli.ini"):
+        dirName = "/etc/kamcli"
+        if not os.path.exists(dirName):
+            os.mkdir(dirName)
+            click.echo("directory " + dirName + " created")
+        else:
+            click.echo("directory " + dirName + " already exists")
+        shutil.copyfile("./kamcli/kamcli.ini", "/etc/kamcli/kamcli.ini")
+        click.echo("config file installed to /etc/kamcli/kamcli.ini")
+    else:
+        click.echo("command must be run in the source code root directory")
