@@ -46,7 +46,7 @@ def cmd_trap_print(ctx, response, params=None):
         outfile.write(
             "---start core.psx -------------------------------------------------------\n"
         )
-        outfile.write(response)
+        outfile.write(str(response))
         outfile.write(
             "---end core.psx -------------------------------------------------------\n\n"
         )
