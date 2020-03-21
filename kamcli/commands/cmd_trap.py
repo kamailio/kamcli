@@ -16,16 +16,31 @@ def cli(ctx):
 
     \b
     """
-    command_ctl(ctx, "core.psx", [], {"func": cmd_trap_print})
-
-
-# callback to print the result based on the rpc command
-def cmd_trap_print(ctx, response, params=None):
     ofile = (
         "/tmp/gdb_kamailio_"
         + datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         + ".txt"
     )
+    command_ctl(
+        ctx,
+        "core.psx",
+        [],
+        {"func": cmd_trap_print, "params": {"ofile": ofile}},
+    )
+
+
+# callback to print the result based on the rpc command
+def cmd_trap_print(ctx, response, params=None):
+    ofile = None
+    if params is not None:
+        if "ofile" in params:
+            ofile = params["ofile"]
+    if ofile is None:
+        ofile = (
+            "/tmp/gdb_kamailio_"
+            + datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+            + ".txt"
+        )
     ctx.printf("Trap file: " + ofile)
     rdata = json.loads(response)
     if "result" in rdata:
