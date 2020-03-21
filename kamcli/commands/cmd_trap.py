@@ -46,9 +46,9 @@ def cmd_trap_print(ctx, response, params=None):
         outfile.write(
             "---start core.psx -------------------------------------------------------\n"
         )
-        outfile.write(str(response))
+        outfile.write(response.decode())
         outfile.write(
-            "---end core.psx -------------------------------------------------------\n\n"
+            "\n---end core.psx -------------------------------------------------------\n\n"
         )
     rdata = json.loads(response)
     if "result" in rdata:
