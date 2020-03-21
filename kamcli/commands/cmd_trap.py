@@ -8,11 +8,11 @@ from kamcli.iorpc import command_ctl
 
 @click.command(
     "trap",
-    short_help="Store gdb full backtrace for all Kamailio processes to a file",
+    short_help="Store runtime details and gdb full backtrace for all Kamailio processes to a file",
 )
 @pass_context
 def cli(ctx):
-    """Store gdb full backtrace for all Kamailio processes to a file
+    """Store runtime details and gdb full backtrace for all Kamailio processes to a file
 
     \b
     """
@@ -29,7 +29,7 @@ def cli(ctx):
     )
 
 
-# callback to print the result based on the rpc command
+# callback to write backtraces to file using the result of an rpc command
 def cmd_trap_print(ctx, response, params=None):
     ofile = None
     if params is not None:
@@ -42,6 +42,14 @@ def cmd_trap_print(ctx, response, params=None):
             + ".txt"
         )
     ctx.printf("Trap file: " + ofile)
+    with open(ofile, "a") as outfile:
+        outfile.write(
+            "---start core.psx -------------------------------------------------------\n"
+        )
+        outfile.write(response)
+        outfile.write(
+            "---end core.psx -------------------------------------------------------\n\n"
+        )
     rdata = json.loads(response)
     if "result" in rdata:
         ctx.printf(
