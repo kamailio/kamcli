@@ -141,5 +141,5 @@ def cmd_trap_rpc_print(ctx, response, params=None):
         )
     with open(ofile, "a") as outfile:
         outfile.write(olinestart)
-        outfile.write(response)
+        outfile.write(response.decode())
         outfile.write(olineend)
