@@ -10,8 +10,15 @@ from kamcli.iorpc import command_ctl
     "trap",
     short_help="Store runtime details and gdb full backtrace for all Kamailio processes to a file",
 )
+@click.option(
+    "all",
+    "--all",
+    "-a",
+    is_flag=True,
+    help="Print all details in the trap file",
+)
 @pass_context
-def cli(ctx):
+def cli(ctx, all):
     """Store runtime details and gdb full backtrace for all Kamailio processes to a file
 
     \b
@@ -21,6 +28,25 @@ def cli(ctx):
         + datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         + ".txt"
     )
+    if all:
+        command_ctl(
+            ctx,
+            "core.version",
+            [],
+            {
+                "func": cmd_trap_rpc_print,
+                "params": {"ofile": ofile, "otitle": "core.version"},
+            },
+        )
+        command_ctl(
+            ctx,
+            "core.uptime",
+            [],
+            {
+                "func": cmd_trap_rpc_print,
+                "params": {"ofile": ofile, "otitle": "core.uptime"},
+            },
+        )
     command_ctl(
         ctx,
         "core.psx",
@@ -86,3 +112,34 @@ def cmd_trap_print(ctx, response, params=None):
             + ofile
         )
     ctx.printf("")
+
+
+# callback to print to file the result of an rpc command
+def cmd_trap_rpc_print(ctx, response, params=None):
+    ofile = None
+    otitle = "SECTION"
+    if params is not None:
+        if "ofile" in params:
+            ofile = params["ofile"]
+        if "otitle" in params:
+            otitle = params["otitle"]
+    olinestart = (
+        "---start "
+        + otitle
+        + " -------------------------------------------------------\n"
+    )
+    olineend = (
+        "\n---end "
+        + otitle
+        + " -------------------------------------------------------\n\n"
+    )
+    if ofile is None:
+        ofile = (
+            "/tmp/gdb_kamailio_"
+            + datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+            + ".txt"
+        )
+    with open(ofile, "a") as outfile:
+        outfile.write(olinestart)
+        outfile.write(response)
+        outfile.write(olineend)
