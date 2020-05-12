@@ -124,6 +124,8 @@ environment to be installed in the system.
 ```
   $ git clone https://github.com/kamailio/kamcli.git
   $ cd kamcli
+  $ pip3 install -r requirements/requirements.txt
+  $ pip3 install mysqlclient
   $ pip3 install --editable .
 ```
 
@@ -154,10 +156,10 @@ mkdir kamclienv
 cd kamclienv
 python3 -m venv venv
 . venv/bin/activate
-pip3 install -r requirements/requirements.txt
-pip3 install mysqlclient
 git clone https://github.com/kamailio/kamcli.git
 cd kamcli
+pip3 install -r requirements/requirements.txt
+pip3 install mysqlclient
 pip3 install --editable .
 ```
 
