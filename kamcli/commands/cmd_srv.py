@@ -42,12 +42,12 @@ def srv_rpclist(ctx):
 @cli.command("rpchelp", short_help="Show the help text for rpc command")
 @click.argument("command", metavar="<command>")
 @pass_context
-def srv_rpchelp(ctx,command):
+def srv_rpchelp(ctx, command):
     """Show the the help text for rpc command
 
     \b
     """
-    command_ctl(ctx, "system.methodHelp", [ command ])
+    command_ctl(ctx, "system.methodHelp", [command])
 
 
 @cli.command("info", short_help="Show server info")
