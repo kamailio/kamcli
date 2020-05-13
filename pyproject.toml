@@ -8,3 +8,14 @@ exclude = '''
   | \.tox
 )/
 '''
+
+[tool.tox]
+legacy_tox_ini = '''
+[tox]
+envlist = style
+
+[testenv:style]
+deps =
+	pre-commit
+commands = pre-commit run --all-files
+'''
