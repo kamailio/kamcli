@@ -175,9 +175,9 @@ def uacreg_showdb(ctx, oformat, ostyle, l_uuid):
         res = e.execute("select * from uacreg")
         ioutils_dbres_print(ctx, oformat, ostyle, res)
     else:
-        for l in l_uuid:
-            ctx.vlog("Showing uacreg records for l_uuid: " + l)
-            res = e.execute('select * from uacreg where l_uuid="%s"', l)
+        for record in l_uuid:
+            ctx.vlog("Showing uacreg records for l_uuid: " + record)
+            res = e.execute('select * from uacreg where l_uuid="%s"', record)
             ioutils_dbres_print(ctx, oformat, ostyle, res)
 
 
