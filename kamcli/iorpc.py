@@ -70,17 +70,23 @@ def command_ctl_response_print(response, oformat):
     print()
     if oformat == "json":
         print(
-            json.dumps(json.loads(response), indent=4, separators=(",", ": "))
+            json.dumps(
+                json.loads(response.decode()), indent=4, separators=(",", ": ")
+            )
         )
     elif oformat == "yaml":
         if iorpc_yaml_format is True:
             print(
-                yaml.safe_dump(json.loads(response), default_flow_style=False)
+                yaml.safe_dump(
+                    json.loads(response.decode()), default_flow_style=False
+                )
             )
         else:
             print(
                 json.dumps(
-                    json.loads(response), indent=4, separators=(",", ": ")
+                    json.loads(response.decode()),
+                    indent=4,
+                    separators=(",", ": "),
                 )
             )
     else:
