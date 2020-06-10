@@ -17,7 +17,7 @@ def cli(ctx):
 # callback to print the result of the rpc command
 def cmd_ps_result_print(ctx, response, params=None):
     ctx.vlog("formatting the response for command ps")
-    rdata = json.loads(response)
+    rdata = json.loads(response.decode())
     if "result" in rdata:
         for r in rdata["result"]:
             ctx.printf("%4d %5d %s", r["IDX"], r["PID"], r["DSC"])
