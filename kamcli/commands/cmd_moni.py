@@ -64,7 +64,7 @@ def cli(ctx, norefresh):
 def cmd_moni_result_print(ctx, response, params=None):
     ctx.vlog("formatting the response for command ps")
     print()
-    rdata = json.loads(response)
+    rdata = json.loads(response.decode())
     if "result" in rdata:
         rd = rdata["result"]
         for a, b in zip(rd[::2], rd[1::2]):
