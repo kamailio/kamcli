@@ -76,7 +76,7 @@ def cmd_trap_print(ctx, response, params=None):
         outfile.write(
             "\n---end core.psx -------------------------------------------------------\n\n"
         )
-    rdata = json.loads(response)
+    rdata = json.loads(response.decode())
     if "result" in rdata:
         ctx.printf(
             "Trapping "
