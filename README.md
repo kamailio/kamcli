@@ -199,49 +199,50 @@ Read the help messages:
 Sample commands to understand quicker the capabilities and how to use it:
 
 ```
+kamcli -d --help
 kamcli -d --config=kamcli/kamcli.ini --help
 
-kamcli --config=kamcli/kamcli.ini subscriber show
-kamcli --config=kamcli/kamcli.ini subscriber add test test00
-kamcli --config=kamcli/kamcli.ini subscriber show test
-kamcli --config=kamcli/kamcli.ini subscriber show --help
-kamcli -d --config=kamcli/kamcli.ini subscriber passwd test01 test10
-kamcli -d --config=kamcli/kamcli.ini subscriber add -t no test02 test02
-kamcli -d --config=kamcli/kamcli.ini subscriber setattrs test01 rpid +123
-kamcli -d --config=kamcli/kamcli.ini subscriber setattrnull test01 rpid
+kamcli subscriber show
+kamcli subscriber add test test00
+kamcli subscriber show test
+kamcli subscriber show --help
+kamcli -d subscriber passwd test01 test10
+kamcli -d subscriber add -t no test02 test02
+kamcli -d subscriber setattrs test01 rpid +123
+kamcli -d subscriber setattrnull test01 rpid
 
-kamcli -d --config=kamcli/kamcli.ini jsonrpc --help
-kamcli -d --config=kamcli/kamcli.ini jsonrpc core.psx
-kamcli -d --config=kamcli/kamcli.ini jsonrpc system.listMethods
-kamcli -d --config=kamcli/kamcli.ini jsonrpc stats.get_statistics
-kamcli -d --config=kamcli/kamcli.ini jsonrpc stats.get_statistics all
-kamcli -d --config=kamcli/kamcli.ini jsonrpc stats.get_statistics shmem:
-kamcli -d --config=kamcli/kamcli.ini jsonrpc --dry-run system.listMethods
+kamcli -d jsonrpc --help
+kamcli -d jsonrpc core.psx
+kamcli -d jsonrpc system.listMethods
+kamcli -d jsonrpc stats.get_statistics
+kamcli -d jsonrpc stats.get_statistics all
+kamcli -d jsonrpc stats.get_statistics shmem:
+kamcli -d jsonrpc --dry-run system.listMethods
 
-kamcli -d --config=kamcli/kamcli.ini config raw
-kamcli -d --config=kamcli/kamcli.ini config show main db
-kamcli -d --config=kamcli/kamcli.ini --no-default-configs config show main db
+kamcli -d config raw
+kamcli -d config show main db
+kamcli -d -no-default-configs config show main db
 
-kamcli -d --config=kamcli/kamcli.ini db connect
-kamcli -d --config=kamcli/kamcli.ini db show -F table version
-kamcli -d --config=kamcli/kamcli.ini db show -F json subscriber
-kamcli -d --config=kamcli/kamcli.ini db showcreate version
-kamcli -d --config=kamcli/kamcli.ini db showcreate -F table version
-kamcli -d --config=kamcli/kamcli.ini db showcreate -F table -S html version
-kamcli -d --config=kamcli/kamcli.ini db clirun "describe version"
-kamcli -d --config=kamcli/kamcli.ini db clishow version
-kamcli -d --config=kamcli/kamcli.ini db clishowg subscriber
+kamcli -d db connect
+kamcli -d db show -F table version
+kamcli -d db show -F json subscriber
+kamcli -d db showcreate version
+kamcli -d db showcreate -F table version
+kamcli -d db showcreate -F table -S html version
+kamcli -d db clirun "describe version"
+kamcli -d db clishow version
+kamcli -d db clishowg subscriber
 
 
-kamcli -d --config=kamcli/kamcli.ini ul showdb
-kamcli -d --config=kamcli/kamcli.ini ul show
-kamcli -d --config=kamcli/kamcli.ini ul rm test
-kamcli -d --config=kamcli/kamcli.ini ul add test sip:test@127.0.0.1
+kamcli -d ul showdb
+kamcli -d ul show
+kamcli -d ul rm test
+kamcli -d ul add test sip:test@127.0.0.1
 
-kamcli -d --config=kamcli/kamcli.ini stats
-kamcli -d --config=kamcli/kamcli.ini stats usrloc
-kamcli -d --config=kamcli/kamcli.ini stats -s registered_users
-kamcli -d --config=kamcli/kamcli.ini stats usrloc:registered_users
+kamcli -d stats
+kamcli -d stats usrloc
+kamcli -d stats -s registered_users
+kamcli -d stats usrloc:registered_users
 ```
 
 ### Kamailio Configuration
