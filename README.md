@@ -1,4 +1,4 @@
-## KAMCLI
+## KAMCLI ##
 
 Kamailio Command Line Interface Control Tool.
 
@@ -24,7 +24,7 @@ file a report on Issue Tracker.
 To run `kamcli` with Python2.x, use the git branch `v1.2-python2`. The branch will be kept
 for a while, but likely there will be no new features added to it.
 
-### Features
+### Features ####
 
 The prototype of using **kamcli** is:
 
@@ -74,9 +74,9 @@ The help for each subcommand can be seen with:
 kamcli command subcommand --help
 ```
 
-### Installation
+### Installation ####
 
-#### Requirements
+#### Requirements ####
 
 OS Packages (install via apt, yum, ...):
 
@@ -94,7 +94,7 @@ Extra PIP Packages (install via pip3):
   * _extra packages requied by kamcli (part of OS or  virtual environment)_
     * mysqlclient (optional - needed if you want to connect to MySQL database)
 
-#### Install Virtual Environment
+#### Install Virtual Environment ####
 
 It is recommended to install in a virtual environment at least for development.
 Some useful details about installing Click in virtual environament are
@@ -140,7 +140,7 @@ To deactivate the virtual environment, run:
   $ deactivate
 ```
 
-#### Install on Debian
+#### Install on Debian ####
 
 Should work on: Ubuntu or Mint
 
@@ -169,7 +169,7 @@ To see if all was installed properly, run:
 kamcli --help
 ```
 
-### Configuration File
+### Configuration File ###
 
 Kamcli uses a configuration file with INI format. The name is kamcli.ini and it looks for it in:
 
@@ -184,7 +184,7 @@ A sample kamailio.ini is available in sources, at `kamcli/kamcli.ini`.
 Note: not all configuration file options in `kamcli.ini` are used at this moment, some
 values are hardcoded, being planned to be replaced with the configuration options.
 
-### Usage
+### Usage ###
 
 Read the help messages:
 
@@ -194,7 +194,7 @@ Read the help messages:
   $ kamcli <command> <subcommand> --help
 ```
 
-#### Examples of Commands
+#### Examples of Commands ####
 
 Sample commands to understand quicker the capabilities and how to use it:
 
@@ -245,7 +245,7 @@ kamcli -d stats -s registered_users
 kamcli -d stats usrloc:registered_users
 ```
 
-### Kamailio Configuration
+### Kamailio Configuration ###
 
 It requires to load the `jsonrpcs` module in `kamalilio.cfg` and enable the
 FIFO or UnixSocket transports (they should be enabled by default).
@@ -260,7 +260,7 @@ modparam("jsonrpcs", "transport", 6)
 modparam("jsonrpcs", "pretty_format", 1)
 ```
 
-### License
+### License ###
 
 GPLv2
 
