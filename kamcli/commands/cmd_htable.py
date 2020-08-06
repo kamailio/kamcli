@@ -112,13 +112,29 @@ def htable_flush(ctx, htname):
 @click.argument("htname", metavar="<htname>")
 @pass_context
 def htable_reload(ctx, htname):
-    """Remove the content from database for hash table named htname
+    """Reload the content from database for hash table named htname
 
     \b
     Parameters:
         <htname> - the name of hash table
     """
     command_ctl(ctx, "htable.reload", [htname])
+
+
+@cli.command(
+    "store",
+    short_help="Write the content to database for hash table named htname",
+)
+@click.argument("htname", metavar="<htname>")
+@pass_context
+def htable_store(ctx, htname):
+    """Store the content to database for hash table named htname
+
+    \b
+    Parameters:
+        <htname> - the name of hash table
+    """
+    command_ctl(ctx, "htable.stored", [htname])
 
 
 @cli.command(
