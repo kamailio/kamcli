@@ -25,7 +25,7 @@ def dlgs_list(ctx):
 @click.argument("mop", metavar="<mkey>")
 @click.argument("mval", metavar="<mval>")
 @pass_context
-def dlgs_match(ctx, mkey, mop, mval):
+def dlgs_get(ctx, mkey, mop, mval):
     """Show the details for the matching dialogs
 
     \b
