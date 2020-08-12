@@ -210,7 +210,7 @@ def command_jsonrpc_fifo(
     tiofifo.start()
 
     w = os.open(sndpath, os.O_WRONLY)
-    os.write(w, scmd)
+    os.write(w, scmd.encode())
 
     waitrun = True
     while waitrun:
