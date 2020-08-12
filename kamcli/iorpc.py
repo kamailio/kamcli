@@ -126,7 +126,7 @@ class IOFifoThread(threading.Thread):
         wcount = 0
         rdata = ""
         while not self.stop_signal:
-            rbuf = os.read(r, 4096)
+            rbuf = os.read(r, 4096).decode()
             if rbuf == "":
                 if rcount != 0:
                     wcount += 1
