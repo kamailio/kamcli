@@ -283,7 +283,9 @@ def htable_dbshow(ctx, oformat, ostyle, dbtname, colkeyname, keyname):
     if not keyname:
         ctx.vlog("Showing all htable database records")
         res = e.execute(
-            "select * from {0}".format(dbtname.encode("ascii", "ignore"))
+            "select * from {0}".format(
+                dbtname.encode("ascii", "ignore").decode()
+            )
         )
         ioutils_dbres_print(ctx, oformat, ostyle, res)
     else:
