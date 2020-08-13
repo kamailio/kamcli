@@ -205,7 +205,7 @@ def htable_dbadd(ctx, dbtname, colkeyname, colkeyvalue, keyname, keyvalue):
     kvalue = keyvalue.encode("ascii", "ignore").decode()
 
     e.execute(
-        "insert into {0!r} ({1!r}, {2!r}) values ({3!r}, {4!r})".format(
+        "insert into {0} ({1}, {2}) values ({3!r}, {4!r})".format(
             dbname, col_kname, col_kvalue, kname, kvalue
         )
     )
@@ -235,7 +235,7 @@ def htable_dbrm(ctx, dbtname, colkeyname, keyname):
     """
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     e.execute(
-        "delete from {0!r} where {1!r}={2!r}".format(
+        "delete from {0} where {1}={2!r}".format(
             dbtname.encode("ascii", "ignore").decode(),
             colkeyname.encode("ascii", "ignore").decode(),
             keyname.encode("ascii", "ignore").decode(),
