@@ -221,7 +221,7 @@ def htable_dbadd(ctx, dbtname, colkeyname, colkeyvalue, keyname, keyvalue):
     "colkeyname",
     "--colkeyname",
     default="key_name",
-    help='Column name for prefix (default: "key_name")',
+    help='Column name for key name (default: "key_name")',
 )
 @click.argument("keyname", metavar="<keyname>")
 @pass_context
@@ -240,3 +240,60 @@ def htable_dbrm(ctx, dbtname, colkeyname, keyname):
             keyname.encode("ascii", "ignore").decode(),
         )
     )
+
+
+@cli.command("db-show", short_help="Show htable records in database")
+@click.option(
+    "oformat",
+    "--output-format",
+    "-F",
+    type=click.Choice(["raw", "json", "table", "dict"]),
+    default=None,
+    help="Format the output",
+)
+@click.option(
+    "ostyle",
+    "--output-style",
+    "-S",
+    default=None,
+    help="Style of the output (tabulate table format)",
+)
+@click.option(
+    "dbtname",
+    "--dbtname",
+    default="htable",
+    help='Database table name (default: "htable")',
+)
+@click.option(
+    "colkeyname",
+    "--colkeyname",
+    default="key_name",
+    help='Column name for key name (default: "key_name")',
+)
+@click.argument("keyname", nargs=-1, metavar="[<keyname>]")
+@pass_context
+def htable_dbshow(ctx, oformat, ostyle, dbtname, colkeyname, keyname):
+    """Show details for records in htable database table
+
+    \b
+    Parameters:
+        <keyname> - key name to match the record (optional)
+    """
+    e = create_engine(ctx.gconfig.get("db", "rwurl"))
+    if not keyname:
+        ctx.vlog("Showing all htable database records")
+        res = e.execute(
+            "select * from {0}".format(dbtname.encode("ascii", "ignore"))
+        )
+        ioutils_dbres_print(ctx, oformat, ostyle, res)
+    else:
+        ctx.vlog("Showing htable database records for key name")
+        for k in keyname:
+            res = e.execute(
+                "select * from {0} where {1}={2!r}".format(
+                    dbtname.encode("ascii", "ignore").decode(),
+                    colkeyname.encode("ascii", "ignore").decode(),
+                    k.encode("ascii", "ignore").decode(),
+                )
+            )
+            ioutils_dbres_print(ctx, oformat, ostyle, res)
