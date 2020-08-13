@@ -11,7 +11,7 @@ def cli(ctx):
     pass
 
 
-@cli.command("add", short_help="Add a new mtree record")
+@cli.command("db-add", short_help="Add a new mtree record to database")
 @click.option(
     "tname",
     "--tname",
@@ -34,7 +34,7 @@ def cli(ctx):
 @click.argument("tprefix", metavar="<tprefix>")
 @click.argument("tvalue", metavar="<tvalue>")
 @pass_context
-def mtree_add(ctx, tname, coltprefix, coltvalue, dbtname, tprefix, tvalue):
+def mtree_dbadd(ctx, tname, coltprefix, coltvalue, dbtname, tprefix, tvalue):
     """Add a new tree record in database table
 
     \b
@@ -54,13 +54,13 @@ def mtree_add(ctx, tname, coltprefix, coltvalue, dbtname, tprefix, tvalue):
     val = tvalue.encode("ascii", "ignore").decode()
     if not tname:
         e.execute(
-            "insert into {0!r} ({1!r}, {2!r}) values ({3!r}, {4!r})".format(
+            "insert into {0} ({1}, {2}) values ({3!r}, {4!r})".format(
                 dbname, col_pref, col_val, prefix, val
             )
         )
     else:
         e.execute(
-            "insert into {0!r} (tname, {1!r}, {2!r}) values "
+            "insert into {0} (tname, {1}, {2}) values "
             "({3!r}, {4!r}, {5!r})".format(
                 dbname,
                 tname.encode("ascii", "ignore").decode(),
@@ -72,7 +72,7 @@ def mtree_add(ctx, tname, coltprefix, coltvalue, dbtname, tprefix, tvalue):
         )
 
 
-@cli.command("rm", short_help="Remove a record from mtree table")
+@cli.command("db-rm", short_help="Remove a record from mtree table")
 @click.option(
     "coltprefix",
     "--coltprefix",
@@ -82,7 +82,7 @@ def mtree_add(ctx, tname, coltprefix, coltvalue, dbtname, tprefix, tvalue):
 @click.argument("dbtname", metavar="<dbtname>")
 @click.argument("tprefix", metavar="<tprefix>")
 @pass_context
-def mtree_rm(ctx, coltprefix, dbtname, tprefix):
+def mtree_dbrm(ctx, coltprefix, dbtname, tprefix):
     """Remove a record from tree database table
 
     \b
@@ -92,7 +92,7 @@ def mtree_rm(ctx, coltprefix, dbtname, tprefix):
     """
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     e.execute(
-        "delete from {0!r} where {1!r}={2!r}".format(
+        "delete from {0} where {1}={2!r}".format(
             dbtname.encode("ascii", "ignore").decode(),
             coltprefix.encode("ascii", "ignore").decode(),
             tprefix.encode("ascii", "ignore").decode(),
@@ -100,7 +100,7 @@ def mtree_rm(ctx, coltprefix, dbtname, tprefix):
     )
 
 
-@cli.command("showdb", short_help="Show mtree records in database")
+@cli.command("db-show", short_help="Show mtree records in database")
 @click.option(
     "oformat",
     "--output-format",
@@ -125,7 +125,7 @@ def mtree_rm(ctx, coltprefix, dbtname, tprefix):
 @click.argument("dbtname", metavar="<dbtname>")
 @click.argument("tprefix", nargs=-1, metavar="[<tprefix>]")
 @pass_context
-def mtree_showdb(ctx, oformat, ostyle, coltprefix, dbtname, tprefix):
+def mtree_dbshow(ctx, oformat, ostyle, coltprefix, dbtname, tprefix):
     """Show details for records in mtree database table
 
     \b
@@ -137,12 +137,14 @@ def mtree_showdb(ctx, oformat, ostyle, coltprefix, dbtname, tprefix):
     if not tprefix:
         ctx.vlog("Showing all tree database records")
         res = e.execute(
-            "select * from {0!r}".format(dbtname.encode("ascii", "ignore"))
+            "select * from {0}".format(
+                dbtname.encode("ascii", "ignore").decode()
+            )
         )
     else:
         ctx.vlog("Showing tree database records for prefix")
         res = e.execute(
-            "select * from {0!r} where {1!r}={2!r}".format(
+            "select * from {0} where {1}={2!r}".format(
                 dbtname.encode("ascii", "ignore").decode(),
                 coltprefix.encode("ascii", "ignore").decode(),
                 tprefix.encode("ascii", "ignore").decode(),
