@@ -318,7 +318,7 @@ def command_jsonrpc_socket(
             rcvaddr = rcvaddr + "." + str(os.getpid())
             ctx.vlog("unix socket reply: " + rcvaddr)
             sockclient.bind(rcvaddr)
-            os.chmod(rcvaddr, 0o660)
+            os.chmod(rcvaddr, 0o666)
             try:
                 shutil.chown(
                     rcvaddr, group=ctx.gconfig.get("jsonrpc", "kamgroup")
