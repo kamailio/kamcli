@@ -182,7 +182,6 @@ def htable_stats(ctx):
     default="key_value",
     help='Column name for value (default: "key_value")',
 )
-@click.argument("dbtname", metavar="<dbtname>")
 @click.argument("keyname", metavar="<keyname>")
 @click.argument("keyvalue", metavar="<keyvalue>")
 @pass_context
