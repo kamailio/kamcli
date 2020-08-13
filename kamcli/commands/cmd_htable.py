@@ -1,9 +1,11 @@
 import click
+from sqlalchemy import create_engine
+from kamcli.ioutils import ioutils_dbres_print
 from kamcli.cli import pass_context
 from kamcli.iorpc import command_ctl
 
 
-@click.group("htable", help="Management of $shv(name) variables")
+@click.group("htable", help="Management of htable module")
 @pass_context
 def cli(ctx):
     pass
@@ -159,3 +161,83 @@ def htable_stats(ctx):
     \b
     """
     command_ctl(ctx, "htable.stats", [])
+
+
+@cli.command("db-add", short_help="Add a new htable record to database")
+@click.option(
+    "dbtname",
+    "--dbtname",
+    default="htable",
+    help='Database table name (default: "htable")',
+)
+@click.option(
+    "colkeyname",
+    "--colkeyname",
+    default="key_name",
+    help='Column name for key name (default: "key_name")',
+)
+@click.option(
+    "colkeyvalue",
+    "--colkeyvalue",
+    default="key_value",
+    help='Column name for value (default: "key_value")',
+)
+@click.argument("dbtname", metavar="<dbtname>")
+@click.argument("keyname", metavar="<keyname>")
+@click.argument("keyvalue", metavar="<keyvalue>")
+@pass_context
+def htable_dbadd(ctx, dbtname, colkeyname, colkeyvalue, keyname, keyvalue):
+    """Add a new htable record in database table
+
+    \b
+    Parameters:
+        <keyname> - key name
+        <keyvalue>  - associated value for key name
+    """
+    ctx.vlog(
+        "Adding to htable [%s] record [%s] => [%s]", dbtname, keyname, keyvalue
+    )
+    e = create_engine(ctx.gconfig.get("db", "rwurl"))
+    dbname = dbtname.encode("ascii", "ignore").decode()
+    col_kname = colkeyname.encode("ascii", "ignore").decode()
+    col_kvalue = colkeyvalue.encode("ascii", "ignore").decode()
+    kname = keyname.encode("ascii", "ignore").decode()
+    kvalue = keyvalue.encode("ascii", "ignore").decode()
+
+    e.execute(
+        "insert into {0!r} ({1!r}, {2!r}) values ({3!r}, {4!r})".format(
+            dbname, col_kname, col_kvalue, kname, kvalue
+        )
+    )
+
+
+@cli.command("db-rm", short_help="Remove a record from htable database")
+@click.option(
+    "dbtname",
+    "--dbtname",
+    default="htable",
+    help='Database table name (default: "htable")',
+)
+@click.option(
+    "colkeyname",
+    "--colkeyname",
+    default="key_name",
+    help='Column name for prefix (default: "key_name")',
+)
+@click.argument("keyname", metavar="<keyname>")
+@pass_context
+def htable_dbrm(ctx, dbtname, colkeyname, keyname):
+    """Remove a record from htable database table
+
+    \b
+    Parameters:
+        <keyname> - key name to match the record
+    """
+    e = create_engine(ctx.gconfig.get("db", "rwurl"))
+    e.execute(
+        "delete from {0!r} where {1!r}={2!r}".format(
+            dbtname.encode("ascii", "ignore").decode(),
+            colkeyname.encode("ascii", "ignore").decode(),
+            keyname.encode("ascii", "ignore").decode(),
+        )
+    )
