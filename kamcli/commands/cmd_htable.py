@@ -182,10 +182,28 @@ def htable_stats(ctx):
     default="key_value",
     help='Column name for value (default: "key_value")',
 )
+@click.option(
+    "colvaltype",
+    "--colvaltype",
+    default="value_type",
+    help='Column name for value type (default: "value_type")',
+)
+@click.option(
+    "valtype", "--valtype", type=int, default=0, help="Value type (default: 0)"
+)
 @click.argument("keyname", metavar="<keyname>")
 @click.argument("keyvalue", metavar="<keyvalue>")
 @pass_context
-def htable_dbadd(ctx, dbtname, colkeyname, colkeyvalue, keyname, keyvalue):
+def htable_dbadd(
+    ctx,
+    dbtname,
+    colkeyname,
+    colkeyvalue,
+    colvaltype,
+    valtype,
+    keyname,
+    keyvalue,
+):
     """Add a new htable record in database table
 
     \b
@@ -200,14 +218,28 @@ def htable_dbadd(ctx, dbtname, colkeyname, colkeyvalue, keyname, keyvalue):
     dbname = dbtname.encode("ascii", "ignore").decode()
     col_kname = colkeyname.encode("ascii", "ignore").decode()
     col_kvalue = colkeyvalue.encode("ascii", "ignore").decode()
+    col_valtype = colvaltype.encode("ascii", "ignore").decode()
     kname = keyname.encode("ascii", "ignore").decode()
     kvalue = keyvalue.encode("ascii", "ignore").decode()
 
-    e.execute(
-        "insert into {0} ({1}, {2}) values ({3!r}, {4!r})".format(
-            dbname, col_kname, col_kvalue, kname, kvalue
+    if valtype == 0:
+        e.execute(
+            "insert into {0} ({1}, {2}) values ({3!r}, {4!r})".format(
+                dbname, col_kname, col_kvalue, kname, kvalue
+            )
         )
-    )
+    else:
+        e.execute(
+            "insert into {0} ({1}, {2}, {3}) values ({4!r}, {5}, {6!r})".format(
+                dbname,
+                col_kname,
+                col_valtype,
+                col_kvalue,
+                kname,
+                valtype,
+                kvalue,
+            )
+        )
 
 
 @cli.command("db-rm", short_help="Remove a record from htable database")
