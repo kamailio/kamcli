@@ -8,6 +8,7 @@ setup(
     install_requires=[
         "setuptools",
         "click",
+        "prompt-toolkit",
         "pyaml",
         "sqlalchemy",
         "tabulate",
