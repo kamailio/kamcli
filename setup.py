@@ -12,6 +12,7 @@ setup(
         "pyaml",
         "sqlalchemy",
         "tabulate",
+        "wheel",
     ],
     entry_points="""
         [console_scripts]
