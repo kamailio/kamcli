@@ -82,6 +82,7 @@ OS Packages (install via apt, yum, ...):
 
   * python3 (python version 3.x)
   * python3-pip
+  * python3-setuptools
   * python3-dev (optional - needed to install mysqlclient via pip)
   * python3-venv (optional - needed to install virtual environment)
 
@@ -142,7 +143,7 @@ To deactivate the virtual environment, run:
 
 #### Install on Debian ####
 
-Should work on: Ubuntu or Mint
+Should work also on: Ubuntu or Mint
 
 Note: you may have to replace python with python3 and pip with pip3 in package
 names, installation and execution commands.
@@ -151,7 +152,7 @@ To get kamcli completely installed on Debian with MySQL support,
 run following commands:
 
 ```
-apt-get install python3 python3-pip python3-venv python3-dev
+apt-get install python3 python3-pip python3-setuptools python3-venv python3-dev
 mkdir kamclienv
 cd kamclienv
 python3 -m venv venv
@@ -177,7 +178,12 @@ Kamcli uses a configuration file with INI format. The name is kamcli.ini and it 
   * ~/.kamcli/kamcli.ini
   * the value of --config command line parameter
 
-The installation process doesn't deploy the configuration file yet.
+The installation process doesn't automatically deploy the configuration file yet. It can be done
+by running the next command in the source directory:
+
+```
+kamcli config install
+```
 
 A sample kamailio.ini is available in sources, at `kamcli/kamcli.ini`.
 
