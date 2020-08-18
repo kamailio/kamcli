@@ -33,6 +33,7 @@ implemented in a file located in **kamcli/commands/**.
 
 Among implemented commands:
 
+  * **acc** - manage accounting records
   * **address** - manage permissions address records
   * **aliasdb** - manage database aliases
   * **config** - manage configuration file for kamcli
@@ -41,19 +42,25 @@ Among implemented commands:
   * **dialplan** - manage dialplan records
   * **dispatcher** - manage load balancer (dispatcher)
   * **domain** - manage domain records
+  * **dlgs** - manage dlgs module
   * **group** - manage group membership records (acl)
+  * **htable** - manage htable module
   * **moni** - continuous refresh of the values for a list of statistics
   * **mtree** - manage memory trees (mtree)
+  * **pike** - manage pike module
   * **ps** - print the details for kamailio running processes
+  * **pstrap** - store runtime details and gdb backtraces for running processes with ps
   * **rpc** - interact with kamailio via jsonrpc control commands (alias of jsonrpc)
   * **rpcmethods** - return the list of available RPC methods (commands)
   * **rtpengine** - manage RTPEngine records and instances
+  * **shell** - run in interactive shell mode
   * **speeddial** - manage speed dial records
   * **srv** - server management commands (sockets, aliases, ...)
   * **stats** - get kamailio internal statistics
   * **subscriber** - manage SIP subscribers
   * **tcp** - management commands for TCP connections
   * **tls** - management commands for TLS profiles and connections
+  * **trap** - store runtime details and gdb backtraces for running processes
   * **uacreg** - manage uac remote registration records
   * **ul** - manage user location records
   * **uptime** - print the uptime for kamailio instance
