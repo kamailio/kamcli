@@ -207,6 +207,20 @@ Read the help messages:
   $ kamcli <command> <subcommand> --help
 ```
 
+### Interactive Shell Mode ###
+
+`kamcli` can offer an internal interactive shell when running:
+
+```
+kamcli shell
+```
+
+To exit the internal shell type `:q`, or run `:h` to see the internal shell help.
+
+The internal shell keeps persistent history of commands (stored in `~/.kamcli/history`)
+and has auto-completion of `kamcli` options and subcommands as one starts typing. Using
+`<TAB>` pops up the auto-completion suggestions.
+
 #### Examples of Commands ####
 
 Sample commands to understand quicker the capabilities and how to use it:
