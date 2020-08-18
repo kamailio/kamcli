@@ -333,17 +333,27 @@ def handle_internal_commands(command):
             return target()
 
 
-@click.command("shell", short_help="Run in shell mode")
+@click.command("shell", short_help="Run in interactive shell mode")
+@click.option(
+    "nohistory",
+    "--no-history",
+    "-n",
+    is_flag=True,
+    help="Do not save commands history",
+)
 @pass_context
-def cli(ctx):
+def cli(ctx, nohistory):
     """Run in shell mode
 
     \b
     """
-    if not os.path.isdir(os.path.expanduser("~/.kamcli")):
-        os.mkdir(os.path.expanduser("~/.kamcli"))
+    if nohistory:
+        shell_repl(click.get_current_context())
+    else:
+        if not os.path.isdir(os.path.expanduser("~/.kamcli")):
+            os.mkdir(os.path.expanduser("~/.kamcli"))
 
-    prompt_kwargs = {
-        "history": FileHistory(os.path.expanduser("~/.kamcli/history")),
-    }
-    shell_repl(click.get_current_context(), prompt_kwargs=prompt_kwargs)
+        prompt_kwargs = {
+            "history": FileHistory(os.path.expanduser("~/.kamcli/history")),
+        }
+        shell_repl(click.get_current_context(), prompt_kwargs=prompt_kwargs)
