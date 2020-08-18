@@ -9,17 +9,13 @@ Kamailio is an open source SIP (RFC3261) server available at:
 **kamcli** is aiming at being a modern and extensible alternative to the shell script **kamctl**.
 
 It requires that `jsonrpcs` module of Kamailio is loaded and configured to listen
-on a Unix domain socket or FIFO file. The way to interact with Kamailio has to be set
+on a Unix domain socket, UDP socket or FIFO file. The way to interact with Kamailio has to be set
 inside `kamcli` config file (kamcli.ini).
 
 ### Important Note ###
 
-The master branch of `kamcli` is under ongoing work to upgrade the code to work with Python3.
-Migration to Python3 is required because Python2 has been deprecated and it is going to be
-removed from major Linux distributions.
-
-Therefore, for the moment, not all commands may work with Python3, if you find any problem,
-file a report on Issue Tracker.
+The current version of `kamcli` is works only with Python3. Python2 has been deprecated
+and removed from major Linux distributions.
 
 To run `kamcli` with Python2.x, use the git branch `v1.2-python2`. The branch will be kept
 for a while, but likely there will be no new features added to it.
