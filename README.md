@@ -83,30 +83,37 @@ kamcli command subcommand --help
 
 OS Packages (install via apt, yum, ...):
 
-  * python3 (python version 3.x)
+  * python3 (python version 3.x, recommended at least Python 3.7)
   * python3-pip
   * python3-setuptools
   * python3-dev (optional - needed to install mysqlclient via pip)
   * python3-venv (optional - needed to install virtual environment)
 
-PIP Packages:
+PIP Packages (run inside `kamcli` folder):
 
-   * pip3 install -r requirements/requirements.txt
+```
+  $ pip3 install -r requirements/requirements.txt
+```
 
 Extra PIP Packages (install via pip3):
 
   * _extra packages requied by kamcli (part of OS or  virtual environment)_
     * mysqlclient (optional - needed if you want to connect to MySQL database)
 
-#### Install Virtual Environment ####
+
+```
+  $ pip3 install mysqlclient
+```
+
+#### Install In Virtual Environment ####
 
 It is recommended to install in a virtual environment at least for development.
-Some useful details about installing Click in virtual environament are
+Some useful details about installing Click in virtual environment are
 available at:
 
   * http://click.pocoo.org/4/quickstart/#virtualenv
 
-For example, create the virtual environemnt in the folder venv:
+For example, create the virtual environment in the folder venv:
 
 ```
   $ apt install python3-venv
@@ -121,7 +128,7 @@ To activate the virtual environment:
   $ . venv/bin/activate
 ```
 
-Clone kamcli and install it. The commands can be done inside the virtual
+Clone `kamcli` and install it. The commands can be done inside the virtual
 environment if activate to be available only there or without virtual
 environment to be installed in the system.
 
@@ -151,20 +158,17 @@ Should work also on: Ubuntu or Mint
 Note: you may have to replace python with python3 and pip with pip3 in package
 names, installation and execution commands.
 
-To get kamcli completely installed on Debian with MySQL support,
+To get `kamcli` completely installed on Debian with MySQL support,
 run following commands:
 
 ```
-apt-get install python3 python3-pip python3-setuptools python3-venv python3-dev
-mkdir kamclienv
-cd kamclienv
-python3 -m venv venv
-. venv/bin/activate
+apt-get install python3 python3-pip python3-setuptools python3-dev
+cd /usr/local/src/
 git clone https://github.com/kamailio/kamcli.git
 cd kamcli
 pip3 install -r requirements/requirements.txt
 pip3 install mysqlclient
-pip3 install --editable .
+pip3 install .
 ```
 
 To see if all was installed properly, run:
@@ -175,7 +179,7 @@ kamcli --help
 
 ### Configuration File ###
 
-Kamcli uses a configuration file with INI format. The name is kamcli.ini and it looks for it in:
+Kamcli uses a configuration file with INI format. The name is `kamcli.ini` and it looks for it in:
 
   * /etc/kamcli/kamcli.ini
   * ~/.kamcli/kamcli.ini
