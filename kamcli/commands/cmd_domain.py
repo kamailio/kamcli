@@ -5,7 +5,11 @@ from kamcli.cli import pass_context
 from kamcli.iorpc import command_ctl
 
 
-@click.group("domain", help="Manage domain module (multi-domain records)")
+@click.group(
+    "domain",
+    help="Manage domain module (multi-domain records)",
+    short_help="Manage domain module",
+)
 @pass_context
 def cli(ctx):
     pass
