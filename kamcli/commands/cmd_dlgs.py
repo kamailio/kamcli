@@ -4,7 +4,11 @@ from kamcli.cli import pass_context
 from kamcli.iorpc import command_ctl
 
 
-@click.group("dlgs", help="Manage dlgs module (active calls stats)")
+@click.group(
+    "dlgs",
+    help="Manage dlgs module (active calls stats)",
+    short_help="Manage dlgs module",
+)
 @pass_context
 def cli(ctx):
     pass
