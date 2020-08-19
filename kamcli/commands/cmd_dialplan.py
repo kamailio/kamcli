@@ -5,7 +5,11 @@ from kamcli.cli import pass_context
 from kamcli.iorpc import command_ctl
 
 
-@click.group("dialplan", help="Manage dialplan module (regexp translations)")
+@click.group(
+    "dialplan",
+    help="Manage dialplan module (regexp translations)",
+    short_help="Manage dialplan module",
+)
 @pass_context
 def cli(ctx):
     pass
