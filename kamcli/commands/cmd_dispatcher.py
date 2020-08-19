@@ -5,7 +5,11 @@ from kamcli.cli import pass_context
 from kamcli.iorpc import command_ctl
 
 
-@click.group("dispatcher", help="Manage dispatcher module (load balancer)")
+@click.group(
+    "dispatcher",
+    help="Manage dispatcher module (load balancer)",
+    short_help="Manage dispatcher module",
+)
 @pass_context
 def cli(ctx):
     pass
