@@ -66,7 +66,9 @@ KDB_GROUP_UID = [
 ]
 
 
-@click.group("db", help="Raw database operations")
+@click.group(
+    "db", help="Raw database operations", short_help="Raw database operations"
+)
 @pass_context
 def cli(ctx):
     pass
