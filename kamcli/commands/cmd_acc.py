@@ -6,7 +6,9 @@ from kamcli.cli import pass_context
 from kamcli.dbutils import dbutils_exec_sqltext
 
 
-@click.group("acc", help="Accounting management")
+@click.group(
+    "acc", help="Accounting management", short_help="Accounting management"
+)
 @pass_context
 def cli(ctx):
     pass
