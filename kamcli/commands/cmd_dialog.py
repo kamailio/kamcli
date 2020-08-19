@@ -5,7 +5,11 @@ from kamcli.cli import pass_context
 from kamcli.iorpc import command_ctl
 
 
-@click.group("dialog", help="Manage dialog module (active calls tracking)")
+@click.group(
+    "dialog",
+    help="Manage dialog module (active calls tracking)",
+    short_help="Manage dialog module",
+)
 @pass_context
 def cli(ctx):
     pass
