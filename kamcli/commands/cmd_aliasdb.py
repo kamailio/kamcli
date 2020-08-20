@@ -5,7 +5,11 @@ from kamcli.cli import pass_context
 from kamcli.cli import parse_user_spec
 
 
-@click.group("aliasdb", help="Manage database user aliases")
+@click.group(
+    "aliasdb",
+    help="Manage database user aliases",
+    short_help="Manage database user aliases",
+)
 @pass_context
 def cli(ctx):
     pass
