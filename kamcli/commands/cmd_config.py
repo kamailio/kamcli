@@ -6,7 +6,11 @@ from kamcli.cli import pass_context
 from kamcli.cli import COMMAND_ALIASES
 
 
-@click.group("config", help="Manage the config file")
+@click.group(
+    "config",
+    help="Manage the config file",
+    short_help="Manage the config file",
+)
 @pass_context
 def cli(ctx):
     pass
