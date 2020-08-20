@@ -5,7 +5,11 @@ from kamcli.cli import pass_context
 from kamcli.iorpc import command_ctl
 
 
-@click.group("address", help="Manage permissions address records")
+@click.group(
+    "address",
+    help="Manage permissions address records",
+    short_help="Manage permissions address records",
+)
 @pass_context
 def cli(ctx):
     pass
