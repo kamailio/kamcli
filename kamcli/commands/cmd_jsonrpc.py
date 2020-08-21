@@ -5,7 +5,7 @@ from kamcli.iorpc import command_jsonrpc_fifo
 from kamcli.iorpc import command_jsonrpc_socket
 
 
-@click.command("jsonrpc", short_help="Execute JSONRPC command")
+@click.command("jsonrpc", short_help="Execute JSONRPC commands")
 @click.option(
     "dryrun",
     "--dry-run",
