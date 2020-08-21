@@ -5,7 +5,11 @@ from kamcli.cli import pass_context
 from kamcli.iorpc import command_ctl
 
 
-@click.group("htable", help="Management of htable module")
+@click.group(
+    "htable",
+    help="Management of htable module",
+    short_help="Management of htable module",
+)
 @pass_context
 def cli(ctx):
     pass
