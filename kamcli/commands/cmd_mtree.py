@@ -5,7 +5,11 @@ from kamcli.cli import pass_context
 from kamcli.iorpc import command_ctl
 
 
-@click.group("mtree", help="Manage mtree module (memory trees)")
+@click.group(
+    "mtree",
+    help="Manage mtree module (memory trees)",
+    short_help="Manage mtree module",
+)
 @pass_context
 def cli(ctx):
     pass
