@@ -8,7 +8,8 @@ from kamcli.iorpc import command_ctl
 
 @click.command(
     "trap",
-    short_help="Store runtime details and gdb full backtrace for all Kamailio processes to a file",
+    help="Store runtime details and gdb full backtrace for all Kamailio processes to a file",
+    short_help="Get runtime details and gdb full backtrace",
 )
 @click.option(
     "all",
