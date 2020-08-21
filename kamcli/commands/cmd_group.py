@@ -5,7 +5,11 @@ from kamcli.cli import pass_context
 from kamcli.cli import parse_user_spec
 
 
-@click.group("group", help="Manage the ACL of users with group membership")
+@click.group(
+    "group",
+    help="Manage the ACL of users with group membership",
+    short_help="Manage group module",
+)
 @pass_context
 def cli(ctx):
     pass
