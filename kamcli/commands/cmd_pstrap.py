@@ -9,7 +9,8 @@ from kamcli.iorpc import command_ctl
 
 @click.command(
     "pstrap",
-    short_help="Store runtime details and gdb full backtrace for all Kamailio processes to a file",
+    help="Store runtime details and gdb full backtrace for all Kamailio processes to a file",
+    short_help="Get runtime details and gdb backtrace with ps",
 )
 @click.option(
     "all",
