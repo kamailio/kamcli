@@ -4,7 +4,11 @@ from kamcli.cli import pass_context
 from kamcli.iorpc import command_ctl
 
 
-@click.group("pike", help="Manage pike module (source IP tracking)")
+@click.group(
+    "pike",
+    help="Manage pike module (source IP tracking)",
+    short_help="Manage pike module",
+)
 @pass_context
 def cli(ctx):
     pass
