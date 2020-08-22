@@ -5,7 +5,11 @@ from kamcli.cli import pass_context
 from kamcli.iorpc import command_ctl
 
 
-@click.group("rtpengine", help="Manage rtpengine module")
+@click.group(
+    "rtpengine",
+    help="Manage rtpengine module",
+    short_help="Manage rtpengine module",
+)
 @pass_context
 def cli(ctx):
     pass
