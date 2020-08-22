@@ -74,6 +74,30 @@ def cli(ctx):
     pass
 
 
+@cli.command("query", short_help="Run SQL statement")
+@click.option(
+    "oformat",
+    "--output-format",
+    "-F",
+    type=click.Choice(["raw", "json", "table", "dict"]),
+    default=None,
+    help="Format the output",
+)
+@click.option(
+    "ostyle",
+    "--output-style",
+    "-S",
+    default=None,
+    help="Style of the output (tabulate table format)",
+)
+@click.argument("query", metavar="<query>")
+@pass_context
+def db_query(ctx, oformat, ostyle, query):
+    e = create_engine(ctx.gconfig.get("db", "rwurl"))
+    res = e.execute(query.encode("ascii", "ignore").decode())
+    ioutils_dbres_print(ctx, oformat, ostyle, res)
+
+
 @cli.command("connect", short_help="Launch db cli and connect to database")
 @pass_context
 def db_connect(ctx):
