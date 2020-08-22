@@ -85,7 +85,7 @@ def cli(ctx):
 @click.argument("attribute", metavar="<attribute>")
 @click.argument("value", metavar="<value>")
 @pass_context
-def htable_dbadd(
+def avp_dbadd(
     ctx,
     dbtname,
     coluuid,
@@ -178,3 +178,285 @@ def htable_dbadd(
                     v_value,
                 )
             )
+
+
+@cli.command("db-rm", short_help="Delete AVPs from database")
+@click.option(
+    "dbtname",
+    "--dbtname",
+    "-T",
+    default="usr_preferences",
+    help='Database table name (default: "usr_preferences")',
+)
+@click.option(
+    "coluuid",
+    "--coluuid",
+    default="uuid",
+    help='Column name for uuid (default: "uuid")',
+)
+@click.option(
+    "colusername",
+    "--colusername",
+    default="username",
+    help='Column name for uuid (default: "username")',
+)
+@click.option(
+    "coldomain",
+    "--coldomain",
+    default="domain",
+    help='Column name for domain (default: "domain")',
+)
+@click.option(
+    "colattribute",
+    "--colattribute",
+    default="attribute",
+    help='Column name for attribute (default: "attribute")',
+)
+@click.option(
+    "coltype",
+    "--coltype",
+    default="type",
+    help='Column name for type (default: "type")',
+)
+@click.option(
+    "colvalue",
+    "--colvalue",
+    default="value",
+    help='Column name for value (default: "value")',
+)
+@click.option(
+    "atype",
+    "--atype",
+    "-t",
+    type=int,
+    default=-1,
+    help="Value of the AVP type (default: -1 - no match on type)",
+)
+@click.option(
+    "isuuid",
+    "--is-uuid",
+    "-u",
+    is_flag=True,
+    help="The <userid> argument is a <uuid>, otherwise <username>@<domain>",
+)
+@click.argument("userid", metavar="<userid>")
+@click.argument("attribute", metavar="<attribute>")
+@click.argument("value", metavar="<value>")
+@pass_context
+def avp_dbrm(
+    ctx,
+    dbtname,
+    coluuid,
+    colusername,
+    coldomain,
+    colattribute,
+    coltype,
+    colvalue,
+    atype,
+    isuuid,
+    userid,
+    attribute,
+    value,
+):
+    """Remove AVP records from database table
+
+    \b
+    Parameters:
+        <userid> - user AVP id (<username>@<domain> or <uuid>)
+        <attribute> - attribute name
+        <value>  - associated value for attribute
+        - use '*' to match any value for <userid>, <attribute> or <value>
+        - example - remove all AVPs: kamcli avp db-rm '*' '*' '*'
+    """
+    ctx.vlog(
+        "Removing AVPs from table [%s] - [%s] [%s] => [%s]",
+        dbtname,
+        userid,
+        attribute,
+        value,
+    )
+    e = create_engine(ctx.gconfig.get("db", "rwurl"))
+    dbname = dbtname.encode("ascii", "ignore").decode()
+    c_uuid = coluuid.encode("ascii", "ignore").decode()
+    c_username = colusername.encode("ascii", "ignore").decode()
+    c_domain = coldomain.encode("ascii", "ignore").decode()
+    c_attribute = colattribute.encode("ascii", "ignore").decode()
+    c_type = coltype.encode("ascii", "ignore").decode()
+    c_value = colvalue.encode("ascii", "ignore").decode()
+    v_userid = userid.encode("ascii", "ignore").decode()
+    v_attribute = attribute.encode("ascii", "ignore").decode()
+    v_value = value.encode("ascii", "ignore").decode()
+
+    sqlquery = "DELETE FROM {0}".format(dbname)
+    if atype != -1 or v_userid != "*" or v_userid != "*" or v_userid != "*":
+        sqlquery += " WHERE 1=1"
+
+    if v_userid != "*":
+        if isuuid:
+            sqlquery += " AND {0}={1!r}".format(c_uuid, v_userid)
+        else:
+            udata = parse_user_spec(ctx, userid)
+            sqlquery += " AND {0}={1!r} AND {2}={3!r}".format(
+                c_username, udata["username"], c_domain, udata["domain"]
+            )
+
+    if v_attribute != "*":
+        sqlquery += " AND {0}={1!r}".format(c_attribute, v_attribute)
+
+    if atype != -1:
+        sqlquery += " AND {0}={1}".format(c_type, atype)
+
+    if v_value != "*":
+        sqlquery += " AND {0}={1!r}".format(c_value, v_value)
+
+    e.execute(sqlquery)
+
+
+@cli.command("db-show", short_help="Show AVPs from database")
+@click.option(
+    "oformat",
+    "--output-format",
+    "-F",
+    type=click.Choice(["raw", "json", "table", "dict"]),
+    default=None,
+    help="Format the output",
+)
+@click.option(
+    "ostyle",
+    "--output-style",
+    "-S",
+    default=None,
+    help="Style of the output (tabulate table format)",
+)
+@click.option(
+    "dbtname",
+    "--dbtname",
+    "-T",
+    default="usr_preferences",
+    help='Database table name (default: "usr_preferences")',
+)
+@click.option(
+    "coluuid",
+    "--coluuid",
+    default="uuid",
+    help='Column name for uuid (default: "uuid")',
+)
+@click.option(
+    "colusername",
+    "--colusername",
+    default="username",
+    help='Column name for uuid (default: "username")',
+)
+@click.option(
+    "coldomain",
+    "--coldomain",
+    default="domain",
+    help='Column name for domain (default: "domain")',
+)
+@click.option(
+    "colattribute",
+    "--colattribute",
+    default="attribute",
+    help='Column name for attribute (default: "attribute")',
+)
+@click.option(
+    "coltype",
+    "--coltype",
+    default="type",
+    help='Column name for type (default: "type")',
+)
+@click.option(
+    "colvalue",
+    "--colvalue",
+    default="value",
+    help='Column name for value (default: "value")',
+)
+@click.option(
+    "atype",
+    "--atype",
+    "-t",
+    type=int,
+    default=-1,
+    help="Value of the AVP type (default: -1 - no match on type)",
+)
+@click.option(
+    "isuuid",
+    "--is-uuid",
+    "-u",
+    is_flag=True,
+    help="The <userid> argument is a <uuid>, otherwise <username>@<domain>",
+)
+@click.argument("userid", metavar="<userid>")
+@click.argument("attribute", metavar="<attribute>")
+@click.argument("value", metavar="<value>")
+@pass_context
+def avp_dbshow(
+    ctx,
+    oformat,
+    ostyle,
+    dbtname,
+    coluuid,
+    colusername,
+    coldomain,
+    colattribute,
+    coltype,
+    colvalue,
+    atype,
+    isuuid,
+    userid,
+    attribute,
+    value,
+):
+    """Show AVP records from database table
+
+    \b
+    Parameters:
+        <userid> - user AVP id (<username>@<domain> or <uuid>)
+        <attribute> - attribute name
+        <value>  - associated value for attribute
+        - use '*' to match any value for <userid>, <attribute> or <value>
+        - example - remove all AVPs: kamcli avp db-rm '*' '*' '*'
+    """
+    ctx.vlog(
+        "Show AVPs from table [%s] - [%s] [%s] => [%s]",
+        dbtname,
+        userid,
+        attribute,
+        value,
+    )
+    e = create_engine(ctx.gconfig.get("db", "rwurl"))
+    dbname = dbtname.encode("ascii", "ignore").decode()
+    c_uuid = coluuid.encode("ascii", "ignore").decode()
+    c_username = colusername.encode("ascii", "ignore").decode()
+    c_domain = coldomain.encode("ascii", "ignore").decode()
+    c_attribute = colattribute.encode("ascii", "ignore").decode()
+    c_type = coltype.encode("ascii", "ignore").decode()
+    c_value = colvalue.encode("ascii", "ignore").decode()
+    v_userid = userid.encode("ascii", "ignore").decode()
+    v_attribute = attribute.encode("ascii", "ignore").decode()
+    v_value = value.encode("ascii", "ignore").decode()
+
+    sqlquery = "SELECT * FROM {0}".format(dbname)
+    if atype != -1 or v_userid != "*" or v_userid != "*" or v_userid != "*":
+        sqlquery += " WHERE 1=1"
+
+    if v_userid != "*":
+        if isuuid:
+            sqlquery += " AND {0}={1!r}".format(c_uuid, v_userid)
+        else:
+            udata = parse_user_spec(ctx, userid)
+            sqlquery += " AND {0}={1!r} AND {2}={3!r}".format(
+                c_username, udata["username"], c_domain, udata["domain"]
+            )
+
+    if v_attribute != "*":
+        sqlquery += " AND {0}={1!r}".format(c_attribute, v_attribute)
+
+    if atype != -1:
+        sqlquery += " AND {0}={1}".format(c_type, atype)
+
+    if v_value != "*":
+        sqlquery += " AND {0}={1!r}".format(c_value, v_value)
+
+    res = e.execute(sqlquery)
+    ioutils_dbres_print(ctx, oformat, ostyle, res)
