@@ -54,7 +54,9 @@ def parse_user_spec(ctx, ustr):
     return udata
 
 
-CONTEXT_SETTINGS = dict(auto_envvar_prefix="KAMCLI")
+CONTEXT_SETTINGS = dict(
+    auto_envvar_prefix="KAMCLI", help_option_names=["-h", "--help"]
+)
 
 COMMAND_ALIASES = {
     "subs": "subscriber",
