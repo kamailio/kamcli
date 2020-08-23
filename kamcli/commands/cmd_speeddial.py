@@ -5,7 +5,11 @@ from kamcli.cli import pass_context
 from kamcli.cli import parse_user_spec
 
 
-@click.group("speeddial", help="Manage speed dial records")
+@click.group(
+    "speeddial",
+    help="Manage speed dial records",
+    short_help="Manage speed dial records",
+)
 @pass_context
 def cli(ctx):
     pass
