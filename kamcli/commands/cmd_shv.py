@@ -3,7 +3,11 @@ from kamcli.cli import pass_context
 from kamcli.iorpc import command_ctl
 
 
-@click.group("shv", help="Management of $shv(name) variables")
+@click.group(
+    "shv",
+    help="Manage $shv(name) variables",
+    short_help="Manage $shv(name) variables",
+)
 @pass_context
 def cli(ctx):
     pass
