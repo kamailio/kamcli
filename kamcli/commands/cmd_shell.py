@@ -34,6 +34,7 @@ from prompt_toolkit.completion import Completer, Completion
 from prompt_toolkit.history import InMemoryHistory
 from prompt_toolkit.shortcuts import prompt
 from prompt_toolkit.history import FileHistory
+from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from prompt_toolkit.styles import Style
 import os
 import shlex
@@ -200,6 +201,7 @@ def bootstrap_prompt(prompt_kwargs, group):
         "completer": ClickCompleter(group),
         "message": [("class:prompt", "kamcli > "),],
         "style": Style.from_dict({"prompt": "bold",}),
+        "auto_suggest": AutoSuggestFromHistory(),
     }
 
     for key in defaults:
