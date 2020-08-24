@@ -36,6 +36,8 @@ from prompt_toolkit.shortcuts import prompt
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from prompt_toolkit.styles import Style
+from prompt_toolkit.lexers import PygmentsLexer
+from pygments.lexers.shell import BashLexer
 import os
 import shlex
 import sys
@@ -359,5 +361,6 @@ def cli(ctx, nohistory):
 
         prompt_kwargs = {
             "history": FileHistory(os.path.expanduser("~/.kamcli/history")),
+            "lexer": PygmentsLexer(BashLexer),
         }
         shell_repl(click.get_current_context(), prompt_kwargs=prompt_kwargs)
