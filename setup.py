@@ -10,6 +10,7 @@ setup(
         "click",
         "prompt-toolkit",
         "pyaml",
+        "pygments",
         "sqlalchemy",
         "tabulate",
         "wheel",
