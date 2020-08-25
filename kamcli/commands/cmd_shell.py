@@ -343,24 +343,31 @@ def handle_internal_commands(command):
 @click.option(
     "nohistory",
     "--no-history",
-    "-n",
+    "-N",
     is_flag=True,
     help="Do not save commands history",
 )
+@click.option(
+    "nosyntax",
+    "--no-syntax",
+    "-S",
+    is_flag=True,
+    help="Do not enable syntax highlighting for command line",
+)
 @pass_context
-def cli(ctx, nohistory):
+def cli(ctx, nohistory, nosyntax):
     """Run in shell mode
 
     \b
     """
-    if nohistory:
-        shell_repl(click.get_current_context())
-    else:
-        if not os.path.isdir(os.path.expanduser("~/.kamcli")):
-            os.mkdir(os.path.expanduser("~/.kamcli"))
+    prompt_kwargs = {}
 
-        prompt_kwargs = {
-            "history": FileHistory(os.path.expanduser("~/.kamcli/history")),
-            "lexer": PygmentsLexer(BashLexer),
-        }
-        shell_repl(click.get_current_context(), prompt_kwargs=prompt_kwargs)
+    if not nohistory:
+        prompt_kwargs.update(
+            {"history": FileHistory(os.path.expanduser("~/.kamcli/history"))}
+        )
+
+    if not nosyntax:
+        prompt_kwargs.update({"lexer": PygmentsLexer(BashLexer)})
+
+    shell_repl(click.get_current_context(), prompt_kwargs=prompt_kwargs)
