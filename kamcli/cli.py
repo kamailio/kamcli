@@ -9,6 +9,12 @@ except ImportError:
 
 kamcli_formats_list = ["raw", "json", "table", "dict"]
 
+COMMAND_ALIASES = {
+    "subs": "subscriber",
+    "rpc": "jsonrpc",
+    "sht": "htable",
+}
+
 
 def read_global_config(config_paths):
     """Get config."""
@@ -58,12 +64,6 @@ CONTEXT_SETTINGS = dict(
     auto_envvar_prefix="KAMCLI", help_option_names=["-h", "--help"]
 )
 
-COMMAND_ALIASES = {
-    "subs": "subscriber",
-    "rpc": "jsonrpc",
-    "sht": "htable",
-}
-
 
 class Context(object):
     def __init__(self):
@@ -97,6 +97,12 @@ class Context(object):
         if args:
             msg %= args
         click.echo(msg, nl=False)
+
+    def read_config(self):
+        if self._gconfig is None:
+            self._gconfig = read_global_config(self.gconfig_paths)
+            if "cmdaliases" in self._gconfig:
+                COMMAND_ALIASES.update(self._gconfig["cmdaliases"])
 
     @property
     def gconfig(self):
@@ -132,18 +138,6 @@ class KamCLI(click.MultiCommand):
         except ImportError:
             return
         return mod.cli
-
-
-def global_read_config(ctx, param, value):
-    """Callback that is used whenever --config is passed.  We use this to
-    always load the correct config.  This means that the config is loaded
-    even if the group itself never executes so our aliases stay always
-    available.
-    """
-    if value is None:
-        value = os.path.join(os.path.dirname(__file__), "kamcli.ini")
-    ctx.read_config(value)
-    return value
 
 
 @click.command(
@@ -209,3 +203,4 @@ def cli(ctx, debug, wdir, config, nodefaultconfigs, oformat):
             ctx.gconfig_paths.append(tpath)
     if config is not None:
         ctx.gconfig_paths.append(os.path.expanduser(config))
+    ctx.read_config()
