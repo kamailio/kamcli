@@ -1,5 +1,6 @@
 import os
 import sys
+import json
 import click
 import shutil
 from kamcli.cli import pass_context
@@ -55,7 +56,7 @@ def config_paths(ctx):
 def config_cmdaliases(ctx):
     """Show the command aliases"""
     print()
-    print(COMMAND_ALIASES)
+    print(json.dumps(COMMAND_ALIASES, indent=4, sort_keys=True))
     print()
 
 
