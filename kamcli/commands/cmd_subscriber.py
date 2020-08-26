@@ -6,7 +6,11 @@ from kamcli.cli import pass_context
 from kamcli.cli import parse_user_spec
 
 
-@click.group("subscriber", help="Manage the subscribers")
+@click.group(
+    "subscriber",
+    help="Manage the subscribers",
+    short_help="Manage the subscribers",
+)
 @pass_context
 def cli(ctx):
     pass
