@@ -3,7 +3,11 @@ from kamcli.cli import pass_context
 from kamcli.iorpc import command_ctl
 
 
-@click.group("tcp", help="Manage TCP options and connections")
+@click.group(
+    "tcp",
+    help="Manage TCP options and connections",
+    short_help="Manage TCP options and connections",
+)
 @pass_context
 def cli(ctx):
     pass
