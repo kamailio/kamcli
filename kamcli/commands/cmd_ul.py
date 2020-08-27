@@ -7,7 +7,11 @@ from kamcli.cli import parse_user_spec
 from kamcli.iorpc import command_ctl
 
 
-@click.group("ul", help="Manage user location records")
+@click.group(
+    "ul",
+    help="Manage user location records",
+    short_help="Manage user location records",
+)
 @pass_context
 def cli(ctx):
     pass
