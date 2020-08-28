@@ -5,7 +5,11 @@ from kamcli.cli import pass_context
 from kamcli.iorpc import command_ctl
 
 
-@click.group("uacreg", help="Manage uac remote registration")
+@click.group(
+    "uacreg",
+    help="Manage uac remote registrations",
+    short_help="Manage uac registrations",
+)
 @pass_context
 def cli(ctx):
     pass
