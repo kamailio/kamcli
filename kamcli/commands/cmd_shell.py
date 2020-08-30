@@ -43,6 +43,9 @@ import shlex
 import sys
 
 
+SHELL_COMMAND_REMAP = {}
+
+
 class InternalCommandException(Exception):
     pass
 
@@ -269,6 +272,9 @@ def shell_repl(
             else:
                 break
 
+        if command in SHELL_COMMAND_REMAP:
+            command = SHELL_COMMAND_REMAP[command]
+
         if allow_system_commands and dispatch_repl_commands(command):
             continue
 
@@ -369,5 +375,8 @@ def cli(ctx, nohistory, nosyntax):
 
     if not nosyntax:
         prompt_kwargs.update({"lexer": PygmentsLexer(BashLexer)})
+
+    if "cmd_shell.cmdremap" in ctx._gconfig:
+        SHELL_COMMAND_REMAP.update(ctx._gconfig["cmd_shell.cmdremap"])
 
     shell_repl(click.get_current_context(), prompt_kwargs=prompt_kwargs)
