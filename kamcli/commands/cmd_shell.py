@@ -120,11 +120,27 @@ def _help_internal():
     return formatter.getvalue()
 
 
+def _help_cmdmap_internal():
+    formatter = click.HelpFormatter()
+    formatter.write_heading("Interactive Shell Commands Mapping")
+    formatter.indent()
+    for cmdshort, cmdlong in SHELL_COMMAND_REMAP.items():
+        formatter.write_dl(
+            [("  * " + cmdshort + " -", cmdlong)], col_spacing=2
+        )
+    return formatter.getvalue()
+
+
 _register_internal_command(
     ["q", "quit", "exit"], _exit_internal, "exit the interactive shell"
 )
 _register_internal_command(
     ["?", "h", "help"], _help_internal, "displays general help information"
+)
+_register_internal_command(
+    ["c", "cmdmap"],
+    _help_cmdmap_internal,
+    "list command remapping associations",
 )
 
 
