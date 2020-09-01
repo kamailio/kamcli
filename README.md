@@ -14,6 +14,11 @@ inside `kamcli` config file (kamcli.ini).
 
 ### Features ####
 
+The tool provides sub-commands for managing many Kamailio modules and their
+database records. The can be run in one shot from terminal or via the embedded
+interactive shell (which can be started with `kamcli shell` - see the
+corresponding section).
+
 The prototype of using **kamcli** is:
 
 ```
@@ -210,8 +215,31 @@ kamcli shell
 To exit the internal shell type `:q`, or run `:h` to see the internal shell help.
 
 The internal shell keeps persistent history of commands (stored in `~/.kamcli/history`)
-and has auto-completion of `kamcli` options and subcommands as one starts typing. Using
-`<TAB>` pops up the auto-completion suggestions.
+and has auto-completion of `kamcli` options and sub-commands as one starts typing.
+
+Using `<TAB>` pops up the auto-completion suggestions.
+
+The cli prompt line has syntax highlighting and keyboard bindings similar to `bash`:
+
+  * `CTRL + A` - go to start of line
+  * `CTRL + E` - go to end of line
+  * `CTRL + D` - exit the shell session
+  * `CTRL + L` - clear the screen
+  * `CTRL + U` - clear the line before the cursor
+  * `CTRL + K` - clear the line after the cursor
+  * `CTRL + R` - search through previously used commands
+  * `CTRL + W` - delete the word before the cursor
+
+Long commands can be remapped to shorter names via configuration file
+`[cmd_shell.cmdremap]` section, like in the next example:
+
+```
+[cmd_shell.cmdremap]
+dv=db show "version"
+```
+
+Executing `dv` inside the interactive shell prints the result of command
+`db show "version"`.
 
 #### Examples of Commands ####
 
