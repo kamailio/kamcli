@@ -12,14 +12,6 @@ It requires that `jsonrpcs` module of Kamailio is loaded and configured to liste
 on a Unix domain socket, UDP socket or FIFO file. The way to interact with Kamailio has to be set
 inside `kamcli` config file (kamcli.ini).
 
-### Important Note ###
-
-The current version of `kamcli` is works only with Python3. Python2 has been deprecated
-and removed from major Linux distributions.
-
-To run `kamcli` with Python2.x, use the git branch `v1.2-python2`. The branch will be kept
-for a while, but likely there will be no new features added to it.
-
 ### Features ####
 
 The prototype of using **kamcli** is:
@@ -286,6 +278,14 @@ modparam("jsonrpcs", "transport", 6)
 # - pretty format for output
 modparam("jsonrpcs", "pretty_format", 1)
 ```
+
+### Python2 Support ###
+
+The current version of `kamcli` works only with Python3. Python2 has been deprecated
+and removed from major Linux distributions.
+
+To run `kamcli` with Python2.x, use the git branch `v1.2-python2`. The branch will be kept
+for a while, but likely there will be no new features added to it.
 
 ### License ###
 
