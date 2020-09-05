@@ -148,7 +148,7 @@ To deactivate the virtual environment, run:
   $ deactivate
 ```
 
-#### Install on Debian ####
+#### Install On Debian ####
 
 Should work also on: Ubuntu or Mint
 
@@ -178,18 +178,30 @@ kamcli --help
 
 Kamcli uses a configuration file with INI format. The name is `kamcli.ini` and it looks for it in:
 
+  * ./kamcli/kamcli.ini
   * /etc/kamcli/kamcli.ini
   * ~/.kamcli/kamcli.ini
   * the value of --config command line parameter
 
-The installation process doesn't automatically deploy the configuration file yet. It can be done
-by running the next command in the source directory:
+A sample kamailio.ini is available in sources, at `kamcli/kamcli.ini`.
+
+The installation process does not automatically deploy the configuration file.
+
+To install the global configuration file, run the next command in the source directory:
 
 ```
 kamcli config install
 ```
 
-A sample kamailio.ini is available in sources, at `kamcli/kamcli.ini`.
+It installs the sample configuration file in `/etc/kamcli/kamcli.ini`.
+
+To install user specific configuration file, run the next command in the source directory:
+
+```
+kamcli config install -u
+```
+
+It installs the sample configuration file in `~/.kamcli/kamcli.ini`.
 
 Note: not all configuration file options in `kamcli.ini` are used at this moment, some
 values are hardcoded, being planned to be replaced with the configuration options.
@@ -241,7 +253,7 @@ dv=db show "version"
 Executing `dv` inside the interactive shell prints the result of command
 `db show "version"`.
 
-#### Examples of Commands ####
+#### Examples Of Commands ####
 
 Sample commands to understand quicker the capabilities and how to use it:
 
