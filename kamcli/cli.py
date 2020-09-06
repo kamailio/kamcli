@@ -146,29 +146,36 @@ class KamCLI(click.MultiCommand):
     short_help="Kamailio command line interface control tool",
 )
 @click.option(
+    "-d", "--debug", "debug", is_flag=True, help="Enable debug mode."
+)
+@click.option(
+    "-c", "--config", "config", default=None, help="Configuration file."
+)
+@click.option(
+    "-w",
     "--wdir",
+    "wdir",
     type=click.Path(exists=True, file_okay=False, resolve_path=True),
     help="Working directory.",
 )
-@click.option("--debug", "-d", is_flag=True, help="Enable debug mode.")
-@click.option("--config", "-c", default=None, help="Configuration file.")
 @click.option(
-    "nodefaultconfigs",
+    "-n",
     "--no-default-configs",
+    "nodefaultconfigs",
     is_flag=True,
     help="Skip loading default configuration files.",
 )
 @click.option(
-    "oformat",
-    "--output-format",
     "-F",
+    "--output-format",
+    "oformat",
     type=click.Choice(kamcli_formats_list),
     default=None,
     help="Format the output",
 )
 @click.version_option()
 @pass_context
-def cli(ctx, debug, wdir, config, nodefaultconfigs, oformat):
+def cli(ctx, debug, config, wdir, nodefaultconfigs, oformat):
     """Kamailio command line interface control tool.
 
     \b
@@ -192,12 +199,12 @@ def cli(ctx, debug, wdir, config, nodefaultconfigs, oformat):
     if oformat is not None:
         ctx.oformat = oformat
     if not nodefaultconfigs:
-        if os.path.isfile("/etc/kamcli/kamcli.ini"):
-            ctx.gconfig_paths.append("/etc/kamcli/kamcli.ini")
-        if os.path.isfile("./kamcli.ini"):
-            ctx.gconfig_paths.append("./kamcli.ini")
         if os.path.isfile("./kamcli/kamcli.ini"):
             ctx.gconfig_paths.append("./kamcli/kamcli.ini")
+        if os.path.isfile("./kamcli.ini"):
+            ctx.gconfig_paths.append("./kamcli.ini")
+        if os.path.isfile("/etc/kamcli/kamcli.ini"):
+            ctx.gconfig_paths.append("/etc/kamcli/kamcli.ini")
         tpath = os.path.expanduser("~/.kamcli/kamcli.ini")
         if os.path.isfile(tpath):
             ctx.gconfig_paths.append(tpath)
