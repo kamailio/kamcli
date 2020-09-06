@@ -178,10 +178,14 @@ kamcli --help
 
 Kamcli uses a configuration file with INI format. The name is `kamcli.ini` and it looks for it in:
 
-  * ./kamcli/kamcli.ini
-  * /etc/kamcli/kamcli.ini
-  * ~/.kamcli/kamcli.ini
-  * the value of --config command line parameter
+  * `./kamcli/kamcli.ini`
+  * `./kamcli.ini`
+  * `/etc/kamcli/kamcli.ini`
+  * `~/.kamcli/kamcli.ini`
+  * the value of `-c` or `--config` command line parameter
+
+All the configuration files that are found are loaded in the order listed above. To load
+only one configuration file, use `-n` parameter together with `-c /path/to/kamcli.ini`.
 
 A sample kamailio.ini is available in sources, at `kamcli/kamcli.ini`.
 
