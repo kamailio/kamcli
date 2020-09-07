@@ -43,7 +43,7 @@ def srv_rpclist(ctx):
 @click.argument("command", metavar="<command>")
 @pass_context
 def srv_rpchelp(ctx, command):
-    """Show the the help text for rpc command
+    """Show the help text for rpc command
 
     \b
     """
