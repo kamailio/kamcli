@@ -1,5 +1,4 @@
 import click
-from kamcli.ioutils import ioutils_dbres_print
 from kamcli.cli import pass_context
 from kamcli.iorpc import command_ctl
 
