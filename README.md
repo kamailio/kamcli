@@ -101,9 +101,12 @@ Extra PIP Packages (install via pip3):
   $ pip3 install mysqlclient
 ```
 
-      * note: it may require to install `libmysqlclient-dev` to for getting
-      Python `mysqlclient` extension
-      * note: `mysql` cli tool is used by some `db` subcommands
+```
+Notes:
+  - it may require to install `libmysqlclient-dev` to for getting
+    Python `mysqlclient` extension
+  - `mysql` cli tool is used by some `db` subcommands
+```
 
     * psycopg2 (optional - needed if you want to connect to PostgreSQL database)
 
@@ -111,15 +114,17 @@ Extra PIP Packages (install via pip3):
   $ pip3 install psycopg2
 ```
 
-      * on some OSes it may require to install `psycopg2-binary`
-
 ```
+# on some OSes it may require to install `psycopg2-binary`
   $ pip3 install psycopg2-binary
 ```
 
-      * note: it may require to install `libpq-dev` to for getting
-      Python `psycopg2` extension
-      * note: `psql` cli tool is used by some `db` subcommands
+```
+Notes:
+  - it may require to install `libpq-dev` to for getting
+    Python `psycopg2` extension
+  - `psql` cli tool is used by some `db` subcommands
+```
 
 #### Install In Virtual Environment ####
 
