@@ -108,9 +108,13 @@ def db_connect(ctx):
             ctx.gconfig.get("db", "rwpassword"),
             ctx.gconfig.get("db", "dbname"),
         )
-    elif dbtype == "postgres":
-        ctx.log("unsupported database type [%s]", dbtype)
-        sys.exit()
+    elif dbtype == "postgresql":
+        scmd = ("psql \"postgresql://{0}:{1}@{2}/{3}\"").format(
+            ctx.gconfig.get("db", "rwuser"),
+            ctx.gconfig.get("db", "rwpassword"),
+            ctx.gconfig.get("db", "host"),
+            ctx.gconfig.get("db", "dbname"),
+        )
     else:
         ctx.log("unsupported database type [%s]", dbtype)
         sys.exit()
@@ -131,7 +135,7 @@ def db_clirun(ctx, query):
             query,
             ctx.gconfig.get("db", "dbname"),
         )
-    elif dbtype == "postgres":
+    elif dbtype == "postgresql":
         ctx.log("unsupported database type [%s]", dbtype)
         sys.exit()
     else:
@@ -154,7 +158,7 @@ def db_clishow(ctx, table):
             table,
             ctx.gconfig.get("db", "dbname"),
         )
-    elif dbtype == "postgres":
+    elif dbtype == "postgresql":
         ctx.log("unsupported database type [%s]", dbtype)
         sys.exit()
     else:
@@ -177,7 +181,7 @@ def db_clishowg(ctx, table):
             table,
             ctx.gconfig.get("db", "dbname"),
         )
-    elif dbtype == "postgres":
+    elif dbtype == "postgresql":
         ctx.log("unsupported database type [%s]", dbtype)
         sys.exit()
     else:
