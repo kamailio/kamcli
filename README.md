@@ -94,13 +94,32 @@ PIP Packages (run inside `kamcli` folder):
 
 Extra PIP Packages (install via pip3):
 
-  * _extra packages requied by kamcli (part of OS or  virtual environment)_
+  * _extra packages requied by kamcli (part of OS or virtual environment)_
     * mysqlclient (optional - needed if you want to connect to MySQL database)
-
 
 ```
   $ pip3 install mysqlclient
 ```
+
+      * note: it may require to install `libmysqlclient-dev` to for getting
+      Python `mysqlclient` extension
+      * note: `mysql` cli tool is used by some `db` subcommands
+
+    * psycopg2 (optional - needed if you want to connect to PostgreSQL database)
+
+```
+  $ pip3 install psycopg2
+```
+
+      * on some OSes it may require to install `psycopg2-binary`
+
+```
+  $ pip3 install psycopg2-binary
+```
+
+      * note: it may require to install `libpq-dev` to for getting
+      Python `psycopg2` extension
+      * note: `psql` cli tool is used by some `db` subcommands
 
 #### Install In Virtual Environment ####
 
@@ -137,10 +156,11 @@ environment to be installed in the system.
   $ pip3 install --editable .
 ```
 
-The *pip3 install* command installs the dependencies appart of the
-database connector module needed on top of sqlalchemy. You need to
-install your wanted database module -- e.g., for MySQL use pip3 to
-install *mysqlclient*.
+The above commands install the MySQL driver. The command `pip3 install mysqlclient`
+can be skipped if no need for database connectivity, or install the PostgreSQL
+driver, if that type of database is used. The *pip3 install* command installs the
+dependencies appart of the database connector module needed on top of sqlalchemy,
+therefore the database driver has to be installed explicitely with `pip3`.
 
 To deactivate the virtual environment, run:
 
