@@ -385,6 +385,10 @@ def cli(ctx, nohistory, nosyntax):
     prompt_kwargs = {}
 
     if not nohistory:
+        dirName = os.path.expanduser("~/.kamcli")
+        if not os.path.exists(dirName):
+            os.mkdir(dirName)
+            click.echo("directory '" + dirName + "' created")
         prompt_kwargs.update(
             {"history": FileHistory(os.path.expanduser("~/.kamcli/history"))}
         )
