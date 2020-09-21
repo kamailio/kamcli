@@ -108,6 +108,7 @@ Notes:
   - `mysql` cli tool is used by some `db` subcommands
 ```
 
+  * _extra packages requied by kamcli (part of OS or virtual environment)_
     * psycopg2 (optional - needed if you want to connect to PostgreSQL database)
 
 ```
