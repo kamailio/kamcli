@@ -10,8 +10,6 @@ from kamcli.ioutils import ioutils_formats_list
 from kamcli.dbutils import dbutils_exec_sqlfile
 
 
-CMD_BASE = "mysql -h {0} -u {1} -p{2} "
-
 KDB_GROUP_BASIC = ["standard"]
 
 KDB_GROUP_STANDARD = [
@@ -103,6 +101,7 @@ def db_query(ctx, oformat, ostyle, query):
 def db_connect(ctx):
     dbtype = ctx.gconfig.get("db", "type")
     if dbtype.lower() == "mysql":
+        CMD_BASE = "mysql -h {0} -u {1} -p{2} "
         scmd = (CMD_BASE + "{3}").format(
             ctx.gconfig.get("db", "host"),
             ctx.gconfig.get("db", "rwuser"),
@@ -124,6 +123,7 @@ def db_connect(ctx):
 def db_clirun(ctx, query):
     dbtype = ctx.gconfig.get("db", "type")
     if dbtype == "mysql":
+        CMD_BASE = "mysql -h {0} -u {1} -p{2} "
         scmd = (CMD_BASE + '-e "{3} ;" {4}').format(
             ctx.gconfig.get("db", "host"),
             ctx.gconfig.get("db", "rwuser"),
@@ -146,6 +146,7 @@ def db_clirun(ctx, query):
 def db_clishow(ctx, table):
     dbtype = ctx.gconfig.get("db", "type")
     if dbtype == "mysql":
+        CMD_BASE = "mysql -h {0} -u {1} -p{2} "
         scmd = (CMD_BASE + '-e "select * from {3} ;" {4}').format(
             ctx.gconfig.get("db", "host"),
             ctx.gconfig.get("db", "rwuser"),
@@ -168,6 +169,7 @@ def db_clishow(ctx, table):
 def db_clishowg(ctx, table):
     dbtype = ctx.gconfig.get("db", "type")
     if dbtype == "mysql":
+        CMD_BASE = "mysql -h {0} -u {1} -p{2} "
         scmd = (CMD_BASE + r'-e "select * from {3} \G" {4}').format(
             ctx.gconfig.get("db", "host"),
             ctx.gconfig.get("db", "rwuser"),
