@@ -130,6 +130,14 @@ Notes:
   * `psql` cli tool is used by some `db` subcommands
 
 
+#### SQLite Backend ####
+
+No extra Python package needs to be installed, it is included in the core language extensions.
+
+Notes:
+  * it may require to install `sqlite3` tool if wanted to execute `kamcli db ...`
+  cli specific subcommands.
+
 #### Install In Virtual Environment ####
 
 It is recommended to install in a virtual environment at least for development.
