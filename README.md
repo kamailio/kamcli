@@ -92,24 +92,28 @@ PIP Packages (run inside `kamcli` folder):
   $ pip3 install -r requirements/requirements.txt
 ```
 
+#### MySQL Backend ####
+
 Extra PIP Packages (install via pip3):
 
-  * _extra packages requied by kamcli (part of OS or virtual environment)_
-    * mysqlclient (optional - needed if you want to connect to MySQL database)
+* _extra packages requied by kamcli (part of OS or virtual environment)_
+  * mysqlclient (optional - needed if you want to connect to MySQL database)
 
 ```
   $ pip3 install mysqlclient
 ```
 
-```
-Notes:
-  - it may require to install `libmysqlclient-dev` to for getting
-    Python `mysqlclient` extension
-  - `mysql` cli tool is used by some `db` subcommands
-```
 
-  * _extra packages requied by kamcli (part of OS or virtual environment)_
-    * psycopg2 (optional - needed if you want to connect to PostgreSQL database)
+Notes:
+  * it may require to install `libmysqlclient-dev` to for getting
+    Python `mysqlclient` extension
+  * `mysql` cli tool is used by some `db` subcommands
+
+
+#### PostgreSQL Backend ####
+
+* _extra packages requied by kamcli (part of OS or virtual environment)_
+  * psycopg2 (optional - needed if you want to connect to PostgreSQL database)
 
 ```
   $ pip3 install psycopg2
@@ -120,12 +124,11 @@ Notes:
   $ pip3 install psycopg2-binary
 ```
 
-```
 Notes:
-  - it may require to install `libpq-dev` to for getting
+  * it may require to install `libpq-dev` to for getting
     Python `psycopg2` extension
-  - `psql` cli tool is used by some `db` subcommands
-```
+  * `psql` cli tool is used by some `db` subcommands
+
 
 #### Install In Virtual Environment ####
 
