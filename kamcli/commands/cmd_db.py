@@ -114,6 +114,10 @@ def db_connect(ctx):
             ctx.gconfig.get("db", "host"),
             ctx.gconfig.get("db", "dbname"),
         )
+    elif dbtype == "sqlite":
+        scmd = ("sqlite3 {0} ").format(
+            ctx.gconfig.get("db", "dbpath"),
+        )
     else:
         ctx.log("unsupported database type [%s]", dbtype)
         sys.exit()
@@ -139,6 +143,11 @@ def db_clirun(ctx, query):
             ctx.gconfig.get("db", "rwpassword"),
             ctx.gconfig.get("db", "host"),
             ctx.gconfig.get("db", "dbname"),
+            query,
+        )
+    elif dbtype == "sqlite":
+        scmd = ("sqlite3 {0} \"{1} \"").format(
+            ctx.gconfig.get("db", "dbpath"),
             query,
         )
     else:
@@ -168,6 +177,11 @@ def db_clishow(ctx, table):
             ctx.gconfig.get("db", "dbname"),
             table,
         )
+    elif dbtype == "sqlite":
+        scmd = ("sqlite3 {0} \"select * from {1} \"").format(
+            ctx.gconfig.get("db", "dbpath"),
+            table,
+        )
     else:
         ctx.log("unsupported database type [%s]", dbtype)
         sys.exit()
@@ -193,6 +207,11 @@ def db_clishowg(ctx, table):
             ctx.gconfig.get("db", "rwpassword"),
             ctx.gconfig.get("db", "host"),
             ctx.gconfig.get("db", "dbname"),
+            table,
+        )
+    elif dbtype == "sqlite":
+        scmd = ("sqlite3 -line {0} \"select * from {1} \"").format(
+            ctx.gconfig.get("db", "dbpath"),
             table,
         )
     else:
