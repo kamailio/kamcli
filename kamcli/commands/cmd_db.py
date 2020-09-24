@@ -694,7 +694,7 @@ def db_version_set(ctx, vertable, table, version):
         <table> - Name of the table to set the version for
         <version> - Version number
     """
-    e = create_engine(ctx.gconfig.get("db", "adminurl"))
+    e = create_engine(ctx.gconfig.get("db", "rwurl"))
     e.execute(
         "delete from {0} where table_name={1!r}".format(
             vertable.encode("ascii", "ignore").decode(),
@@ -743,7 +743,7 @@ def db_version_get(ctx, vertable, oformat, ostyle, table):
     Parameters:
         <table> - Name of the table to get the version for
     """
-    e = create_engine(ctx.gconfig.get("db", "adminurl"))
+    e = create_engine(ctx.gconfig.get("db", "rwurl"))
     res = e.execute(
         "select * from {0} where table_name={1!r}".format(
             vertable.encode("ascii", "ignore").decode(),
