@@ -267,9 +267,28 @@ def db_show(ctx, oformat, ostyle, table):
 @pass_context
 def db_showcreate(ctx, oformat, ostyle, table):
     ctx.vlog("Show create of database table [%s]", table)
-    e = create_engine(ctx.gconfig.get("db", "rwurl"))
-    res = e.execute("show create table {0}".format(table))
-    ioutils_dbres_print(ctx, oformat, ostyle, res)
+    dbtype = ctx.gconfig.get("db", "type")
+    if dbtype == "mysql":
+        e = create_engine(ctx.gconfig.get("db", "rwurl"))
+        res = e.execute("show create table {0}".format(table))
+        ioutils_dbres_print(ctx, oformat, ostyle, res)
+    elif dbtype == "postgresql":
+        scmd = ("psql \"postgresql://{0}:{1}@{2}/{3}\" -c \"\\d {4} \"").format(
+            ctx.gconfig.get("db", "rwuser"),
+            ctx.gconfig.get("db", "rwpassword"),
+            ctx.gconfig.get("db", "host"),
+            ctx.gconfig.get("db", "dbname"),
+            table,
+        )
+        os.system(scmd)
+    elif dbtype == "sqlite":
+        scmd = ("sqlite3 {0} \".schema {1} \"").format(
+            ctx.gconfig.get("db", "dbpath"),
+            table,
+        )
+        os.system(scmd)
+    else:
+        ctx.log("unsupported database type [%s]", dbtype)
 
 
 @cli.command("runfile", short_help="Run SQL statements in a file")
