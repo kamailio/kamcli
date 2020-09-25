@@ -365,14 +365,31 @@ def db_create_users(ctx, e, dbname):
         )
 
 
-def db_create_database(ctx, e, dbname):
-    e.execute("create database {0}".format(dbname))
-
-
 def db_create_group(ctx, e, dirpath, dbgroup):
     for t in dbgroup:
         fname = dirpath + "/" + t + "-create.sql"
         dbutils_exec_sqlfile(ctx, e, fname)
+
+
+def db_create_mysql(ctx, ldbname, ldirectory):
+    e = create_engine(ctx.gconfig.get("db", "adminurl"))
+    e.execute("create database {0}".format(ldbname))
+    db_create_users(ctx, e, ldbname)
+    e.execute("use {0}".format(ldbname))
+    db_create_group(ctx, e, ldirectory, KDB_GROUP_BASIC)
+    db_create_group(ctx, e, ldirectory, KDB_GROUP_STANDARD)
+    print("Do you want to create extra tables? (y/n):", end=" ")
+    option = input()
+    if option == "y":
+        db_create_group(ctx, e, ldirectory, KDB_GROUP_EXTRA)
+    print("Do you want to create presence tables? (y/n):", end=" ")
+    option = input()
+    if option == "y":
+        db_create_group(ctx, e, ldirectory, KDB_GROUP_PRESENCE)
+    print("Do you want to create uid tables? (y/n):", end=" ")
+    option = input()
+    if option == "y":
+        db_create_group(ctx, e, ldirectory, KDB_GROUP_UID)
 
 
 @cli.command("create", short_help="Create database structure")
@@ -395,9 +412,6 @@ def db_create(ctx, dbname, directory):
     \b
     """
     dbtype = ctx.gconfig.get("db", "type")
-    if dbtype != "mysql":
-        ctx.vlog("Database type [%s] not supported yet", dbtype)
-        return
     ldbname = ctx.gconfig.get("db", "dbname")
     if len(dbname) > 0:
         ldbname = dbname
@@ -405,24 +419,14 @@ def db_create(ctx, dbname, directory):
     if len(directory) > 0:
         ldirectory = directory
     ctx.vlog("Creating database [%s] structure", ldbname)
-    e = create_engine(ctx.gconfig.get("db", "adminurl"))
-    db_create_database(ctx, e, ldbname)
-    db_create_users(ctx, e, ldbname)
-    e.execute("use {0}".format(ldbname))
-    db_create_group(ctx, e, ldirectory, KDB_GROUP_BASIC)
-    db_create_group(ctx, e, ldirectory, KDB_GROUP_STANDARD)
-    print("Do you want to create extra tables? (y/n):", end=" ")
-    option = input()
-    if option == "y":
-        db_create_group(ctx, e, ldirectory, KDB_GROUP_EXTRA)
-    print("Do you want to create presence tables? (y/n):", end=" ")
-    option = input()
-    if option == "y":
-        db_create_group(ctx, e, ldirectory, KDB_GROUP_PRESENCE)
-    print("Do you want to create uid tables? (y/n):", end=" ")
-    option = input()
-    if option == "y":
-        db_create_group(ctx, e, ldirectory, KDB_GROUP_UID)
+    if dbtype == "mysql":
+        db_create_mysql(ctx, ldbname, ldirectory)
+    elif dbtype == "postgresql":
+        ctx.vlog("Database type [%s] not supported yet", dbtype)
+        return
+    else:
+        ctx.vlog("Database type [%s] not supported yet", dbtype)
+        return
 
 
 @cli.command("create-dbonly", short_help="Create database only")
@@ -438,17 +442,28 @@ def db_create_dbonly(ctx, dbname):
 
     \b
     """
-    dbtype = ctx.gconfig.get("db", "type")
-    if dbtype != "mysql":
-        ctx.vlog("Database type [%s] not supported yet", dbtype)
-        return
     ldbname = ctx.gconfig.get("db", "dbname")
     if len(dbname) > 0:
         ldbname = dbname
     ctx.vlog("Creating only database [%s]", ldbname)
-    e = create_engine(ctx.gconfig.get("db", "adminurl"))
-    db_create_database(ctx, e, ldbname)
-    e.execute("use {0}".format(ldbname))
+
+    dbtype = ctx.gconfig.get("db", "type")
+    if dbtype == "mysql":
+        e = create_engine(ctx.gconfig.get("db", "adminurl"))
+        e.execute("create database {0}".format(ldbname))
+    elif dbtype == "postgresql":
+        scmd = ("psql \"postgresql://{0}:{1}@{2}\" -c \"create database {3} \"").format(
+            ctx.gconfig.get("db", "adminuser"),
+            ctx.gconfig.get("db", "adminpassword"),
+            ctx.gconfig.get("db", "host"),
+            ldbname,
+        )
+        os.system(scmd)
+    elif dbtype == "sqlite":
+        ctx.vlog("Database file for type [%s] is created on first use", dbtype)
+    else:
+        ctx.vlog("Database type [%s] not supported yet", dbtype)
+        return
 
 
 @cli.command("drop", short_help="Drop database")
@@ -465,15 +480,28 @@ def db_drop(ctx, dbname):
     \b
     """
     dbtype = ctx.gconfig.get("db", "type")
-    if dbtype != "mysql":
-        ctx.vlog("Database type [%s] not supported yet", dbtype)
-        return
     ldbname = ctx.gconfig.get("db", "dbname")
     if len(dbname) > 0:
         ldbname = dbname
     ctx.vlog("Dropping database [%s]", ldbname)
-    e = create_engine(ctx.gconfig.get("db", "adminurl"))
-    e.execute("drop database {0}".format(dbname))
+
+    if dbtype == "mysql":
+        e = create_engine(ctx.gconfig.get("db", "adminurl"))
+        e.execute("drop database {0}".format(ldbname))
+    elif dbtype == "postgresql":
+        scmd = ("psql \"postgresql://{0}:{1}@{2}\" -c \"drop database {3} \"").format(
+            ctx.gconfig.get("db", "adminuser"),
+            ctx.gconfig.get("db", "adminpassword"),
+            ctx.gconfig.get("db", "host"),
+            ldbname,
+        )
+        os.system(scmd)
+    elif dbtype == "sqlite":
+        ctx.vlog("Database type [%s] not supported yet", dbtype)
+        return
+    else:
+        ctx.vlog("Database type [%s] not supported yet", dbtype)
+        return
 
 
 def db_create_tables_list(ctx, directory, group):
