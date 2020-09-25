@@ -371,10 +371,11 @@ def db_create_group(ctx, e, dirpath, dbgroup):
         dbutils_exec_sqlfile(ctx, e, fname)
 
 
-def db_create_mysql(ctx, ldbname, ldirectory):
+def db_create_mysql(ctx, ldbname, ldirectory, nogrant):
     e = create_engine(ctx.gconfig.get("db", "adminurl"))
     e.execute("create database {0}".format(ldbname))
-    db_create_users(ctx, e, ldbname)
+    if not nogrant:
+        db_create_users(ctx, e, ldbname)
     e.execute("use {0}".format(ldbname))
     db_create_group(ctx, e, ldirectory, KDB_GROUP_BASIC)
     db_create_group(ctx, e, ldirectory, KDB_GROUP_STANDARD)
@@ -405,6 +406,13 @@ def db_create_mysql(ctx, ldbname, ldirectory):
     default="",
     help="Path to the directory with db schema files",
 )
+@click.option(
+    "nogrant",
+    "--no-grant",
+    "-G",
+    is_flag=True,
+    help="Do not create users and do not grant privileges",
+)
 @pass_context
 def db_create(ctx, dbname, directory):
     """Create database structure
@@ -420,7 +428,7 @@ def db_create(ctx, dbname, directory):
         ldirectory = directory
     ctx.vlog("Creating database [%s] structure", ldbname)
     if dbtype == "mysql":
-        db_create_mysql(ctx, ldbname, ldirectory)
+        db_create_mysql(ctx, ldbname, ldirectory, nogrant)
     elif dbtype == "postgresql":
         ctx.vlog("Database type [%s] not supported yet", dbtype)
         return
