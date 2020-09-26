@@ -479,7 +479,7 @@ def db_create_dbonly(ctx, dbname):
     "dbname",
     "--dbname",
     default="",
-    help="Database name or path to the folder for database",
+    help="Database name or path to the database",
 )
 @pass_context
 def db_drop(ctx, dbname):
@@ -488,7 +488,10 @@ def db_drop(ctx, dbname):
     \b
     """
     dbtype = ctx.gconfig.get("db", "type")
-    ldbname = ctx.gconfig.get("db", "dbname")
+    if dbtype == "sqlite":
+        ldbname = ctx.gconfig.get("db", "dbpath")
+    else:
+        ldbname = ctx.gconfig.get("db", "dbname")
     if len(dbname) > 0:
         ldbname = dbname
     ctx.vlog("Dropping database [%s]", ldbname)
@@ -505,7 +508,10 @@ def db_drop(ctx, dbname):
         )
         os.system(scmd)
     elif dbtype == "sqlite":
-        ctx.vlog("Database type [%s] not supported yet", dbtype)
+        if not os.path.isfile(ldbname):
+            ctx.vlog("Database file [%s] does not exist", ldbname)
+        else:
+            os.remove(ldbname)
         return
     else:
         ctx.vlog("Database type [%s] not supported yet", dbtype)
