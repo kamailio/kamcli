@@ -481,8 +481,15 @@ def db_create_dbonly(ctx, dbname):
     default="",
     help="Database name or path to the database",
 )
+@click.option(
+    "yes",
+    "--yes",
+    "-y",
+    is_flag=True,
+    help="Do not ask for confirmation",
+)
 @pass_context
-def db_drop(ctx, dbname):
+def db_drop(ctx, dbname, yes):
     """Drop database
 
     \b
@@ -494,6 +501,13 @@ def db_drop(ctx, dbname):
         ldbname = ctx.gconfig.get("db", "dbname")
     if len(dbname) > 0:
         ldbname = dbname
+    if not yes:
+        print("Dropping database. Are you sure? (y/n):", end=" ")
+        option = input()
+        if option != "y":
+            ctx.vlog("Skip dropping database [%s]", ldbname)
+            return
+
     ctx.vlog("Dropping database [%s]", ldbname)
 
     if dbtype == "mysql":
