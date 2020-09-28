@@ -431,11 +431,16 @@ def db_create_mysql(ctx, ldbname, ldirectory, nousers, nogrants, alltables):
 def db_create_postgresql(
     ctx, ldbname, ldirectory, nousers, nogrants, nofunctions, alltables
 ):
+    scmd = (
+        'psql "postgresql://{0}:{1}@{2}" -c "create database {3} "'
+    ).format(
+        ctx.gconfig.get("db", "adminuser"),
+        ctx.gconfig.get("db", "adminpassword"),
+        ctx.gconfig.get("db", "host"),
+        ldbname,
+    )
+    os.system(scmd)
     e = create_engine(ctx.gconfig.get("db", "adminurl"))
-    conn = e.connect()
-    conn.connection.connection.set_isolation_level(0)
-    conn.execute("create database {0}".format(ldbname))
-    conn.connection.connection.set_isolation_level(1)
     if not nogrant:
         e.execute(
             "CREATE USER {0} WITH PASSWORD '{1}';".format(
