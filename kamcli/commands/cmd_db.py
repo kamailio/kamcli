@@ -371,35 +371,42 @@ def db_create_group(ctx, e, dirpath, dbgroup):
         dbutils_exec_sqlfile(ctx, e, fname)
 
 
-def db_create_sql_table_groups(ctx, e, ldirectory):
+def db_create_sql_table_groups(ctx, e, ldirectory, alltables):
     db_create_group(ctx, e, ldirectory, KDB_GROUP_BASIC)
     db_create_group(ctx, e, ldirectory, KDB_GROUP_STANDARD)
-    print("Do you want to create extra tables? (y/n):", end=" ")
-    option = input()
+
+    option = "y"
+    if not alltables:
+        print("Do you want to create extra tables? (y/n):", end=" ")
+        option = input()
     if option == "y":
         db_create_group(ctx, e, ldirectory, KDB_GROUP_EXTRA)
-    print("Do you want to create presence tables? (y/n):", end=" ")
-    option = input()
+
+    if not alltables:
+        print("Do you want to create presence tables? (y/n):", end=" ")
+        option = input()
     if option == "y":
         db_create_group(ctx, e, ldirectory, KDB_GROUP_PRESENCE)
-    print("Do you want to create uid tables? (y/n):", end=" ")
-    option = input()
+
+    if not alltables:
+        print("Do you want to create uid tables? (y/n):", end=" ")
+        option = input()
     if option == "y":
         db_create_group(ctx, e, ldirectory, KDB_GROUP_UID)
 
 
-def db_create_mysql(ctx, ldbname, ldirectory, nogrant):
+def db_create_mysql(ctx, ldbname, ldirectory, nogrant, alltables):
     e = create_engine(ctx.gconfig.get("db", "adminurl"))
     e.execute("create database {0}".format(ldbname))
     if not nogrant:
         db_create_users(ctx, e, ldbname)
     e.execute("use {0}".format(ldbname))
-    db_create_sql_table_groups(ctx, e, ldirectory)
+    db_create_sql_table_groups(ctx, e, ldirectory, alltables)
 
 
-def db_create_sqlite(ctx, ldbname, ldirectory):
+def db_create_sqlite(ctx, ldbname, ldirectory, alltables):
     e = create_engine("{0}+{1}:///{2}".format(ctx.gconfig.get("db", "type"), ctx.gconfig.get("db", "driver"), ldbname))
-    db_create_sql_table_groups(ctx, e, ldirectory)
+    db_create_sql_table_groups(ctx, e, ldirectory, alltables)
 
 
 @cli.command("create", short_help="Create database structure")
@@ -422,8 +429,15 @@ def db_create_sqlite(ctx, ldbname, ldirectory):
     is_flag=True,
     help="Do not create users and do not grant privileges",
 )
+@click.option(
+    "alltables",
+    "--all-tables",
+    "-a",
+    is_flag=True,
+    help="Create all tables without asking for confirmation",
+)
 @pass_context
-def db_create(ctx, dbname, directory, nogrant):
+def db_create(ctx, dbname, directory, nogrant, alltables):
     """Create database structure
 
     \b
@@ -441,13 +455,13 @@ def db_create(ctx, dbname, directory, nogrant):
         ldirectory = directory
     ctx.vlog("Creating database [%s] structure", ldbname)
     if dbtype == "mysql":
-        db_create_mysql(ctx, ldbname, ldirectory, nogrant)
+        db_create_mysql(ctx, ldbname, ldirectory, nogrant, alltables)
         return
     elif dbtype == "postgresql":
         ctx.vlog("Database type [%s] not supported yet", dbtype)
         return
     elif dbtype == "sqlite":
-        db_create_sqlite(ctx, ldbname, ldirectory)
+        db_create_sqlite(ctx, ldbname, ldirectory, alltables)
         return
     else:
         ctx.vlog("Database type [%s] not supported yet", dbtype)
