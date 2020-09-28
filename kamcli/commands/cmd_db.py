@@ -108,7 +108,7 @@ def db_connect(ctx):
             ctx.gconfig.get("db", "dbname"),
         )
     elif dbtype == "postgresql":
-        scmd = ("psql \"postgresql://{0}:{1}@{2}/{3}\"").format(
+        scmd = ('psql "postgresql://{0}:{1}@{2}/{3}"').format(
             ctx.gconfig.get("db", "rwuser"),
             ctx.gconfig.get("db", "rwpassword"),
             ctx.gconfig.get("db", "host"),
@@ -138,7 +138,7 @@ def db_clirun(ctx, query):
             ctx.gconfig.get("db", "dbname"),
         )
     elif dbtype == "postgresql":
-        scmd = ("psql \"postgresql://{0}:{1}@{2}/{3}\" -c \"{4} ;\"").format(
+        scmd = ('psql "postgresql://{0}:{1}@{2}/{3}" -c "{4} ;"').format(
             ctx.gconfig.get("db", "rwuser"),
             ctx.gconfig.get("db", "rwpassword"),
             ctx.gconfig.get("db", "host"),
@@ -146,7 +146,7 @@ def db_clirun(ctx, query):
             query,
         )
     elif dbtype == "sqlite":
-        scmd = ("sqlite3 {0} \"{1} \"").format(
+        scmd = ('sqlite3 {0} "{1} "').format(
             ctx.gconfig.get("db", "dbpath"),
             query,
         )
@@ -162,7 +162,9 @@ def db_clirun(ctx, query):
 def db_clishow(ctx, table):
     dbtype = ctx.gconfig.get("db", "type")
     if dbtype == "mysql":
-        scmd = ('mysql -h {0} -u {1} -p{2} -e "select * from {3} ;" {4}').format(
+        scmd = (
+            'mysql -h {0} -u {1} -p{2} -e "select * from {3} ;" {4}'
+        ).format(
             ctx.gconfig.get("db", "host"),
             ctx.gconfig.get("db", "rwuser"),
             ctx.gconfig.get("db", "rwpassword"),
@@ -170,7 +172,9 @@ def db_clishow(ctx, table):
             ctx.gconfig.get("db", "dbname"),
         )
     elif dbtype == "postgresql":
-        scmd = ("psql \"postgresql://{0}:{1}@{2}/{3}\" -c \"select * from {4} ;\"").format(
+        scmd = (
+            'psql "postgresql://{0}:{1}@{2}/{3}" -c "select * from {4} ;"'
+        ).format(
             ctx.gconfig.get("db", "rwuser"),
             ctx.gconfig.get("db", "rwpassword"),
             ctx.gconfig.get("db", "host"),
@@ -178,7 +182,7 @@ def db_clishow(ctx, table):
             table,
         )
     elif dbtype == "sqlite":
-        scmd = ("sqlite3 {0} \"select * from {1} \"").format(
+        scmd = ('sqlite3 {0} "select * from {1} "').format(
             ctx.gconfig.get("db", "dbpath"),
             table,
         )
@@ -194,7 +198,9 @@ def db_clishow(ctx, table):
 def db_clishowg(ctx, table):
     dbtype = ctx.gconfig.get("db", "type")
     if dbtype == "mysql":
-        scmd = (r'mysql -h {0} -u {1} -p{2} -e "select * from {3} \G" {4}').format(
+        scmd = (
+            r'mysql -h {0} -u {1} -p{2} -e "select * from {3} \G" {4}'
+        ).format(
             ctx.gconfig.get("db", "host"),
             ctx.gconfig.get("db", "rwuser"),
             ctx.gconfig.get("db", "rwpassword"),
@@ -202,7 +208,9 @@ def db_clishowg(ctx, table):
             ctx.gconfig.get("db", "dbname"),
         )
     elif dbtype == "postgresql":
-        scmd = ("psql \"postgresql://{0}:{1}@{2}/{3}\" -c \"\\x\" -c \"select * from {4} ;\" -c \"\\x\"").format(
+        scmd = (
+            'psql "postgresql://{0}:{1}@{2}/{3}" -c "\\x" -c "select * from {4} ;" -c "\\x"'
+        ).format(
             ctx.gconfig.get("db", "rwuser"),
             ctx.gconfig.get("db", "rwpassword"),
             ctx.gconfig.get("db", "host"),
@@ -210,7 +218,7 @@ def db_clishowg(ctx, table):
             table,
         )
     elif dbtype == "sqlite":
-        scmd = ("sqlite3 -line {0} \"select * from {1} \"").format(
+        scmd = ('sqlite3 -line {0} "select * from {1} "').format(
             ctx.gconfig.get("db", "dbpath"),
             table,
         )
@@ -273,7 +281,7 @@ def db_showcreate(ctx, oformat, ostyle, table):
         res = e.execute("show create table {0}".format(table))
         ioutils_dbres_print(ctx, oformat, ostyle, res)
     elif dbtype == "postgresql":
-        scmd = ("psql \"postgresql://{0}:{1}@{2}/{3}\" -c \"\\d {4} \"").format(
+        scmd = ('psql "postgresql://{0}:{1}@{2}/{3}" -c "\\d {4} "').format(
             ctx.gconfig.get("db", "rwuser"),
             ctx.gconfig.get("db", "rwpassword"),
             ctx.gconfig.get("db", "host"),
@@ -282,7 +290,7 @@ def db_showcreate(ctx, oformat, ostyle, table):
         )
         os.system(scmd)
     elif dbtype == "sqlite":
-        scmd = ("sqlite3 {0} \".schema {1} \"").format(
+        scmd = ('sqlite3 {0} ".schema {1} "').format(
             ctx.gconfig.get("db", "dbpath"),
             table,
         )
@@ -306,45 +314,60 @@ def db_runfile(ctx, fname):
     dbutils_exec_sqlfile(ctx, e, fname)
 
 
-def db_create_host_users(
-    ctx, e, dbname, dbhost, dbrwuser, dbrwpassword, dbrouser, dbropassword
+def db_create_mysql_host_users(
+    ctx,
+    e,
+    nousers,
+    nogrants,
+    dbname,
+    dbhost,
+    dbrwuser,
+    dbrwpassword,
+    dbrouser,
+    dbropassword,
 ):
-    e.execute(
-        "CREATE USER {0!r}@{1!r} IDENTIFIED BY {2!r}".format(
-            dbrwuser, dbhost, dbrwpassword
+    if not nousers:
+        e.execute(
+            "CREATE USER {0!r}@{1!r} IDENTIFIED BY {2!r}".format(
+                dbrwuser, dbhost, dbrwpassword
+            )
         )
-    )
-    e.execute(
-        "GRANT ALL PRIVILEGES ON {0}.* TO {1!r}@{2!r}".format(
-            dbname, dbrwuser, dbhost
+    if not nogrants:
+        e.execute(
+            "GRANT ALL PRIVILEGES ON {0}.* TO {1!r}@{2!r}".format(
+                dbname, dbrwuser, dbhost
+            )
         )
-    )
-    e.execute(
-        "CREATE USER {0!r}@{1!r} IDENTIFIED BY {2!r}".format(
-            dbrouser, dbhost, dbropassword
+    if not nousers:
+        e.execute(
+            "CREATE USER {0!r}@{1!r} IDENTIFIED BY {2!r}".format(
+                dbrouser, dbhost, dbropassword
+            )
         )
-    )
-    e.execute(
-        "GRANT SELECT PRIVILEGES ON {0}.* TO {1!r}@{2!r}".format(
-            dbname, dbrouser, dbhost
+    if not nogrants:
+        e.execute(
+            "GRANT SELECT PRIVILEGES ON {0}.* TO {1!r}@{2!r}".format(
+                dbname, dbrouser, dbhost
+            )
         )
-    )
 
 
-def db_create_users(ctx, e, dbname):
+def db_create_mysql_users(ctx, e, dbname, nousers, nogrants):
     dbhost = ctx.gconfig.get("db", "host")
     dbrwuser = ctx.gconfig.get("db", "rwuser")
     dbrwpassword = ctx.gconfig.get("db", "rwpassword")
     dbrouser = ctx.gconfig.get("db", "rouser")
     dbropassword = ctx.gconfig.get("db", "ropassword")
     dbaccesshost = ctx.gconfig.get("db", "accesshost")
-    db_create_host_users(
+    db_create_mysql_host_users(
         ctx, e, dbname, dbhost, dbrwuser, dbrwpassword, dbrouser, dbropassword
     )
     if dbhost != "localhost":
-        db_create_host_users(
+        db_create_mysql_host_users(
             ctx,
             e,
+            nousers,
+            nogrants,
             dbname,
             "localhost",
             dbrwuser,
@@ -353,9 +376,11 @@ def db_create_users(ctx, e, dbname):
             dbropassword,
         )
     if len(dbaccesshost) > 0:
-        db_create_host_users(
+        db_create_mysql_host_users(
             ctx,
             e,
+            nousers,
+            nogrants,
             dbname,
             dbaccesshost,
             dbrwuser,
@@ -365,47 +390,123 @@ def db_create_users(ctx, e, dbname):
         )
 
 
-def db_create_group(ctx, e, dirpath, dbgroup):
+def db_create_sql_group(ctx, e, dirpath, dbgroup):
     for t in dbgroup:
         fname = dirpath + "/" + t + "-create.sql"
         dbutils_exec_sqlfile(ctx, e, fname)
 
 
 def db_create_sql_table_groups(ctx, e, ldirectory, alltables):
-    db_create_group(ctx, e, ldirectory, KDB_GROUP_BASIC)
-    db_create_group(ctx, e, ldirectory, KDB_GROUP_STANDARD)
+    db_create_sql_group(ctx, e, ldirectory, KDB_GROUP_BASIC)
+    db_create_sql_group(ctx, e, ldirectory, KDB_GROUP_STANDARD)
 
     option = "y"
     if not alltables:
         print("Do you want to create extra tables? (y/n):", end=" ")
         option = input()
     if option == "y":
-        db_create_group(ctx, e, ldirectory, KDB_GROUP_EXTRA)
+        db_create_sql_group(ctx, e, ldirectory, KDB_GROUP_EXTRA)
 
     if not alltables:
         print("Do you want to create presence tables? (y/n):", end=" ")
         option = input()
     if option == "y":
-        db_create_group(ctx, e, ldirectory, KDB_GROUP_PRESENCE)
+        db_create_sql_group(ctx, e, ldirectory, KDB_GROUP_PRESENCE)
 
     if not alltables:
         print("Do you want to create uid tables? (y/n):", end=" ")
         option = input()
     if option == "y":
-        db_create_group(ctx, e, ldirectory, KDB_GROUP_UID)
+        db_create_sql_group(ctx, e, ldirectory, KDB_GROUP_UID)
 
 
-def db_create_mysql(ctx, ldbname, ldirectory, nogrant, alltables):
+def db_create_mysql(ctx, ldbname, ldirectory, nousers, nogrants, alltables):
     e = create_engine(ctx.gconfig.get("db", "adminurl"))
     e.execute("create database {0}".format(ldbname))
-    if not nogrant:
-        db_create_users(ctx, e, ldbname)
+    db_create_mysql_users(ctx, e, ldbname, nousers, nogrants)
     e.execute("use {0}".format(ldbname))
     db_create_sql_table_groups(ctx, e, ldirectory, alltables)
 
 
+def db_create_postgresql(
+    ctx, ldbname, ldirectory, nousers, nogrants, nofunctions, alltables
+):
+    e = create_engine(ctx.gconfig.get("db", "adminurl"))
+    conn = e.connect()
+    conn.connection.connection.set_isolation_level(0)
+    conn.execute("create database {0}".format(ldbname))
+    conn.connection.connection.set_isolation_level(1)
+    if not nogrant:
+        e.execute(
+            "CREATE USER {0} WITH PASSWORD '{1}';".format(
+                ctx.gconfig.get("db", "rwuser"),
+                ctx.gconfig.get("db", "rwpassword"),
+            )
+        )
+        e.execute(
+            "GRANT CONNECT ON DATABASE {0} TO {1};".format(
+                ldbname,
+                ctx.gconfig.get("db", "rwuser"),
+            )
+        )
+        if ctx.gconfig.get("db", "rwuser") != ctx.gconfig.get("db", "rouser"):
+            e.execute(
+                "CREATE USER {0} WITH PASSWORD '{1}';".format(
+                    ctx.gconfig.get("db", "rouser"),
+                    ctx.gconfig.get("db", "ropassword"),
+                )
+            )
+            e.execute(
+                "GRANT CONNECT ON DATABASE {0} TO {1};".format(
+                    ldbname,
+                    ctx.gconfig.get("db", "rouser"),
+                )
+            )
+    e.dispose()
+    e = create_engine(
+        "{0}+{1}://{2}:{3}@{4}/{5}".format(
+            ctx.gconfig.get("db", "type"),
+            ctx.gconfig.get("db", "driver"),
+            ctx.gconfig.get("db", "rwuser"),
+            ctx.gconfig.get("db", "rwpassword"),
+            ctx.gconfig.get("db", "host"),
+            ldbname,
+        )
+    )
+    if not nofunctions:
+        e.execute(
+            "CREATE FUNCTION concat(text, text) RETURNS text AS 'SELECT $1 || $2;' LANGUAGE 'sql';"
+        )
+        e.execute(
+            "CREATE FUNCTION rand() RETURNS double precision AS 'SELECT random();' LANGUAGE 'sql';"
+        )
+    db_create_sql_table_groups(ctx, e, ldirectory, alltables)
+    e.dispose()
+    e = create_engine(ctx.gconfig.get("db", "adminurl"))
+    if not nogrant:
+        e.execute(
+            "GRANT ALL PRIVILEGES ON DATABASE {0} TO {1};".format(
+                ldbname,
+                ctx.gconfig.get("db", "rwuser"),
+            )
+        )
+        if ctx.gconfig.get("db", "rwuser") != ctx.gconfig.get("db", "rouser"):
+            e.execute(
+                "GRANT SELECT ON DATABASE {0} TO {1};".format(
+                    ldbname,
+                    ctx.gconfig.get("db", "rouser"),
+                )
+            )
+
+
 def db_create_sqlite(ctx, ldbname, ldirectory, alltables):
-    e = create_engine("{0}+{1}:///{2}".format(ctx.gconfig.get("db", "type"), ctx.gconfig.get("db", "driver"), ldbname))
+    e = create_engine(
+        "{0}+{1}:///{2}".format(
+            ctx.gconfig.get("db", "type"),
+            ctx.gconfig.get("db", "driver"),
+            ldbname,
+        )
+    )
     db_create_sql_table_groups(ctx, e, ldirectory, alltables)
 
 
@@ -413,21 +514,37 @@ def db_create_sqlite(ctx, ldbname, ldirectory, alltables):
 @click.option(
     "dbname",
     "--dbname",
+    "-d",
     default="",
     help="Database name or path to the folder for database",
 )
 @click.option(
-    "directory",
-    "--directory",
+    "sqldirectory",
+    "--sql-directory",
+    "-s",
     default="",
     help="Path to the directory with db schema files",
 )
 @click.option(
-    "nogrant",
-    "--no-grant",
+    "nousers",
+    "--no-users",
+    "-U",
+    is_flag=True,
+    help="Do not create users",
+)
+@click.option(
+    "nogrants",
+    "--no-grants",
     "-G",
     is_flag=True,
-    help="Do not create users and do not grant privileges",
+    help="Do not grant privileges",
+)
+@click.option(
+    "nofunctions",
+    "--no-functions",
+    "-F",
+    is_flag=True,
+    help="Do not create additional SQL functions",
 )
 @click.option(
     "alltables",
@@ -437,7 +554,9 @@ def db_create_sqlite(ctx, ldbname, ldirectory, alltables):
     help="Create all tables without asking for confirmation",
 )
 @pass_context
-def db_create(ctx, dbname, directory, nogrant, alltables):
+def db_create(
+    ctx, dbname, sqldirectory, nousers, nogrants, nofunctions, alltables
+):
     """Create database structure
 
     \b
@@ -451,14 +570,16 @@ def db_create(ctx, dbname, directory, nogrant, alltables):
         ldbname = dbname
 
     ldirectory = ""
-    if len(directory) > 0:
-        ldirectory = directory
+    if len(sqldirectory) > 0:
+        ldirectory = sqldirectory
     ctx.vlog("Creating database [%s] structure", ldbname)
     if dbtype == "mysql":
-        db_create_mysql(ctx, ldbname, ldirectory, nogrant, alltables)
+        db_create_mysql(ctx, ldbname, ldirectory, nousers, nogrants, alltables)
         return
     elif dbtype == "postgresql":
-        ctx.vlog("Database type [%s] not supported yet", dbtype)
+        db_create_postgresql(
+            ctx, ldbname, ldirectory, nousers, nogrants, nofunctions, alltables
+        )
         return
     elif dbtype == "sqlite":
         db_create_sqlite(ctx, ldbname, ldirectory, alltables)
@@ -472,6 +593,7 @@ def db_create(ctx, dbname, directory, nogrant, alltables):
 @click.option(
     "dbname",
     "--dbname",
+    "-d",
     default="",
     help="Database name or path to the folder for database",
 )
@@ -495,7 +617,9 @@ def db_create_dbonly(ctx, dbname):
         e = create_engine(ctx.gconfig.get("db", "adminurl"))
         e.execute("create database {0}".format(ldbname))
     elif dbtype == "postgresql":
-        scmd = ("psql \"postgresql://{0}:{1}@{2}\" -c \"create database {3} \"").format(
+        scmd = (
+            'psql "postgresql://{0}:{1}@{2}" -c "create database {3} "'
+        ).format(
             ctx.gconfig.get("db", "adminuser"),
             ctx.gconfig.get("db", "adminpassword"),
             ctx.gconfig.get("db", "host"),
@@ -513,6 +637,7 @@ def db_create_dbonly(ctx, dbname):
 @click.option(
     "dbname",
     "--dbname",
+    "-d",
     default="",
     help="Database name or path to the database",
 )
@@ -549,7 +674,9 @@ def db_drop(ctx, dbname, yes):
         e = create_engine(ctx.gconfig.get("db", "adminurl"))
         e.execute("drop database {0}".format(ldbname))
     elif dbtype == "postgresql":
-        scmd = ("psql \"postgresql://{0}:{1}@{2}\" -c \"drop database {3} \"").format(
+        scmd = (
+            'psql "postgresql://{0}:{1}@{2}" -c "drop database {3} "'
+        ).format(
             ctx.gconfig.get("db", "adminuser"),
             ctx.gconfig.get("db", "adminpassword"),
             ctx.gconfig.get("db", "host"),
@@ -576,91 +703,96 @@ def db_create_tables_list(ctx, directory, group):
     if len(directory) > 0:
         ldirectory = directory
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
-    db_create_group(ctx, e, ldirectory, group)
+    db_create_sql_group(ctx, e, ldirectory, group)
 
 
 @cli.command("create-tables-basic", short_help="Create basic database tables")
 @click.option(
-    "directory",
-    "--directory",
+    "sqldirectory",
+    "--sql-directory",
+    "-s",
     default="",
     help="Path to the directory with db schema files",
 )
 @pass_context
-def db_create_tables_basic(ctx, directory):
+def db_create_tables_basic(ctx, sqldirectory):
     """Create basic database tables
 
     \b
     """
-    db_create_tables_list(ctx, directory, KDB_GROUP_BASIC)
+    db_create_tables_list(ctx, sqldirectory, KDB_GROUP_BASIC)
 
 
 @cli.command(
     "create-tables-standard", short_help="Create standard database tables"
 )
 @click.option(
-    "directory",
-    "--directory",
+    "sqldirectory",
+    "--sql-directory",
+    "-s",
     default="",
     help="Path to the directory with db schema files",
 )
 @pass_context
-def db_create_tables_standard(ctx, directory):
+def db_create_tables_standard(ctx, sqldirectory):
     """Create standard database tables
 
     \b
     """
-    db_create_tables_list(ctx, directory, KDB_GROUP_STANDARD)
+    db_create_tables_list(ctx, sqldirectory, KDB_GROUP_STANDARD)
 
 
 @cli.command("create-tables-extra", short_help="Create extra database tables")
 @click.option(
-    "directory",
-    "--directory",
+    "sqldirectory",
+    "--sql-directory",
+    "-s",
     default="",
     help="Path to the directory with db schema files",
 )
 @pass_context
-def db_create_tables_extra(ctx, directory):
+def db_create_tables_extra(ctx, sqldirectory):
     """Create extra database tables
 
     \b
     """
-    db_create_tables_list(ctx, directory, KDB_GROUP_EXTRA)
+    db_create_tables_list(ctx, sqldirectory, KDB_GROUP_EXTRA)
 
 
 @cli.command(
     "create-tables-presence", short_help="Create presence database tables"
 )
 @click.option(
-    "directory",
-    "--directory",
+    "sqldirectory",
+    "--sql-directory",
+    "-s",
     default="",
     help="Path to the directory with db schema files",
 )
 @pass_context
-def db_create_tables_presence(ctx, directory):
+def db_create_tables_presence(ctx, sqldirectory):
     """Create presence database tables
 
     \b
     """
-    db_create_tables_list(ctx, directory, KDB_GROUP_PRESENCE)
+    db_create_tables_list(ctx, sqldirectory, KDB_GROUP_PRESENCE)
 
 
 @cli.command("create-tables-uid", short_help="Create uid database tables")
 @click.option(
-    "directory",
-    "--directory",
+    "sqldirectory",
+    "--sql-directory",
+    "-s",
     default="",
     help="Path to the directory with db schema files",
 )
 @pass_context
-def db_create_tables_uid(ctx, directory):
+def db_create_tables_uid(ctx, sqldirectory):
     """Create uid database tables
 
     \b
     """
-    db_create_tables_list(ctx, directory, KDB_GROUP_UID)
+    db_create_tables_list(ctx, sqldirectory, KDB_GROUP_UID)
 
 
 @cli.command(
@@ -668,14 +800,15 @@ def db_create_tables_uid(ctx, directory):
     short_help="Create the group of database tables for a specific extension",
 )
 @click.option(
-    "directory",
-    "--directory",
+    "sqldirectory",
+    "--sql-directory",
+    "-s",
     default="",
     help="Path to the directory with db schema files",
 )
 @click.argument("gname", metavar="<gname>")
 @pass_context
-def db_create_tables_group(ctx, directory, gname):
+def db_create_tables_group(ctx, sqldirectory, gname):
     """Create the group of database tables for a specific extension
 
     \b
@@ -683,8 +816,8 @@ def db_create_tables_group(ctx, directory, gname):
         <gname> - the name of the group of tables
     """
     ldirectory = ""
-    if len(directory) > 0:
-        ldirectory = directory
+    if len(sqldirectory) > 0:
+        ldirectory = sqldirectory
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     fpath = ldirectory + "/" + gname + "-create.sql"
     dbutils_exec_sqlfile(ctx, e, fpath)
@@ -692,7 +825,11 @@ def db_create_tables_group(ctx, directory, gname):
 
 @cli.command("grant", short_help="Create db access users and grant privileges")
 @click.option(
-    "dbname", "--dbname", default="", help="Database name",
+    "dbname",
+    "--dbname",
+    "-d",
+    default="",
+    help="Database name",
 )
 @pass_context
 def db_grant(ctx, dbname):
@@ -709,7 +846,7 @@ def db_grant(ctx, dbname):
         ldbname = dbname
     ctx.vlog("Creating only database [%s]", ldbname)
     e = create_engine(ctx.gconfig.get("db", "adminurl"))
-    db_create_users(ctx, e, ldbname)
+    db_create_mysql_users(ctx, e, ldbname, False, False)
 
 
 def db_revoke_host_users(ctx, e, dbname, dbhost, dbrwuser, dbrouser):
@@ -735,17 +872,31 @@ def db_revoke_users(ctx, e, dbname):
     db_revoke_host_users(ctx, e, dbname, dbhost, dbrwuser, dbrouser)
     if dbhost != "localhost":
         db_revoke_host_users(
-            ctx, e, dbname, "localhost", dbrwuser, dbrouser,
+            ctx,
+            e,
+            dbname,
+            "localhost",
+            dbrwuser,
+            dbrouser,
         )
     if len(dbaccesshost) > 0:
         db_revoke_host_users(
-            ctx, e, dbname, dbaccesshost, dbrwuser, dbrouser,
+            ctx,
+            e,
+            dbname,
+            dbaccesshost,
+            dbrwuser,
+            dbrouser,
         )
 
 
 @cli.command("revoke", short_help="Revoke db access privileges")
 @click.option(
-    "dbname", "--dbname", default="", help="Database name",
+    "dbname",
+    "--dbname",
+    "-d",
+    default="",
+    help="Database name",
 )
 @pass_context
 def db_revoke(ctx, dbname):
