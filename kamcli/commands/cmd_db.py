@@ -371,12 +371,7 @@ def db_create_group(ctx, e, dirpath, dbgroup):
         dbutils_exec_sqlfile(ctx, e, fname)
 
 
-def db_create_mysql(ctx, ldbname, ldirectory, nogrant):
-    e = create_engine(ctx.gconfig.get("db", "adminurl"))
-    e.execute("create database {0}".format(ldbname))
-    if not nogrant:
-        db_create_users(ctx, e, ldbname)
-    e.execute("use {0}".format(ldbname))
+def db_create_sql_table_groups(ctx, e, ldirectory):
     db_create_group(ctx, e, ldirectory, KDB_GROUP_BASIC)
     db_create_group(ctx, e, ldirectory, KDB_GROUP_STANDARD)
     print("Do you want to create extra tables? (y/n):", end=" ")
@@ -391,6 +386,20 @@ def db_create_mysql(ctx, ldbname, ldirectory, nogrant):
     option = input()
     if option == "y":
         db_create_group(ctx, e, ldirectory, KDB_GROUP_UID)
+
+
+def db_create_mysql(ctx, ldbname, ldirectory, nogrant):
+    e = create_engine(ctx.gconfig.get("db", "adminurl"))
+    e.execute("create database {0}".format(ldbname))
+    if not nogrant:
+        db_create_users(ctx, e, ldbname)
+    e.execute("use {0}".format(ldbname))
+    db_create_sql_table_groups(ctx, e, ldirectory)
+
+
+def db_create_sqlite(ctx, ldbname, ldirectory):
+    e = create_engine("{0}+{1}:///{2}".format(ctx.gconfig.get("db", "type"), ctx.gconfig.get("db", "driver"), ldbname))
+    db_create_sql_table_groups(ctx, e, ldirectory)
 
 
 @cli.command("create", short_help="Create database structure")
@@ -414,23 +423,31 @@ def db_create_mysql(ctx, ldbname, ldirectory, nogrant):
     help="Do not create users and do not grant privileges",
 )
 @pass_context
-def db_create(ctx, dbname, directory):
+def db_create(ctx, dbname, directory, nogrant):
     """Create database structure
 
     \b
     """
     dbtype = ctx.gconfig.get("db", "type")
-    ldbname = ctx.gconfig.get("db", "dbname")
+    if dbtype == "sqlite":
+        ldbname = ctx.gconfig.get("db", "dbpath")
+    else:
+        ldbname = ctx.gconfig.get("db", "dbname")
     if len(dbname) > 0:
         ldbname = dbname
+
     ldirectory = ""
     if len(directory) > 0:
         ldirectory = directory
     ctx.vlog("Creating database [%s] structure", ldbname)
     if dbtype == "mysql":
         db_create_mysql(ctx, ldbname, ldirectory, nogrant)
+        return
     elif dbtype == "postgresql":
         ctx.vlog("Database type [%s] not supported yet", dbtype)
+        return
+    elif dbtype == "sqlite":
+        db_create_sqlite(ctx, ldbname, ldirectory)
         return
     else:
         ctx.vlog("Database type [%s] not supported yet", dbtype)
@@ -450,12 +467,16 @@ def db_create_dbonly(ctx, dbname):
 
     \b
     """
-    ldbname = ctx.gconfig.get("db", "dbname")
-    if len(dbname) > 0:
-        ldbname = dbname
     ctx.vlog("Creating only database [%s]", ldbname)
 
     dbtype = ctx.gconfig.get("db", "type")
+    if dbtype == "sqlite":
+        ldbname = ctx.gconfig.get("db", "dbpath")
+    else:
+        ldbname = ctx.gconfig.get("db", "dbname")
+    if len(dbname) > 0:
+        ldbname = dbname
+
     if dbtype == "mysql":
         e = create_engine(ctx.gconfig.get("db", "adminurl"))
         e.execute("create database {0}".format(ldbname))
