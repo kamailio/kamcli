@@ -33,6 +33,7 @@ Among implemented commands:
   * **acc** - manage accounting records
   * **address** - manage permissions address records
   * **aliasdb** - manage database aliases
+  * **avp** - manage avp user preferences
   * **config** - manage configuration file for kamcli
   * **db** - manage kamailio database content
   * **dialog** - manage active calls (dialog)
@@ -45,11 +46,14 @@ Among implemented commands:
   * **moni** - continuous refresh of the values for a list of statistics
   * **mtree** - manage memory trees (mtree)
   * **pike** - manage pike module
+  * **pkg** - private memory (pkg) management
   * **ps** - print the details for kamailio running processes
   * **pstrap** - store runtime details and gdb backtraces for running processes with ps
   * **rpc** - interact with kamailio via jsonrpc control commands (alias of jsonrpc)
   * **rpcmethods** - return the list of available RPC methods (commands)
   * **rtpengine** - manage RTPEngine records and instances
+  * **shm** - shared memory (shm) management
+  * **shv** - manage $shv(name) variables
   * **shell** - run in interactive shell mode
   * **speeddial** - manage speed dial records
   * **srv** - server management commands (sockets, aliases, ...)
