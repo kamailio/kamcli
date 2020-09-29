@@ -298,7 +298,7 @@ dv=db show "version"
 Executing `dv` inside the interactive shell prints the result of command
 `db show "version"`.
 
-#### Examples Of Commands ####
+### Examples Of Commands ###
 
 Sample commands to understand quicker the capabilities and how to use it:
 
@@ -362,6 +362,40 @@ loadmodule "jsonrpcs.so"
 modparam("jsonrpcs", "transport", 6)
 # - pretty format for output
 modparam("jsonrpcs", "pretty_format", 1)
+```
+
+### Database Backend Support ###
+
+When using `Kamailio` with a database backend and want `kamcli` to manage it, then update
+configuration file `kamcli.ini` and set the attributes in the section `[db]`. Couple of
+these attributes (e.g., database name) can be also provided as cli parameters for some
+`kamcli db ...` sub-commands.
+
+Note: of course, it requires to install the Python extension to connect to the type of
+database to be used, as well as the cli tools for the database type, see the sections
+related to installation for specific details.
+
+One of the most important steps when using `Kamailio` with database backend is the creation
+of the database and its tables. That can be done with:
+
+```
+kamcli db create
+```
+
+By default, when applicable, this command creates database access users and grants the
+appropriate privileges. This behaviour can be controlled via cli parameters.
+
+To create the database tables, `kamcli` needs to know where creation scripts are located.
+For example, when using MySQL for a Kamailio instance installed from sources, the path is:
+
+  * /usr/local/share/kamailio/mysql
+
+This has to be set to `scriptsdirectory` attribute in `[db]` section of `kamcli.ini`, or given
+via `-s` (or `--scripts-directory`) command line parameter. It can also point to the corresponding
+folder in the source code tree, for example:
+
+```
+kamcli db create -s /usr/local/src/kamailio-dev/utils/kamctl/mysql
 ```
 
 ### Python2 Support ###
