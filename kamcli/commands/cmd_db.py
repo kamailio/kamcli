@@ -524,8 +524,8 @@ def db_create_sqlite(ctx, ldbname, ldirectory, alltables):
     help="Database name or path to the folder for database",
 )
 @click.option(
-    "sqldirectory",
-    "--sql-directory",
+    "scriptsdirectory",
+    "--scripts-directory",
     "-s",
     default="",
     help="Path to the directory with db schema files",
@@ -560,7 +560,7 @@ def db_create_sqlite(ctx, ldbname, ldirectory, alltables):
 )
 @pass_context
 def db_create(
-    ctx, dbname, sqldirectory, nousers, nogrants, nofunctions, alltables
+    ctx, dbname, scriptsdirectory, nousers, nogrants, nofunctions, alltables
 ):
     """Create database structure
 
@@ -575,8 +575,8 @@ def db_create(
         ldbname = dbname
 
     ldirectory = ""
-    if len(sqldirectory) > 0:
-        ldirectory = sqldirectory
+    if len(scriptsdirectory) > 0:
+        ldirectory = scriptsdirectory
     ctx.vlog("Creating database [%s] structure", ldbname)
     if dbtype == "mysql":
         db_create_mysql(ctx, ldbname, ldirectory, nousers, nogrants, alltables)
@@ -713,91 +713,91 @@ def db_create_tables_list(ctx, directory, group):
 
 @cli.command("create-tables-basic", short_help="Create basic database tables")
 @click.option(
-    "sqldirectory",
-    "--sql-directory",
+    "scriptsdirectory",
+    "--scripts-directory",
     "-s",
     default="",
     help="Path to the directory with db schema files",
 )
 @pass_context
-def db_create_tables_basic(ctx, sqldirectory):
+def db_create_tables_basic(ctx, scripts-directory):
     """Create basic database tables
 
     \b
     """
-    db_create_tables_list(ctx, sqldirectory, KDB_GROUP_BASIC)
+    db_create_tables_list(ctx, scriptsdirectory, KDB_GROUP_BASIC)
 
 
 @cli.command(
     "create-tables-standard", short_help="Create standard database tables"
 )
 @click.option(
-    "sqldirectory",
-    "--sql-directory",
+    "scriptsdirectory",
+    "--scripts-directory",
     "-s",
     default="",
     help="Path to the directory with db schema files",
 )
 @pass_context
-def db_create_tables_standard(ctx, sqldirectory):
+def db_create_tables_standard(ctx, scriptsdirectory):
     """Create standard database tables
 
     \b
     """
-    db_create_tables_list(ctx, sqldirectory, KDB_GROUP_STANDARD)
+    db_create_tables_list(ctx, scriptsdirectory, KDB_GROUP_STANDARD)
 
 
 @cli.command("create-tables-extra", short_help="Create extra database tables")
 @click.option(
-    "sqldirectory",
-    "--sql-directory",
+    "scriptsdirectory",
+    "--scripts-directory",
     "-s",
     default="",
     help="Path to the directory with db schema files",
 )
 @pass_context
-def db_create_tables_extra(ctx, sqldirectory):
+def db_create_tables_extra(ctx, scriptsdirectory):
     """Create extra database tables
 
     \b
     """
-    db_create_tables_list(ctx, sqldirectory, KDB_GROUP_EXTRA)
+    db_create_tables_list(ctx, scriptsdirectory, KDB_GROUP_EXTRA)
 
 
 @cli.command(
     "create-tables-presence", short_help="Create presence database tables"
 )
 @click.option(
-    "sqldirectory",
-    "--sql-directory",
+    "scriptsdirectory",
+    "--scripts-directory",
     "-s",
     default="",
     help="Path to the directory with db schema files",
 )
 @pass_context
-def db_create_tables_presence(ctx, sqldirectory):
+def db_create_tables_presence(ctx, scriptsdirectory):
     """Create presence database tables
 
     \b
     """
-    db_create_tables_list(ctx, sqldirectory, KDB_GROUP_PRESENCE)
+    db_create_tables_list(ctx, scriptsdirectory, KDB_GROUP_PRESENCE)
 
 
 @cli.command("create-tables-uid", short_help="Create uid database tables")
 @click.option(
-    "sqldirectory",
-    "--sql-directory",
+    "scriptsdirectory",
+    "--scripts-directory",
     "-s",
     default="",
     help="Path to the directory with db schema files",
 )
 @pass_context
-def db_create_tables_uid(ctx, sqldirectory):
+def db_create_tables_uid(ctx, scriptsdirectory):
     """Create uid database tables
 
     \b
     """
-    db_create_tables_list(ctx, sqldirectory, KDB_GROUP_UID)
+    db_create_tables_list(ctx, scriptsdirectory, KDB_GROUP_UID)
 
 
 @cli.command(
@@ -805,15 +805,15 @@ def db_create_tables_uid(ctx, sqldirectory):
     short_help="Create the group of database tables for a specific extension",
 )
 @click.option(
-    "sqldirectory",
-    "--sql-directory",
+    "scriptsdirectory",
+    "--scripts-directory",
     "-s",
     default="",
     help="Path to the directory with db schema files",
 )
 @click.argument("gname", metavar="<gname>")
 @pass_context
-def db_create_tables_group(ctx, sqldirectory, gname):
+def db_create_tables_group(ctx, scriptsdirectory, gname):
     """Create the group of database tables for a specific extension
 
     \b
@@ -821,8 +821,8 @@ def db_create_tables_group(ctx, sqldirectory, gname):
         <gname> - the name of the group of tables
     """
     ldirectory = ""
-    if len(sqldirectory) > 0:
-        ldirectory = sqldirectory
+    if len(scriptsdirectory) > 0:
+        ldirectory = scriptsdirectory
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     fpath = ldirectory + "/" + gname + "-create.sql"
     dbutils_exec_sqlfile(ctx, e, fpath)
