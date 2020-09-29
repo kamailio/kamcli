@@ -574,7 +574,7 @@ def db_create(
     if len(dbname) > 0:
         ldbname = dbname
 
-    ldirectory = ""
+    ldirectory = ctx.gconfig.get("db", "scriptsdirectory")
     if len(scriptsdirectory) > 0:
         ldirectory = scriptsdirectory
     ctx.vlog("Creating database [%s] structure", ldbname)
@@ -725,7 +725,10 @@ def db_create_tables_basic(ctx, scripts-directory):
 
     \b
     """
-    db_create_tables_list(ctx, scriptsdirectory, KDB_GROUP_BASIC)
+    ldirectory = ctx.gconfig.get("db", "scriptsdirectory")
+    if len(scriptsdirectory) > 0:
+        ldirectory = scriptsdirectory
+    db_create_tables_list(ctx, ldirectory, KDB_GROUP_BASIC)
 
 
 @cli.command(
@@ -744,7 +747,10 @@ def db_create_tables_standard(ctx, scriptsdirectory):
 
     \b
     """
-    db_create_tables_list(ctx, scriptsdirectory, KDB_GROUP_STANDARD)
+    ldirectory = ctx.gconfig.get("db", "scriptsdirectory")
+    if len(scriptsdirectory) > 0:
+        ldirectory = scriptsdirectory
+    db_create_tables_list(ctx, ldirectory, KDB_GROUP_STANDARD)
 
 
 @cli.command("create-tables-extra", short_help="Create extra database tables")
@@ -761,7 +767,10 @@ def db_create_tables_extra(ctx, scriptsdirectory):
 
     \b
     """
-    db_create_tables_list(ctx, scriptsdirectory, KDB_GROUP_EXTRA)
+    ldirectory = ctx.gconfig.get("db", "scriptsdirectory")
+    if len(scriptsdirectory) > 0:
+        ldirectory = scriptsdirectory
+    db_create_tables_list(ctx, ldirectory, KDB_GROUP_EXTRA)
 
 
 @cli.command(
@@ -780,7 +789,10 @@ def db_create_tables_presence(ctx, scriptsdirectory):
 
     \b
     """
-    db_create_tables_list(ctx, scriptsdirectory, KDB_GROUP_PRESENCE)
+    ldirectory = ctx.gconfig.get("db", "scriptsdirectory")
+    if len(scriptsdirectory) > 0:
+        ldirectory = scriptsdirectory
+    db_create_tables_list(ctx, ldirectory, KDB_GROUP_PRESENCE)
 
 
 @cli.command("create-tables-uid", short_help="Create uid database tables")
@@ -797,7 +809,10 @@ def db_create_tables_uid(ctx, scriptsdirectory):
 
     \b
     """
-    db_create_tables_list(ctx, scriptsdirectory, KDB_GROUP_UID)
+    ldirectory = ctx.gconfig.get("db", "scriptsdirectory")
+    if len(scriptsdirectory) > 0:
+        ldirectory = scriptsdirectory
+    db_create_tables_list(ctx, ldirectory, KDB_GROUP_UID)
 
 
 @cli.command(
@@ -820,7 +835,7 @@ def db_create_tables_group(ctx, scriptsdirectory, gname):
     Parameters:
         <gname> - the name of the group of tables
     """
-    ldirectory = ""
+    ldirectory = ctx.gconfig.get("db", "scriptsdirectory")
     if len(scriptsdirectory) > 0:
         ldirectory = scriptsdirectory
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
