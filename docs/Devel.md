@@ -1,18 +1,29 @@
-## KAMCLI
+## KAMCLI Development ##
 
 Kamailio Command Line Interface Control Tool
 
 
-### Development Guidelines
+### Development Environment ###
 
-#### [pre-commit](https://pre-commit.com/)
+Use 4 spaces for indentation.
 
-  * apt install build-essentials python3-dev python3-virtualenvwrapper
-  * mkvirtualenv kamcli --python=python3
-  * pip install -r requirements/requirements_dev.txt
-  * pre-commit install
+#### [pre-commit](https://pre-commit.com/) ####
 
-#### Used Frameworks
+It is highly recommended to set the `pre-commit` git hook to get code identation and
+error detections using `black` and `flake8` tools before changes are committed.
+
+On a Debian/Ubuntu system, do:
+
+```
+apt install build-essentials python3-dev python3-virtualenvwrapper
+mkvirtualenv kamcli --python=python3
+pip install -r requirements/requirements_dev.txt
+pre-commit install
+```
+
+### Development Guidelines ###
+
+#### Used Frameworks ####
 
 Kamcli is using the following Python frameworks:
 
@@ -23,7 +34,7 @@ Kamcli is using the following Python frameworks:
   * pyaml - yaml package used for compact printing of jsonrpc responses
   * tabulate - pretty printing of database results
 
-#### Plugins
+#### Plugins ####
 
 Kamcli prototype is:
 
@@ -43,7 +54,7 @@ Other examples provided by Click are good source of inspiration:
 
   * https://github.com/mitsuhiko/click/tree/master/examples
 
-##### Adding a new command
+#### Adding A New Command ####
 
 In short, the steps for adding a new command (refered also as plugin or module):
 
