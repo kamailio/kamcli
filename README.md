@@ -398,6 +398,11 @@ folder in the source code tree, for example:
 kamcli db create -s /usr/local/src/kamailio-dev/utils/kamctl/mysql
 ```
 
+### Development ###
+
+Notes about setting up development environment and guidelines to add new commands are inside the
+[docs/Devel.md](docs/Devel.md) file.
+
 ### Python2 Support ###
 
 The current version of `kamcli` works only with Python3. Python2 has been deprecated
