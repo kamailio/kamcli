@@ -115,9 +115,7 @@ def db_connect(ctx):
             ctx.gconfig.get("db", "dbname"),
         )
     elif dbtype == "sqlite":
-        scmd = ("sqlite3 {0} ").format(
-            ctx.gconfig.get("db", "dbpath"),
-        )
+        scmd = ("sqlite3 {0} ").format(ctx.gconfig.get("db", "dbpath"),)
     else:
         ctx.log("unsupported database type [%s]", dbtype)
         sys.exit()
@@ -147,8 +145,7 @@ def db_clirun(ctx, query):
         )
     elif dbtype == "sqlite":
         scmd = ('sqlite3 {0} "{1} "').format(
-            ctx.gconfig.get("db", "dbpath"),
-            query,
+            ctx.gconfig.get("db", "dbpath"), query,
         )
     else:
         ctx.log("unsupported database type [%s]", dbtype)
@@ -183,8 +180,7 @@ def db_clishow(ctx, table):
         )
     elif dbtype == "sqlite":
         scmd = ('sqlite3 {0} "select * from {1} "').format(
-            ctx.gconfig.get("db", "dbpath"),
-            table,
+            ctx.gconfig.get("db", "dbpath"), table,
         )
     else:
         ctx.log("unsupported database type [%s]", dbtype)
@@ -219,8 +215,7 @@ def db_clishowg(ctx, table):
         )
     elif dbtype == "sqlite":
         scmd = ('sqlite3 -line {0} "select * from {1} "').format(
-            ctx.gconfig.get("db", "dbpath"),
-            table,
+            ctx.gconfig.get("db", "dbpath"), table,
         )
     else:
         ctx.log("unsupported database type [%s]", dbtype)
@@ -291,8 +286,7 @@ def db_showcreate(ctx, oformat, ostyle, table):
         os.system(scmd)
     elif dbtype == "sqlite":
         scmd = ('sqlite3 {0} ".schema {1} "').format(
-            ctx.gconfig.get("db", "dbpath"),
-            table,
+            ctx.gconfig.get("db", "dbpath"), table,
         )
         os.system(scmd)
     else:
@@ -441,7 +435,7 @@ def db_create_postgresql(
     )
     os.system(scmd)
     e = create_engine(ctx.gconfig.get("db", "adminurl"))
-    if not nogrant:
+    if not nogrants:
         e.execute(
             "CREATE USER {0} WITH PASSWORD '{1}';".format(
                 ctx.gconfig.get("db", "rwuser"),
@@ -450,8 +444,7 @@ def db_create_postgresql(
         )
         e.execute(
             "GRANT CONNECT ON DATABASE {0} TO {1};".format(
-                ldbname,
-                ctx.gconfig.get("db", "rwuser"),
+                ldbname, ctx.gconfig.get("db", "rwuser"),
             )
         )
         if ctx.gconfig.get("db", "rwuser") != ctx.gconfig.get("db", "rouser"):
@@ -463,8 +456,7 @@ def db_create_postgresql(
             )
             e.execute(
                 "GRANT CONNECT ON DATABASE {0} TO {1};".format(
-                    ldbname,
-                    ctx.gconfig.get("db", "rouser"),
+                    ldbname, ctx.gconfig.get("db", "rouser"),
                 )
             )
     e.dispose()
@@ -488,18 +480,16 @@ def db_create_postgresql(
     db_create_sql_table_groups(ctx, e, ldirectory, alltables)
     e.dispose()
     e = create_engine(ctx.gconfig.get("db", "adminurl"))
-    if not nogrant:
+    if not nogrants:
         e.execute(
             "GRANT ALL PRIVILEGES ON DATABASE {0} TO {1};".format(
-                ldbname,
-                ctx.gconfig.get("db", "rwuser"),
+                ldbname, ctx.gconfig.get("db", "rwuser"),
             )
         )
         if ctx.gconfig.get("db", "rwuser") != ctx.gconfig.get("db", "rouser"):
             e.execute(
                 "GRANT SELECT ON DATABASE {0} TO {1};".format(
-                    ldbname,
-                    ctx.gconfig.get("db", "rouser"),
+                    ldbname, ctx.gconfig.get("db", "rouser"),
                 )
             )
 
@@ -531,11 +521,7 @@ def db_create_sqlite(ctx, ldbname, ldirectory, alltables):
     help="Path to the directory with db schema files",
 )
 @click.option(
-    "nousers",
-    "--no-users",
-    "-U",
-    is_flag=True,
-    help="Do not create users",
+    "nousers", "--no-users", "-U", is_flag=True, help="Do not create users",
 )
 @click.option(
     "nogrants",
@@ -608,7 +594,7 @@ def db_create_dbonly(ctx, dbname):
 
     \b
     """
-    ctx.vlog("Creating only database [%s]", ldbname)
+    ctx.vlog("Creating only database [%s]", dbname)
 
     dbtype = ctx.gconfig.get("db", "type")
     if dbtype == "sqlite":
@@ -647,11 +633,7 @@ def db_create_dbonly(ctx, dbname):
     help="Database name or path to the database",
 )
 @click.option(
-    "yes",
-    "--yes",
-    "-y",
-    is_flag=True,
-    help="Do not ask for confirmation",
+    "yes", "--yes", "-y", is_flag=True, help="Do not ask for confirmation",
 )
 @pass_context
 def db_drop(ctx, dbname, yes):
@@ -720,7 +702,7 @@ def db_create_tables_list(ctx, directory, group):
     help="Path to the directory with db schema files",
 )
 @pass_context
-def db_create_tables_basic(ctx, scripts-directory):
+def db_create_tables_basic(ctx, scriptsdirectory):
     """Create basic database tables
 
     \b
@@ -845,11 +827,7 @@ def db_create_tables_group(ctx, scriptsdirectory, gname):
 
 @cli.command("grant", short_help="Create db access users and grant privileges")
 @click.option(
-    "dbname",
-    "--dbname",
-    "-d",
-    default="",
-    help="Database name",
+    "dbname", "--dbname", "-d", default="", help="Database name",
 )
 @pass_context
 def db_grant(ctx, dbname):
@@ -892,31 +870,17 @@ def db_revoke_users(ctx, e, dbname):
     db_revoke_host_users(ctx, e, dbname, dbhost, dbrwuser, dbrouser)
     if dbhost != "localhost":
         db_revoke_host_users(
-            ctx,
-            e,
-            dbname,
-            "localhost",
-            dbrwuser,
-            dbrouser,
+            ctx, e, dbname, "localhost", dbrwuser, dbrouser,
         )
     if len(dbaccesshost) > 0:
         db_revoke_host_users(
-            ctx,
-            e,
-            dbname,
-            dbaccesshost,
-            dbrwuser,
-            dbrouser,
+            ctx, e, dbname, dbaccesshost, dbrwuser, dbrouser,
         )
 
 
 @cli.command("revoke", short_help="Revoke db access privileges")
 @click.option(
-    "dbname",
-    "--dbname",
-    "-d",
-    default="",
-    help="Database name",
+    "dbname", "--dbname", "-d", default="", help="Database name",
 )
 @pass_context
 def db_revoke(ctx, dbname):
