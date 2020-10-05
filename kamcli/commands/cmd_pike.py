@@ -16,7 +16,7 @@ def cli(ctx):
 @cli.command("list", short_help="Show the details of tracked IP addresses")
 @pass_context
 def pike_list(ctx):
-    """Show details for dialog records in memory
+    """Show details of tracked IP addresses
 
     \b
     """
