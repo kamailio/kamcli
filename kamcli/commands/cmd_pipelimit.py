@@ -28,3 +28,30 @@ def pipelimit_list(ctx, pipeid):
     else:
         for p in pipeid:
             command_ctl(ctx, "pl.list", [p])
+
+
+@cli.command("stats", short_help="Show pipelimit stats")
+@pass_context
+def pipelimit_stats(ctx):
+    """Show pipelimit stats
+
+    \b
+    """
+    command_ctl(ctx, "pl.stats", [])
+
+
+@cli.command("set-pipe", short_help="Set pipe algorithm and limit")
+@click.argument("pipeid", metavar="<pipeid>")
+@click.argument("alg", metavar="<alg>")
+@click.argument("limit", metavar="<limit>")
+@pass_context
+def pipelimit_set_pipe(ctx, pipeid, alg, limit):
+    """Show pipelimit stats
+
+    \b
+    Parameters:
+        <pipeid> - pipe name id
+        <alg> - pipe algorithm
+        <limit> - pipe limit
+    """
+    command_ctl(ctx, "pl.set_pipe", [pipeid, alg, limit])
