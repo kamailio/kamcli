@@ -215,6 +215,52 @@ To see if all was installed properly, run:
 kamcli --help
 ```
 
+**Tip**: install configuration file in the user home directory:
+
+```
+cd /usr/local/src/kamcli
+sudo kamcli config install -u
+```
+
+Edit `/root/.kamcli/kamcli.ini` or `/home/$USER/.kamcli/kamcli.ini` and update
+the config values as needed.
+
+#### Install On CentOS ####
+
+Should work also on other RPM-based distros.
+
+Note: you may have to replace python with python3 and pip with pip3 in package
+names, installation and execution commands.
+
+To get `kamcli` installed on CentOS with MySQL support,
+run following commands:
+
+```
+yum install python3 python3-devel python3-pip python3-setuptools
+cd /usr/local/src/
+git clone https://github.com/kamailio/kamcli.git
+cd kamcli
+pip3 install -r requirements/requirements.txt
+pip3 install mysqlclient
+pip3 install .
+```
+
+To see if all was installed properly, run:
+
+```
+kamcli --help
+```
+
+**Tip**: install configuration file in the user home directory:
+
+```
+cd /usr/local/src/kamcli
+sudo kamcli config install -u
+```
+
+Edit `/root/.kamcli/kamcli.ini` or `/home/$USER/.kamcli/kamcli.ini` and update
+the config values as needed.
+
 ### Configuration File ###
 
 Kamcli uses a configuration file with INI format. The name is `kamcli.ini` and it looks for it in:
