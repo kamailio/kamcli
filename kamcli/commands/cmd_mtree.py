@@ -145,16 +145,18 @@ def mtree_dbshow(ctx, oformat, ostyle, coltprefix, dbtname, tprefix):
                 dbtname.encode("ascii", "ignore").decode()
             )
         )
+        ioutils_dbres_print(ctx, oformat, ostyle, res)
     else:
-        ctx.vlog("Showing tree database records for prefix")
-        res = e.execute(
-            "select * from {0} where {1}={2!r}".format(
-                dbtname.encode("ascii", "ignore").decode(),
-                coltprefix.encode("ascii", "ignore").decode(),
-                tprefix.encode("ascii", "ignore").decode(),
+        for tp in tprefix:
+            ctx.vlog("Showing tree database records for prefix {0}".format(tp))
+            res = e.execute(
+                "select * from {0} where {1}={2!r}".format(
+                    dbtname.encode("ascii", "ignore").decode(),
+                    coltprefix.encode("ascii", "ignore").decode(),
+                    tp.encode("ascii", "ignore").decode(),
+                )
             )
-        )
-    ioutils_dbres_print(ctx, oformat, ostyle, res)
+            ioutils_dbres_print(ctx, oformat, ostyle, res)
 
 
 @cli.command("list", short_help="Show the records in memory tree")
