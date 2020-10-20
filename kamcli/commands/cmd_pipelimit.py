@@ -111,6 +111,31 @@ def pipelimit_dbshow(ctx, oformat, ostyle, dbtname, pipeid):
             ioutils_dbres_print(ctx, oformat, ostyle, res)
 
 
+@cli.command("db-rm", short_help="Remove a record from pipelimit table")
+@click.option(
+    "dbtname",
+    "--dbtname",
+    default="pl_pipes",
+    help='The name of database table (default: "pl_pipes")',
+)
+@click.argument("pipeid", metavar="<pipeid>")
+@pass_context
+def pipelimit_dbrm(ctx, dbtname, pipeid):
+    """Remove a record from pipelimit database table
+
+    \b
+    Parameters:
+        <dbtname> - name of pipelimit database table
+    """
+    e = create_engine(ctx.gconfig.get("db", "rwurl"))
+    e.execute(
+        "delete from {0} where pipeid={1!r}".format(
+            dbtname.encode("ascii", "ignore").decode(),
+            pipeid.encode("ascii", "ignore").decode(),
+        )
+    )
+
+
 @cli.command("list", short_help="Lists the details of one or all pipes")
 @click.argument("pipeid", nargs=-1, metavar="[<pipeid>]")
 @pass_context
