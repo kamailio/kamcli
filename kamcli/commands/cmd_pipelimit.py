@@ -118,15 +118,24 @@ def pipelimit_dbshow(ctx, oformat, ostyle, dbtname, pipeid):
     default="pl_pipes",
     help='The name of database table (default: "pl_pipes")',
 )
+@click.option(
+    "yes", "--yes", "-y", is_flag=True, help="Do not ask for confirmation",
+)
 @click.argument("pipeid", metavar="<pipeid>")
 @pass_context
-def pipelimit_dbrm(ctx, dbtname, pipeid):
+def pipelimit_dbrm(ctx, dbtname, yes, pipeid):
     """Remove a record from pipelimit database table
 
     \b
     Parameters:
         <dbtname> - name of pipelimit database table
     """
+    if not yes:
+        print("Removing pipe. Are you sure? (y/n):", end=" ")
+        option = input()
+        if option != "y":
+            ctx.vlog("Skip removing pipe [%s]", pipeid)
+            return
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     e.execute(
         "delete from {0} where pipeid={1!r}".format(
