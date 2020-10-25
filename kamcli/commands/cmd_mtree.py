@@ -83,10 +83,13 @@ def mtree_dbadd(ctx, tname, coltprefix, coltvalue, dbtname, tprefix, tvalue):
     default="tprefix",
     help='Column name for prefix (default: "tprefix")',
 )
+@click.option(
+    "yes", "--yes", "-y", is_flag=True, help="Do not ask for confirmation",
+)
 @click.argument("dbtname", metavar="<dbtname>")
 @click.argument("tprefix", metavar="<tprefix>")
 @pass_context
-def mtree_dbrm(ctx, coltprefix, dbtname, tprefix):
+def mtree_dbrm(ctx, coltprefix, yes, dbtname, tprefix):
     """Remove a record from tree database table
 
     \b
@@ -94,6 +97,12 @@ def mtree_dbrm(ctx, coltprefix, dbtname, tprefix):
         <dbtname> - name of tree database table
         <tprefix> - tree prefix value to match the record
     """
+    if not yes:
+        print("Removing prefix. Are you sure? (y/n):", end=" ")
+        option = input()
+        if option != "y":
+            ctx.vlog("Skip removing prefix [%s]", tprefix)
+            return
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     e.execute(
         "delete from {0} where {1}={2!r}".format(
