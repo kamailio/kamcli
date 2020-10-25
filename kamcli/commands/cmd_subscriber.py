@@ -72,15 +72,24 @@ def subscriber_add(ctx, pwtext, userid, password):
 
 
 @cli.command("rm", short_help="Remove an existing subscriber")
+@click.option(
+    "yes", "--yes", "-y", is_flag=True, help="Do not ask for confirmation",
+)
 @click.argument("userid", metavar="<userid>")
 @pass_context
-def subscriber_rm(ctx, userid):
+def subscriber_rm(ctx, yes, userid):
     """Remove an existing subscriber
 
     \b
     Parameters:
         <userid> - username, AoR or SIP URI for subscriber
     """
+    if not yes:
+        print("Removing user. Are you sure? (y/n):", end=" ")
+        option = input()
+        if option != "y":
+            ctx.vlog("Skip removing user [%s]", userid)
+            return
     udata = parse_user_spec(ctx, userid)
     ctx.log("Removing subscriber [%s@%s]", udata["username"], udata["domain"])
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
