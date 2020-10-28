@@ -82,10 +82,13 @@ def htable_seti(ctx, htname, itname, ival):
 
 
 @cli.command("rm", short_help="Remove the item $sht(htname=>itname)")
+@click.option(
+    "yes", "--yes", "-y", is_flag=True, help="Do not ask for confirmation",
+)
 @click.argument("htname", metavar="<htname>")
 @click.argument("itname", metavar="<itname>")
 @pass_context
-def htable_rm(ctx, htname, itname):
+def htable_rm(ctx, yes, htname, itname):
     """Remove the item $sht(htname=>itname)
 
     \b
@@ -93,6 +96,12 @@ def htable_rm(ctx, htname, itname):
         <htname> - the name of hash table
         <itname> - the name of item
     """
+    if not yes:
+        print("Removing item. Are you sure? (y/n):", end=" ")
+        option = input()
+        if option != "y":
+            ctx.vlog("Skip removing item [%s]", itname)
+            return
     command_ctl(ctx, "htable.delete", [htname, itname])
 
 
@@ -259,15 +268,24 @@ def htable_dbadd(
     default="key_name",
     help='Column name for key name (default: "key_name")',
 )
+@click.option(
+    "yes", "--yes", "-y", is_flag=True, help="Do not ask for confirmation",
+)
 @click.argument("keyname", metavar="<keyname>")
 @pass_context
-def htable_dbrm(ctx, dbtname, colkeyname, keyname):
+def htable_dbrm(ctx, dbtname, colkeyname, yes, keyname):
     """Remove a record from htable database table
 
     \b
     Parameters:
         <keyname> - key name to match the record
     """
+    if not yes:
+        print("Removing item. Are you sure? (y/n):", end=" ")
+        option = input()
+        if option != "y":
+            ctx.vlog("Skip removing item [%s]", keyname)
+            return
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     e.execute(
         "delete from {0} where {1}={2!r}".format(
