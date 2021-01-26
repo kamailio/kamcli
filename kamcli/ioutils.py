@@ -26,13 +26,12 @@ ioutils_formats_list = ["raw", "json", "table", "dict", "yaml"]
 def ioutils_dbres_print(ctx, oformat, ostyle, res):
     """ print a database result using different formats and styles """
     if oformat is None:
-        if ctx.oformat is None:
+        oformat = ctx.gconfig.get("db", "outformat")
+        if oformat is None:
             if ioutils_tabulate_format is True:
                 oformat = "table"
             else:
                 oformat = "json"
-        else:
-            oformat = ctx.oformat
 
     if oformat == "table":
         if ioutils_tabulate_format is False:

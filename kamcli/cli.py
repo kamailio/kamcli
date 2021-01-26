@@ -68,7 +68,6 @@ CONTEXT_SETTINGS = dict(
 class Context(object):
     def __init__(self):
         self.debug = False
-        self.oformat = None
         self.wdir = os.getcwd()
         self.gconfig_paths = []
         self._gconfig = None
@@ -171,7 +170,7 @@ class KamCLI(click.MultiCommand):
     "oformat",
     type=click.Choice(kamcli_formats_list),
     default=None,
-    help="Format the output (overwriting jsonrpc/outformat config attribute)",
+    help="Format the output (overwriting db/jsonrpc outformat config attributes)",
 )
 @click.version_option()
 @pass_context
@@ -210,5 +209,5 @@ def cli(ctx, debug, config, wdir, nodefaultconfigs, oformat):
         ctx.gconfig_paths.append(os.path.expanduser(config))
     ctx.read_config()
     if oformat is not None:
-        ctx.oformat = oformat
+        ctx.gconfig.set("db", "outformat", oformat)
         ctx.gconfig.set("jsonrpc", "outformat", oformat)
