@@ -10,8 +10,17 @@ except ImportError:
     ioutils_tabulate_format = False
     pass  # module doesn't exist, deal with it.
 
+##
+# enable yaml output format if the lib can be loaded
+ioutils_yaml_format = True
+try:
+    import yaml
+except ImportError:
+    ioutils_yaml_format = False
+    pass  # yaml module doesn't exist, deal with it.
 
-ioutils_formats_list = ["raw", "json", "table", "dict"]
+
+ioutils_formats_list = ["raw", "json", "table", "dict", "yaml"]
 
 
 def ioutils_dbres_print(ctx, oformat, ostyle, res):
@@ -30,13 +39,26 @@ def ioutils_dbres_print(ctx, oformat, ostyle, res):
             ctx.log("Package tabulate is not installed")
             sys.exit()
 
+    if oformat == "yaml":
+        if ioutils_yaml_format is False:
+            ctx.log("Package yaml is not installed")
+            sys.exit()
+
     if ostyle is None:
         ostyle = "grid"
 
     if oformat == "json":
+        jdata = []
         for row in res:
-            print(json.dumps(dict(row), indent=4))
-            print()
+            jdata.append(dict(row))
+        print(json.dumps(jdata, indent=4))
+        print()
+    elif oformat == "yaml":
+        ydata = []
+        for row in res:
+            ydata.append(dict(row))
+        print(yaml.dump(ydata, indent=4))
+        print()
     elif oformat == "dict":
         for row in res:
             print(dict(row))
