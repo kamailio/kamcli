@@ -20,7 +20,7 @@ def cli(ctx, nowait, furi, uri):
     """
     lcmd = "tm.t_uac_wait_block"
     if nowait:
-        lcmd = "tm.t_uac"
+        lcmd = "tm.t_uac_start"
     lfrom = ""
     if len(furi) == 0:
         ldomain = ctx.gconfig.get("main", "domain", fallback="localhost")
