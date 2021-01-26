@@ -7,7 +7,7 @@ try:
 except ImportError:
     import configparser
 
-kamcli_formats_list = ["raw", "json", "table", "dict"]
+kamcli_formats_list = ["raw", "json", "table", "dict", "yaml"]
 
 COMMAND_ALIASES = {
     "subs": "subscriber",
@@ -171,7 +171,7 @@ class KamCLI(click.MultiCommand):
     "oformat",
     type=click.Choice(kamcli_formats_list),
     default=None,
-    help="Format the output",
+    help="Format the output (overwriting jsonrpc/outformat config attribute)",
 )
 @click.version_option()
 @pass_context
@@ -196,8 +196,6 @@ def cli(ctx, debug, config, wdir, nodefaultconfigs, oformat):
     ctx.debug = debug
     if wdir is not None:
         ctx.wdir = wdir
-    if oformat is not None:
-        ctx.oformat = oformat
     if not nodefaultconfigs:
         if os.path.isfile("./kamcli/kamcli.ini"):
             ctx.gconfig_paths.append("./kamcli/kamcli.ini")
@@ -211,3 +209,6 @@ def cli(ctx, debug, config, wdir, nodefaultconfigs, oformat):
     if config is not None:
         ctx.gconfig_paths.append(os.path.expanduser(config))
     ctx.read_config()
+    if oformat is not None:
+        ctx.oformat = oformat
+        ctx.gconfig.set("jsonrpc", "outformat", oformat)
