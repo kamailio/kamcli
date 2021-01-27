@@ -56,6 +56,7 @@ Among implemented commands:
   * **shm** - shared memory (shm) management
   * **shv** - manage $shv(name) variables
   * **shell** - run in interactive shell mode
+  * **sipreq** - send SIP request via RPC command
   * **speeddial** - manage speed dial records
   * **srv** - server management commands (sockets, aliases, ...)
   * **stats** - get kamailio internal statistics
