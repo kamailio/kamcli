@@ -47,9 +47,9 @@ def cli(ctx, nowait, method, furi, curi, duri, hdrs, socket, body, uri):
 
         Note: additional headers must not include From, To or Contact
         headers, these are generated from the other parameters. If From
-        URI is not provided, then it is generated using local host. The
-        To URI is set to <uri>. If Contact URI is not provided, then it
-        is set to From URI.
+        URI is not provided, then it is generated using local host. The To
+        URI is set to <uri>. If Contact URI is not provided, then it is set
+        to From URI. If --curi=none, the Contact header is not added.
     \b
     """
     lcmd = "tm.t_uac_wait_block"
@@ -63,16 +63,13 @@ def cli(ctx, nowait, method, furi, curi, duri, hdrs, socket, body, uri):
         lfrom = furi
     lcuri = lfrom
     if len(curi) != 0:
-        lcuri = curi
-    lhdrs = (
-        "From: <"
-        + lfrom
-        + ">\r\nTo: <"
-        + uri
-        + ">\r\n Contact: <"
-        + lcuri
-        + ">\r\n"
-    )
+        if curi == "none":
+            lcuri = ""
+        else:
+            lcuri = curi
+    lhdrs = "From: <" + lfrom + ">\r\nTo: <" + uri + ">\r\n"
+    if len(lcuri) != 0:
+        lhdrs += "Contact: <" + lcuri + ">\r\n"
     if len(hdrs) != 0:
         lhdrs += hdrs
         if lhdrs[-2:] != "\r\n":
