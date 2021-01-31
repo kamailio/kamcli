@@ -44,7 +44,9 @@ def ioutils_dbres_print(ctx, oformat, ostyle, res):
             sys.exit()
 
     if ostyle is None:
-        ostyle = "grid"
+        ostyle = ctx.gconfig.get("db", "outstyle")
+        if ostyle is None:
+            ostyle = "grid"
 
     if oformat == "json":
         jdata = []
