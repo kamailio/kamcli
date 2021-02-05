@@ -104,3 +104,19 @@ def srv_shm(ctx):
     \b
     """
     command_ctl(ctx, "core.shmmem")
+
+
+@cli.command("debug", short_help="Control debug level of the server")
+@pass_context
+@click.argument("level", metavar="<level>", nargs=-1, type=int)
+def srv_debug(ctx, level):
+    """Control debug level of the server
+
+    \b
+    Parameters:
+        <level> - new debug level (optional)
+    """
+    if not level:
+        command_ctl(ctx, "corex.debug")
+    else:
+        command_ctl(ctx, "corex.debug", [level[0]])
