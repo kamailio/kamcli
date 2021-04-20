@@ -1,9 +1,25 @@
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.sql import text
 from sqlalchemy.exc import SQLAlchemyError
 
 
+KDB_IGNORE_MISSING = [
+    "userblacklist",
+    "userblocklist",
+]
+
+
 def dbutils_exec_sqlfile(ctx, sqlengine, fname):
+    if not os.path.exists(fname):
+        for i in KDB_IGNORE_MISSING:
+            if i in fname:
+                return
+        ctx.log(
+            "sql statements file not found [%s]",
+            fname,
+        )
+        return
     sql_file = open(fname, "r")
     sql_command = ""
     for line in sql_file:
@@ -14,7 +30,8 @@ def dbutils_exec_sqlfile(ctx, sqlengine, fname):
                     sqlengine.execute(text(sql_command))
                 except SQLAlchemyError:
                     ctx.log(
-                        "failed to execute sql statements from file [%s]",
+                        "failed to execute sql statement [%s] from file [%s]",
+                        sql_command,
                         fname,
                     )
                 finally:
@@ -32,7 +49,8 @@ def dbutils_exec_sqltext(ctx, sqlengine, sqltext):
                     sqlengine.execute(text(sql_command))
                 except SQLAlchemyError:
                     ctx.log(
-                        "failed to execute sql statements [%s]", sql_command,
+                        "failed to execute sql statements [%s]",
+                        sql_command,
                     )
                 finally:
                     sql_command = ""
