@@ -49,31 +49,40 @@ def subscriber_add(ctx, pwtext, userid, password):
         udata["username"], udata["domain"], udata["domain"], password
     )
     ha1b = hashlib.md5(dig.encode()).hexdigest()
+    dbtname = "subscriber"
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     if pwtext == "yes":
         e.execute(
-            "insert into subscriber (username, domain, password, ha1, ha1b) "
-            "values (%s, %s, %s, %s, %s)",
-            udata["username"],
-            udata["domain"],
-            password,
-            ha1,
-            ha1b,
+            "insert into {0} (username, domain, password, ha1, ha1b) "
+            "values ({1!r}, {2!r}, {3!r}, {4!r}, {5!r})".format(
+                dbtname,
+                udata["username"],
+                udata["domain"],
+                password.encode("ascii", "ignore").decode(),
+                ha1,
+                ha1b,
+            )
         )
     else:
         e.execute(
-            "insert into subscriber (username, domain, ha1, ha1b) values "
-            "(%s, %s, %s, %s)",
-            udata["username"],
-            udata["domain"],
-            ha1,
-            ha1b,
+            "insert into {0} (username, domain, ha1, ha1b) values "
+            "({1!r}, {2!r}, {3!r}, {4!r})".format(
+                dbtname,
+                udata["username"],
+                udata["domain"],
+                ha1,
+                ha1b,
+            )
         )
 
 
 @cli.command("rm", short_help="Remove an existing subscriber")
 @click.option(
-    "yes", "--yes", "-y", is_flag=True, help="Do not ask for confirmation",
+    "yes",
+    "--yes",
+    "-y",
+    is_flag=True,
+    help="Do not ask for confirmation",
 )
 @click.argument("userid", metavar="<userid>")
 @pass_context
@@ -92,11 +101,14 @@ def subscriber_rm(ctx, yes, userid):
             return
     udata = parse_user_spec(ctx, userid)
     ctx.log("Removing subscriber [%s@%s]", udata["username"], udata["domain"])
+    dbtname = "subscriber"
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     e.execute(
-        "delete from subscriber where username=%s and domain=%s",
-        udata["username"],
-        udata["domain"],
+        "delete from {0} where username={1!r} and domain={2!r}".format(
+            dbtname,
+            udata["username"],
+            udata["domain"],
+        )
     )
 
 
@@ -133,25 +145,30 @@ def subscriber_passwd(ctx, pwtext, userid, password):
         udata["username"], udata["domain"], udata["domain"], password
     )
     ha1b = hashlib.md5(dig.encode()).hexdigest()
+    dbtname = "subscriber"
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     if pwtext == "yes":
         e.execute(
-            "update subscriber set password=%s, ha1=%s, ha1b=%s where "
-            "username=%s and domain=%s",
-            password,
-            ha1,
-            ha1b,
-            udata["username"],
-            udata["domain"],
+            "update {0} set password={1!r}, ha1={2!r}, ha1b={3!r} where "
+            "username={4!r} and domain={5!r}".format(
+                dbtname,
+                password,
+                ha1,
+                ha1b,
+                udata["username"],
+                udata["domain"],
+            )
         )
     else:
         e.execute(
-            "update subscriber set ha1=%s, ha1b=%s where "
-            "username=%s and domain=%s",
-            ha1,
-            ha1b,
-            udata["username"],
-            udata["domain"],
+            "update {0} set ha1={1!r}, ha1b={2!r} where "
+            "username={3!r} and domain={4!r}".format(
+                dbtname,
+                ha1,
+                ha1b,
+                udata["username"],
+                udata["domain"],
+            )
         )
 
 
@@ -182,10 +199,11 @@ def subscriber_show(ctx, oformat, ostyle, userid):
                    - it can be a list of userids
                    - if not provided then all subscribers are shown
     """
+    dbtname = "subscriber"
     if not userid:
         ctx.vlog("Showing all subscribers")
         e = create_engine(ctx.gconfig.get("db", "rwurl"))
-        res = e.execute("select * from subscriber")
+        res = e.execute("select * from {0}".format(dbtname))
         ioutils_dbres_print(ctx, oformat, ostyle, res)
     else:
         for u in userid:
@@ -197,9 +215,11 @@ def subscriber_show(ctx, oformat, ostyle, userid):
             )
             e = create_engine(ctx.gconfig.get("db", "rwurl"))
             res = e.execute(
-                "select * from subscriber where username=%s and domain=%s",
-                udata["username"],
-                udata["domain"],
+                "select * from {0} where username={1!r} and domain={2!r}".format(
+                    dbtname,
+                    udata["username"],
+                    udata["domain"],
+                )
             )
             ioutils_dbres_print(ctx, oformat, ostyle, res)
 
@@ -219,6 +239,7 @@ def subscriber_setattrs(ctx, userid, attr, val):
                       subscriber table)
         <value> - the value to be set for the attribute
     """
+    dbtname = "subscriber"
     udata = parse_user_spec(ctx, userid)
     ctx.log(
         "Updating subscriber [%s@%s] with str attribute [%s]=[%s]",
@@ -229,8 +250,9 @@ def subscriber_setattrs(ctx, userid, attr, val):
     )
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     e.execute(
-        "update subscriber set {0}={1!r} where username={2!r} and "
-        "domain={3!r}".format(
+        "update {0} set {1}={2!r} where username={3!r} and "
+        "domain={4!r}".format(
+            dbtname,
             attr.encode("ascii", "ignore").decode(),
             val.encode("ascii", "ignore").decode(),
             udata["username"],
@@ -256,6 +278,7 @@ def subscriber_setattri(ctx, userid, attr, val):
                       subscriber table)
         <value> - the value to be set for the attribute
     """
+    dbtname = "subscriber"
     udata = parse_user_spec(ctx, userid)
     ctx.log(
         "Updating subscriber [%s@%s] with int attribute [%s]=[%s]",
@@ -266,8 +289,9 @@ def subscriber_setattri(ctx, userid, attr, val):
     )
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     e.execute(
-        "update subscriber set {0}={1} where username={2!r} and "
-        "domain={3!r}".format(
+        "update {0} set {1}={2} where username={3!r} and "
+        "domain={4!r}".format(
+            dbtname,
             attr.encode("ascii", "ignore").decode(),
             val.encode("ascii", "ignore").decode(),
             udata["username"],
@@ -291,6 +315,7 @@ def subscriber_setattrnull(ctx, userid, attr):
         <attribute> - the name of the attribute (column name in
                       subscriber table)
     """
+    dbtname = "subscriber"
     udata = parse_user_spec(ctx, userid)
     ctx.log(
         "Updating subscriber [%s@%s] with attribute [%s]=NULL",
@@ -300,8 +325,9 @@ def subscriber_setattrnull(ctx, userid, attr):
     )
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     e.execute(
-        "update subscriber set {0}=NULL where username={1!r} and "
-        "domain={2!r}".format(
+        "update {0} set {1}=NULL where username={2!r} and "
+        "domain={3!r}".format(
+            dbtname,
             attr.encode("ascii", "ignore").decode(),
             udata["username"],
             udata["domain"],
