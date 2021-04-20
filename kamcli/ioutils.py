@@ -26,7 +26,7 @@ ioutils_formats_list = ["raw", "json", "table", "dict", "yaml"]
 def ioutils_dbres_print(ctx, oformat, ostyle, res):
     """ print a database result using different formats and styles """
     if oformat is None:
-        oformat = ctx.gconfig.get("db", "outformat")
+        oformat = ctx.gconfig.get("db", "outformat", fallback=None)
         if oformat is None:
             if ioutils_tabulate_format is True:
                 oformat = "table"
@@ -44,7 +44,7 @@ def ioutils_dbres_print(ctx, oformat, ostyle, res):
             sys.exit()
 
     if ostyle is None:
-        ostyle = ctx.gconfig.get("db", "outstyle")
+        ostyle = ctx.gconfig.get("db", "outstyle", fallback="grid")
         if ostyle is None:
             ostyle = "grid"
 
