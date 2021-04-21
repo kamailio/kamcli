@@ -106,7 +106,9 @@ def dispatcher_showdb(ctx, oformat, ostyle, setid):
     else:
         for s in setid:
             ctx.vlog("Showing dispatcher records for set id")
-            res = e.execute("select * from dispatcher where setid=%d", s)
+            res = e.execute(
+                "select * from dispatcher where setid={0}".format(s)
+            )
             ioutils_dbres_print(ctx, oformat, ostyle, res)
 
 
