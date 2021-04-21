@@ -120,7 +120,7 @@ def address_showdb(ctx, oformat, ostyle, group):
         res = e.execute("select * from address")
     else:
         ctx.vlog("Showing address records for group")
-        res = e.execute("select * from address where group=%d", group)
+        res = e.execute("select * from address where group={0}".format(group))
     ioutils_dbres_print(ctx, oformat, ostyle, res)
 
 
