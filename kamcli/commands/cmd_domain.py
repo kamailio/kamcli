@@ -88,7 +88,9 @@ def domain_showdb(ctx, oformat, ostyle, domain):
     else:
         for d in domain:
             ctx.vlog("Showing a specific domain record")
-            res = e.execute('select * from domain where domain="%s"', d)
+            res = e.execute(
+                "select * from domain where domain={0!r}".format(d)
+            )
             ioutils_dbres_print(ctx, oformat, ostyle, res)
 
 
