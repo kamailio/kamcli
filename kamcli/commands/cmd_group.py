@@ -36,10 +36,9 @@ def group_grant(ctx, userid, groupid):
     )
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     e.execute(
-        "insert into grp (username, domain, grp) values (%s, %s, %s)",
-        udata["username"],
-        udata["domain"],
-        groupid,
+        "insert into grp (username, domain, grp) values ({0!r}, {1!r}, {2!r})".format(
+            udata["username"], udata["domain"], groupid,
+        )
     )
 
 
@@ -62,16 +61,15 @@ def group_revoke(ctx, userid, groupid):
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     if not groupid:
         e.execute(
-            "delete from grp where username=%s and domain=%s",
-            udata["username"],
-            udata["domain"],
+            "delete from grp where username={0!r} and domain={1!r}".format(
+                udata["username"], udata["domain"],
+            )
         )
     else:
         e.execute(
-            "delete from grp where username=%s and domain=%s and grp=%s",
-            udata["username"],
-            udata["domain"],
-            groupid,
+            "delete from grp where username={0!r} and domain={1!r} and grp={2!r}".format(
+                udata["username"], udata["domain"], groupid,
+            )
         )
 
 
@@ -117,8 +115,8 @@ def group_show(ctx, oformat, ostyle, userid):
             )
             e = create_engine(ctx.gconfig.get("db", "rwurl"))
             res = e.execute(
-                "select * from grp where username=%s and domain=%s",
-                udata["username"],
-                udata["domain"],
+                "select * from grp where username={0!r} and domain={1!r}".format(
+                    udata["username"], udata["domain"],
+                )
             )
             ioutils_dbres_print(ctx, oformat, ostyle, res)
