@@ -171,8 +171,8 @@ def ul_showdb(ctx, oformat, ostyle, userid):
             )
             e = create_engine(ctx.gconfig.get("db", "rwurl"))
             res = e.execute(
-                "select * from location where username=%s and domain=%s",
-                udata["username"],
-                udata["domain"],
+                "select * from location where username={0!r} and domain={1!r}".format(
+                    udata["username"], udata["domain"],
+                )
             )
             ioutils_dbres_print(ctx, oformat, ostyle, res)
