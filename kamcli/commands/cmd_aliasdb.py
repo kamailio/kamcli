@@ -44,12 +44,14 @@ def aliasdb_add(ctx, table, userid, aliasid):
     )
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     e.execute(
-        "insert into " + table + " (username, domain, alias_username, "
-        "alias_domain) values (%s, %s, %s, %s)",
-        udata["username"],
-        udata["domain"],
-        adata["username"],
-        adata["domain"],
+        "insert into {0} (username, domain, alias_username, "
+        "alias_domain) values ({1!r}, {2!r}, {3!r}, {4!r})".format(
+            table,
+            udata["username"],
+            udata["domain"],
+            adata["username"],
+            adata["domain"],
+        )
     )
 
 
@@ -85,27 +87,29 @@ def aliasdb_rm(ctx, table, matchalias, userid, aliasid):
     if not aliasid:
         if matchalias:
             e.execute(
-                "delete from " + table + " where alias_username=%s and "
-                "alias_domain=%s",
-                udata["username"],
-                udata["domain"],
+                "delete from {0} where alias_username={1!r} and "
+                "alias_domain={2!r}".format(
+                    table, udata["username"], udata["domain"],
+                )
             )
         else:
             e.execute(
-                "delete from " + table + " where username=%s and domain=%s",
-                udata["username"],
-                udata["domain"],
+                "delete from {0} where username={1!r} and domain={2!r}".format(
+                    table, udata["username"], udata["domain"],
+                )
             )
     else:
         for a in aliasid:
             adata = parse_user_spec(ctx, a)
             e.execute(
-                "delete from " + table + " where username=%s and domain=%s "
-                "and alias_username=%s and alias_domain=%s",
-                udata["username"],
-                udata["domain"],
-                adata["username"],
-                adata["domain"],
+                "delete from {0} where username={1!r} and domain={2!r} "
+                "and alias_username={3!r} and alias_domain={4!r}".format(
+                    table,
+                    udata["username"],
+                    udata["domain"],
+                    adata["username"],
+                    adata["domain"],
+                )
             )
 
 
@@ -151,7 +155,7 @@ def aliasdb_show(ctx, oformat, ostyle, table, matchalias, userid):
     if not userid:
         ctx.vlog("Showing all records")
         e = create_engine(ctx.gconfig.get("db", "rwurl"))
-        res = e.execute("select * from " + table)
+        res = e.execute("select * from {0}".format(table))
         ioutils_dbres_print(ctx, oformat, ostyle, res)
     else:
         for u in userid:
@@ -165,10 +169,10 @@ def aliasdb_show(ctx, oformat, ostyle, table, matchalias, userid):
                     udata["domain"],
                 )
                 res = e.execute(
-                    "select * from " + table + " where alias_username=%s "
-                    "and alias_domain=%s",
-                    udata["username"],
-                    udata["domain"],
+                    "select * from {0} where alias_username={1!r} "
+                    "and alias_domain={2!r}".format(
+                        table, udata["username"], udata["domain"],
+                    )
                 )
             else:
                 ctx.vlog(
@@ -177,9 +181,9 @@ def aliasdb_show(ctx, oformat, ostyle, table, matchalias, userid):
                     udata["domain"],
                 )
                 res = e.execute(
-                    "select * from " + table + " where username=%s and "
-                    "domain=%s",
-                    udata["username"],
-                    udata["domain"],
+                    "select * from {0} where username={1!r} and "
+                    "domain={2!r}".format(
+                        table, udata["username"], udata["domain"],
+                    )
                 )
             ioutils_dbres_print(ctx, oformat, ostyle, res)
