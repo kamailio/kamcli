@@ -146,7 +146,7 @@ def dialplan_showdb(ctx, oformat, ostyle, dpid):
     else:
         for d in dpid:
             ctx.vlog("Showing dialplan records for set id: " + d)
-            res = e.execute("select * from dialplan where dpid=%d", d)
+            res = e.execute("select * from dialplan where dpid={0}".format(d))
             ioutils_dbres_print(ctx, oformat, ostyle, res)
 
 
