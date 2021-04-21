@@ -53,24 +53,28 @@ def speeddial_add(ctx, table, userid, shortdial, targeturi, desc):
     uri = "sip:{}@{}".format(tdata["username"], tdata["domain"])
     if not desc:
         e.execute(
-            "insert into " + table + " %s (username, domain, sd_username, "
-            "sd_domain, new_uri) values (%s, %s, %s, %s, %s)",
-            udata["username"],
-            udata["domain"],
-            sdata["username"],
-            sdata["domain"],
-            uri,
+            "insert into {0} (username, domain, sd_username, "
+            "sd_domain, new_uri) values ({1!r}, {2!r}, {3!r}, {4!r}, {5!r})".format(
+                table,
+                udata["username"],
+                udata["domain"],
+                sdata["username"],
+                sdata["domain"],
+                uri,
+            )
         )
     else:
         e.execute(
-            "insert into " + table + " (username, domain, sd_username, "
-            "sd_domain, new_uri, description) values (%s, %s, %s, %s, %s, %s)",
-            udata["username"],
-            udata["domain"],
-            sdata["username"],
-            sdata["domain"],
-            uri,
-            desc,
+            "insert into {0} (username, domain, sd_username, "
+            "sd_domain, new_uri, description) values ({1!r}, {2!r}, {3!r}, {4!r}, {5!r}, {6!r})".format(
+                table,
+                udata["username"],
+                udata["domain"],
+                sdata["username"],
+                sdata["domain"],
+                uri,
+                desc,
+            )
         )
 
 
@@ -101,20 +105,22 @@ def speeddial_rm(ctx, table, userid, shortdial):
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     if not shortdial:
         e.execute(
-            "delete from " + table + " where username=%s and domain=%s",
-            udata["username"],
-            udata["domain"],
+            "delete from {0} where username={1!r} and domain={2!r}".format(
+                table, udata["username"], udata["domain"],
+            )
         )
     else:
         for s in shortdial:
             sdata = parse_user_spec(ctx, s)
             e.execute(
-                "delete from " + table + " where username=%s and domain=%s "
-                "and sd_username=%s and sd_domain=%s",
-                udata["username"],
-                udata["domain"],
-                sdata["username"],
-                sdata["domain"],
+                "delete from {0} where username={1!r} and domain={2!r} "
+                "and sd_username={3!r} and sd_domain={4!r}".format(
+                    table,
+                    udata["username"],
+                    udata["domain"],
+                    sdata["username"],
+                    sdata["domain"],
+                )
             )
 
 
@@ -161,20 +167,22 @@ def speeddial_show(ctx, oformat, ostyle, table, userid, shortdial):
     )
     if not shortdial:
         res = e.execute(
-            "select * from " + table + " where username=%s and domain=%s",
-            udata["username"],
-            udata["domain"],
+            "select * from {0} where username={1!r} and domain={2!r}".format(
+                table, udata["username"], udata["domain"],
+            )
         )
         ioutils_dbres_print(ctx, oformat, ostyle, res)
     else:
         for s in shortdial:
             sdata = parse_user_spec(ctx, s)
             res = e.execute(
-                "select * from " + table + " where username=%s and domain=%s "
-                "and sd_username=%s and sd_domain=%s",
-                udata["username"],
-                udata["domain"],
-                sdata["username"],
-                sdata["domain"],
+                "select * from {0} where username={1!r} and domain={2!r} "
+                "and sd_username={3!r} and sd_domain={4!r}".format(
+                    table,
+                    udata["username"],
+                    udata["domain"],
+                    sdata["username"],
+                    sdata["domain"],
+                )
             )
             ioutils_dbres_print(ctx, oformat, ostyle, res)
