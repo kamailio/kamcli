@@ -66,8 +66,10 @@ def ioutils_dbres_print(ctx, oformat, ostyle, res):
             # pprint.pprint(dict(row), indent=4)
             print()
     elif oformat == "table":
-        allrows = res.fetchall()
-        gstring = tabulate(allrows, headers=res.keys(), tablefmt=ostyle)
+        arows = res.fetchall()
+        dcols = dict((k, k) for k in res.keys())
+        drows = [dict(r) for r in arows]
+        gstring = tabulate(drows, headers=dcols, tablefmt=ostyle)
         print(gstring)
     else:
         allrows = res.fetchall()
