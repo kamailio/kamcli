@@ -53,9 +53,9 @@ Among implemented commands:
   * **rpc** - interact with kamailio via jsonrpc control commands (alias of jsonrpc)
   * **rpcmethods** - return the list of available RPC methods (commands)
   * **rtpengine** - manage RTPEngine records and instances
+  * **shell** - run in interactive shell mode
   * **shm** - shared memory (shm) management
   * **shv** - manage $shv(name) variables
-  * **shell** - run in interactive shell mode
   * **sipreq** - send SIP request via RPC command
   * **speeddial** - manage speed dial records
   * **srv** - server management commands (sockets, aliases, ...)
