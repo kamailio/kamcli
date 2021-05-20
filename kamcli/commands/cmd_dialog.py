@@ -82,7 +82,7 @@ def dialog_match(ctx, mkey, mop, mval):
     short_help="Send BYE to the dialog identified by call-id,"
     " from-tag and to-tag",
 )
-@click.argument("callid", metavar="<domain>")
+@click.argument("callid", metavar="<callid>")
 @click.argument("fromtag", metavar="<fromtag>")
 @click.argument("totag", metavar="<totag>")
 @pass_context
