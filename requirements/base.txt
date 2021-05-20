@@ -1,4 +1,4 @@
-Click>=7.0
+Click~=7.0
 prompt-toolkit>=3.0.2
 pyaml>=19.4.1
 PyYAML>=5.1.2
