@@ -18,10 +18,11 @@ def acc_acc_struct_update_exec(ctx, e):
     sqltext = """
       ALTER TABLE acc ADD COLUMN src_user VARCHAR(64) NOT NULL DEFAULT '';
       ALTER TABLE acc ADD COLUMN src_domain VARCHAR(128) NOT NULL DEFAULT '';
-      ALTER TABLE acc ADD COLUMN src_ip varchar(64) NOT NULL default '';
+      ALTER TABLE acc ADD COLUMN src_ip VARCHAR(64) NOT NULL DEFAULT '';
       ALTER TABLE acc ADD COLUMN dst_ouser VARCHAR(64) NOT NULL DEFAULT '';
       ALTER TABLE acc ADD COLUMN dst_user VARCHAR(64) NOT NULL DEFAULT '';
       ALTER TABLE acc ADD COLUMN dst_domain VARCHAR(128) NOT NULL DEFAULT '';
+      ALTER TABLE acc ADD COLUMN cdr_id INTEGER NOT NULL DEFAULT 0;
     """
     dbutils_exec_sqltext(ctx, e, sqltext)
 
@@ -43,10 +44,11 @@ def acc_mc_struct_update_exec(ctx, e):
     sqltext = """
       ALTER TABLE missed_calls ADD COLUMN src_user VARCHAR(64) NOT NULL DEFAULT '';
       ALTER TABLE missed_calls ADD COLUMN src_domain VARCHAR(128) NOT NULL DEFAULT '';
-      ALTER TABLE missed_calls ADD COLUMN src_ip varchar(64) NOT NULL default '';
+      ALTER TABLE missed_calls ADD COLUMN src_ip VARCHAR(64) NOT NULL DEFAULT '';
       ALTER TABLE missed_calls ADD COLUMN dst_ouser VARCHAR(64) NOT NULL DEFAULT '';
       ALTER TABLE missed_calls ADD COLUMN dst_user VARCHAR(64) NOT NULL DEFAULT '';
       ALTER TABLE missed_calls ADD COLUMN dst_domain VARCHAR(128) NOT NULL DEFAULT '';
+      ALTER TABLE missed_calls ADD COLUMN cdr_id INTEGER NOT NULL DEFAULT 0;
     """
     dbutils_exec_sqltext(ctx, e, sqltext)
 
