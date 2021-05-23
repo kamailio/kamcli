@@ -1,5 +1,6 @@
 import click
 from sqlalchemy import create_engine
+from kamcli.ioutils import ioutils_dbres_print
 from sqlalchemy.sql import text
 from sqlalchemy.exc import SQLAlchemyError
 from kamcli.cli import pass_context
@@ -190,3 +191,43 @@ def acc_rating_table_create(ctx):
       );
     """
     e.execute(sqltext)
+
+
+@cli.command(
+    "list", short_help="List accounting records",
+)
+@click.option(
+    "oformat",
+    "--output-format",
+    "-F",
+    type=click.Choice(["raw", "json", "table", "dict"]),
+    default=None,
+    help="Format the output",
+)
+@click.option(
+    "ostyle",
+    "--output-style",
+    "-S",
+    default=None,
+    help="Style of the output (tabulate table format)",
+)
+@click.option(
+    "limit",
+    "--limit",
+    "-l",
+    type=int,
+    default=20,
+    help="The limit of listed records (default: 20)",
+)
+@pass_context
+def acc_list(ctx, oformat, ostyle, limit):
+    """List accounting records
+
+    \b
+    """
+    e = create_engine(ctx.gconfig.get("db", "rwurl"))
+    ctx.vlog("Showing accounting records")
+    res = e.execute(
+        "select * from acc order by id desc limit {0}".format(limit)
+    )
+    ioutils_dbres_print(ctx, oformat, ostyle, res)
