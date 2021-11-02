@@ -238,3 +238,36 @@ CREATE TABLE `tlscfg` (
 );
 """
     print(sqls)
+
+
+@cli.command(
+    "gen-certs",
+    short_help="Generate self signed certificates in current directory",
+)
+@click.option(
+    "domain", "--domain", "-d", default=None, help="Domain of the certificate",
+)
+@click.option(
+    "expiredays",
+    "--expire-days",
+    "-e",
+    default=365,
+    help="Validity of the certificate in days",
+)
+@pass_context
+def tls_gen_certs(ctx, domain, expiredays):
+    """Generate self signed certificates in current directory
+
+    \b
+    """
+    scmd = ""
+    if not domain:
+        scmd = (
+            "openssl req -x509 -newkey rsa:4096 -nodes -keyout kamailio-selfsigned.key -out kamailio-selfsigned.pem -days {0}"
+        ).format(expiredays)
+    else:
+        scmd = (
+            'openssl req -x509 -newkey rsa:4096 -nodes -subj "/CN={0}" -keyout kamailio-selfsigned.key -out kamailio-selfsigned.pem -days {1}'
+        ).format(domain, expiredays)
+
+    os.system(scmd)
