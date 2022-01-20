@@ -29,6 +29,7 @@ import click
 import click._bashcomplete
 import click.parser
 from kamcli.cli import pass_context
+from kamcli.iorpc import command_ctl
 from collections import defaultdict
 from prompt_toolkit.completion import Completer, Completion
 from prompt_toolkit.history import InMemoryHistory
@@ -41,10 +42,13 @@ from pygments.lexers.shell import BashLexer
 import os
 import shlex
 import sys
+import json
+import subprocess
 
 
 SHELL_COMMAND_REMAP = {}
 
+_ksr_rpc_commands = [ ]
 
 class InternalCommandException(Exception):
     pass
@@ -65,7 +69,6 @@ except ImportError:
 
 # Dictionary with internal commands of the interactive shell
 _internal_commands = dict()
-
 
 def _register_internal_command(names, target, description=None):
     if not hasattr(target, "__call__"):
@@ -175,6 +178,11 @@ class ClickCompleter(Completer):
             return
 
         choices = []
+        if (ctx.command.name=="jsonrpc") and (len(args)==1):
+            for it in _ksr_rpc_commands:
+                choices.append(
+                            Completion(str(it), -len(incomplete))
+                        )
         for param in ctx.command.params:
             if isinstance(param, click.Option):
                 for options in (param.opts, param.secondary_opts):
@@ -382,7 +390,15 @@ def cli(ctx, nohistory, nosyntax):
 
     \b
     """
+    global _ksr_rpc_commands
     prompt_kwargs = {}
+
+    p = subprocess.Popen(sys.argv[0] + " -F json rpc --no-log system.listMethods", stdout=subprocess.PIPE, shell=True)
+    (output, err) = p.communicate()
+    p.wait()
+    if err is None:
+        jdata = json.loads(output)
+        _ksr_rpc_commands = _ksr_rpc_commands + jdata["result"]
 
     if not nohistory:
         dirName = os.path.expanduser("~/.kamcli")
