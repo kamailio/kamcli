@@ -12,10 +12,16 @@ from kamcli.iorpc import command_jsonrpc_socket
     is_flag=True,
     help="Do not execute the command, only print it",
 )
+@click.option(
+    "nolog",
+    "--no-log",
+    is_flag=True,
+    help="Do not print the log with executed command",
+)
 @click.argument("cmd", nargs=1, metavar="[<command>]")
 @click.argument("params", nargs=-1, metavar="[<params>]")
 @pass_context
-def cli(ctx, dryrun, cmd, params):
+def cli(ctx, dryrun, nolog, cmd, params):
     """Execute JSONRPC command
 
         \b
@@ -35,7 +41,8 @@ def cli(ctx, dryrun, cmd, params):
             - jsonrpc stats.get_statistics all
             - jsonrpc pv.shvSet counter i:123
     """
-    ctx.log("Running JSONRPC command: [%s]", cmd)
+    if not nolog:
+        ctx.log("Running JSONRPC command: [%s]", cmd)
     if ctx.gconfig.get("jsonrpc", "transport") == "socket":
         command_jsonrpc_socket(
             ctx,
