@@ -384,8 +384,15 @@ def handle_internal_commands(command):
     is_flag=True,
     help="Do not enable syntax highlighting for command line",
 )
+@click.option(
+    "norpcautocomplete",
+    "--no-rpc-auto-complete",
+    "-R",
+    is_flag=True,
+    help="Do not fetch RPC commands for command auto-complete",
+)
 @pass_context
-def cli(ctx, nohistory, nosyntax):
+def cli(ctx, nohistory, nosyntax, norpcautocomplete):
     """Run in shell mode
 
     \b
@@ -393,12 +400,13 @@ def cli(ctx, nohistory, nosyntax):
     global _ksr_rpc_commands
     prompt_kwargs = {}
 
-    p = subprocess.Popen(sys.argv[0] + " -F json rpc --no-log system.listMethods", stdout=subprocess.PIPE, shell=True)
-    (output, err) = p.communicate()
-    p.wait()
-    if err is None:
-        jdata = json.loads(output)
-        _ksr_rpc_commands = _ksr_rpc_commands + jdata["result"]
+    if not norpcautocomplete:
+        p = subprocess.Popen(sys.argv[0] + " -F json rpc --no-log system.listMethods", stdout=subprocess.PIPE, shell=True)
+        (output, err) = p.communicate()
+        p.wait()
+        if err is None:
+            jdata = json.loads(output)
+            _ksr_rpc_commands = _ksr_rpc_commands + jdata["result"]
 
     if not nohistory:
         dirName = os.path.expanduser("~/.kamcli")
