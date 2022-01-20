@@ -39,7 +39,7 @@ def apiban_fetch(ctx, key):
     return allAddresses
 
 
-@cli.command("show", short_help="Fetch the records from apiban.org")
+@cli.command("show", short_help="Show the addresses returned by apiban.org")
 @click.option(
     "key",
     "--key",
@@ -66,7 +66,7 @@ def apiban_show(ctx, key):
     print()
 
 
-@cli.command("load", short_help="Load the records from apiban.org to htable")
+@cli.command("load", short_help="Load the records from apiban.org to a Kamailio htable")
 @click.option(
     "key",
     "--key",
@@ -83,7 +83,7 @@ def apiban_show(ctx, key):
 )
 @pass_context
 def apiban_load(ctx, key, htname):
-    """Show the APIBan addresses
+    """Load the APIBan addresses to a Kamailio htable
 
     \b
     """
@@ -106,3 +106,35 @@ def apiban_load(ctx, key, htname):
     else:
         ctx.log("no APIBan records")
 
+
+@cli.command("check", short_help="Check IP address against apiban.org")
+@click.option(
+    "key",
+    "--key",
+    "-k",
+    default=None,
+    help="The APIBan key",
+)
+@click.argument("ipaddr", metavar="<ipaddr>")
+@pass_context
+def apiban_check(ctx, key, ipaddr):
+    """Check IP address against apiban.org
+
+    \b
+    Parameters:
+        <ipaddr> - IP address
+    """
+    ctx.vlog("cheking address againt apiban.org")
+    if key is None:
+        key = ctx.gconfig.get("apiban", "key", fallback=None)
+        if key is None:
+            ctx.log("no APIBan key")
+            return
+
+    conn = http.client.HTTPSConnection("apiban.org", timeout=4)
+    conn.request("GET", "/api/" + key + "/check/" + ipaddr)
+    r1 = conn.getresponse()
+    print(r1.status, r1.reason)
+    data1 = r1.read()
+    print(data1)
+    print()
