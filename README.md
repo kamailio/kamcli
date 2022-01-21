@@ -33,6 +33,7 @@ Among implemented commands:
   * **acc** - manage accounting records
   * **address** - manage permissions address records
   * **aliasdb** - manage database aliases
+  * **apiban** - interact with apiban.org and push to htable for IP blocking
   * **avp** - manage avp user preferences
   * **config** - manage configuration file for kamcli
   * **db** - manage kamailio database content
