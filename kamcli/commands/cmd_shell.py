@@ -404,7 +404,7 @@ def cli(ctx, nohistory, nosyntax, norpcautocomplete):
         p = subprocess.Popen(sys.argv[0] + " -F json rpc --no-log system.listMethods", stdout=subprocess.PIPE, shell=True)
         (output, err) = p.communicate(timeout=10)
         p.wait(timeout=10)
-        if err is None:
+        if err is None and len(output)>32:
             jdata = json.loads(output)
             _ksr_rpc_commands = _ksr_rpc_commands + jdata["result"]
 
