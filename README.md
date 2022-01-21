@@ -40,14 +40,15 @@ Among implemented commands:
   * **dialog** - manage active calls (dialog)
   * **dialplan** - manage dialplan records
   * **dispatcher** - manage load balancer (dispatcher)
-  * **domain** - manage domain records
   * **dlgs** - manage dlgs module
+  * **domain** - manage domain records
   * **group** - manage group membership records (acl)
   * **htable** - manage htable module
   * **moni** - continuous refresh of the values for a list of statistics
   * **mtree** - manage memory trees (mtree)
   * **pike** - manage pike module
   * **ping** - send OPTIONS request
+  * **pipelimit** - manage pipelimit module
   * **pkg** - private memory (pkg) management
   * **ps** - print the details for kamailio running processes
   * **pstrap** - store runtime details and gdb backtraces for running processes with ps
