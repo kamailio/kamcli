@@ -48,7 +48,8 @@ import subprocess
 
 SHELL_COMMAND_REMAP = {}
 
-_ksr_rpc_commands = [ ]
+_ksr_rpc_commands = []
+
 
 class InternalCommandException(Exception):
     pass
@@ -69,6 +70,7 @@ except ImportError:
 
 # Dictionary with internal commands of the interactive shell
 _internal_commands = dict()
+
 
 def _register_internal_command(names, target, description=None):
     if not hasattr(target, "__call__"):
@@ -178,11 +180,9 @@ class ClickCompleter(Completer):
             return
 
         choices = []
-        if (ctx.command.name=="jsonrpc") and (len(args)==1):
+        if (ctx.command.name == "jsonrpc") and (len(args) == 1):
             for it in _ksr_rpc_commands:
-                choices.append(
-                            Completion(str(it), -len(incomplete))
-                        )
+                choices.append(Completion(str(it), -len(incomplete)))
         for param in ctx.command.params:
             if isinstance(param, click.Option):
                 for options in (param.opts, param.secondary_opts):
@@ -401,12 +401,18 @@ def cli(ctx, nohistory, nosyntax, norpcautocomplete):
     prompt_kwargs = {}
 
     if not norpcautocomplete:
-        p = subprocess.Popen(sys.argv[0] + " -F json rpc --no-log system.listMethods", stdout=subprocess.PIPE, shell=True)
-        (output, err) = p.communicate(timeout=10)
-        p.wait(timeout=10)
-        if err is None and len(output)>32:
+        proc = subprocess.Popen(
+            sys.argv[0] + " -F json rpc --no-log system.listMethods",
+            stdout=subprocess.PIPE,
+            shell=True,
+        )
+        (output, err) = proc.communicate(timeout=10)
+        proc.wait(timeout=10)
+        if err is None and len(output) > 32:
             jdata = json.loads(output)
             _ksr_rpc_commands = _ksr_rpc_commands + jdata["result"]
+        else:
+            click.echo("(info) unable to fetch the list of rpc commands")
 
     if not nohistory:
         dirName = os.path.expanduser("~/.kamcli")
