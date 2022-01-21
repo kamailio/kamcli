@@ -2,6 +2,7 @@ import click
 from kamcli.cli import pass_context
 from kamcli.iorpc import command_ctl
 import http.client
+import os
 import json
 import time
 import pprint
@@ -54,8 +55,10 @@ def apiban_show(ctx, key):
     if key is None:
         key = ctx.gconfig.get("apiban", "key", fallback=None)
         if key is None:
-            ctx.log("no APIBan key")
-            return
+            key = os.environ.get("APIBANKEY")
+            if key is None or len(key) == 0:
+                ctx.log("no APIBan key")
+                return
 
     allAddresses = apiban_fetch(ctx, key)
     ctx.vlog("all ip addresses array size: " + str(len(allAddresses)))
@@ -90,8 +93,10 @@ def apiban_load(ctx, key, htname, expire):
     if key is None:
         key = ctx.gconfig.get("apiban", "key", fallback=None)
         if key is None:
-            ctx.log("no APIBan key")
-            return
+            key = os.environ.get("APIBANKEY")
+            if key is None or len(key) == 0:
+                ctx.log("no APIBan key")
+                return
     if htname is None:
         htname = ctx.gconfig.get("apiban", "htname", fallback=None)
         if htname is None:
@@ -125,8 +130,10 @@ def apiban_check(ctx, key, ipaddr):
     if key is None:
         key = ctx.gconfig.get("apiban", "key", fallback=None)
         if key is None:
-            ctx.log("no APIBan key")
-            return
+            key = os.environ.get("APIBANKEY")
+            if key is None or len(key) == 0:
+                ctx.log("no APIBan key")
+                return
 
     conn = http.client.HTTPSConnection("apiban.org", timeout=4)
     conn.request("GET", "/api/" + key + "/check/" + ipaddr)
