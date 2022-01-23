@@ -180,7 +180,10 @@ class ClickCompleter(Completer):
             return
 
         choices = []
-        if (ctx.command.name == "jsonrpc") and (len(args) == 1):
+        if (len(args) == 1) and (ctx.command.name == "jsonrpc"):
+            for it in _ksr_rpc_commands:
+                choices.append(Completion(str(it), -len(incomplete)))
+        if (len(args) == 2) and (args[0] == "srv") and (args[1] == "rpchelp"):
             for it in _ksr_rpc_commands:
                 choices.append(Completion(str(it), -len(incomplete)))
         for param in ctx.command.params:
