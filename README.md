@@ -229,6 +229,15 @@ sudo kamcli config install -u
 Edit `/root/.kamcli/kamcli.ini` or `/home/$USER/.kamcli/kamcli.ini` and update
 the config values as needed.
 
+### Debian And Ubuntu Packages ###
+
+Packages for various Debian and Ubuntu distributions are made available in
+the APT repository at:
+
+  * https://deb.kamailio.org/kamcli-nightly/
+
+They are nightly builds from git development branch.
+
 #### Install On CentOS ####
 
 Should work also on other RPM-based distros.
