@@ -12,6 +12,28 @@ It requires that `jsonrpcs` module of Kamailio is loaded and configured to liste
 on a Unix domain socket, UDP socket or FIFO file. The way to interact with Kamailio has to be set
 inside `kamcli` config file (kamcli.ini).
 
+**Table Of Content**
+
+  * [Features](#features)
+  * [Installation](#installation)
+    + [Requirements](#requirements)
+    + [MySQL Backend](#mysql-backend)
+    + [PostgreSQL Backend](#postgresql-backend)
+    + [SQLite Backend](#sqlite-backend)
+    + [Install In Virtual Environment](#install-in-virtual-environment)
+    + [Install On Debian](#install-on-debian)
+    + [Debian And Ubuntu Packages](#debian-and-ubuntu-packages)
+    + [Install On CentOS](#install-on-centos)
+  * [Configuration File](#configuration-file)
+  * [Usage](#usage)
+  * [Interactive Shell Mode](#interactive-shell-mode)
+  * [Examples Of Commands](#examples-of-commands)
+  * [Kamailio Configuration](#kamailio-configuration)
+  * [Database Backend Support](#database-backend-support)
+  * [Development](#development)
+  * [Python2 Support](#python2-support)
+  * [License](#license)
+
 ### Features ####
 
 The tool provides sub-commands for managing many Kamailio modules and their
@@ -229,7 +251,7 @@ sudo kamcli config install -u
 Edit `/root/.kamcli/kamcli.ini` or `/home/$USER/.kamcli/kamcli.ini` and update
 the config values as needed.
 
-### Debian And Ubuntu Packages ###
+#### Debian And Ubuntu Packages ####
 
 Packages for various Debian and Ubuntu distributions are made available in
 the APT repository at:
