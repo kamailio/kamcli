@@ -388,6 +388,13 @@ def handle_internal_commands(command):
     help="Do not enable syntax highlighting for command line",
 )
 @click.option(
+    "noconnect",
+    "--no-connect",
+    "-C",
+    is_flag=True,
+    help="Do not connect to kamailio on starting the shell command",
+)
+@click.option(
     "norpcautocomplete",
     "--no-rpc-auto-complete",
     "-R",
@@ -395,7 +402,7 @@ def handle_internal_commands(command):
     help="Do not fetch RPC commands for command auto-complete",
 )
 @pass_context
-def cli(ctx, nohistory, nosyntax, norpcautocomplete):
+def cli(ctx, nohistory, nosyntax, noconnect, norpcautocomplete):
     """Run in shell mode
 
     \b
@@ -403,9 +410,9 @@ def cli(ctx, nohistory, nosyntax, norpcautocomplete):
     global _ksr_rpc_commands
     prompt_kwargs = {}
 
-    if not norpcautocomplete:
+    if not noconnect:
         proc = subprocess.Popen(
-            sys.argv[0] + " -F json rpc --no-log system.listMethods",
+            sys.argv[0] + " -F json rpc --no-log core.version",
             stdout=subprocess.PIPE,
             shell=True,
         )
@@ -413,9 +420,24 @@ def cli(ctx, nohistory, nosyntax, norpcautocomplete):
         proc.wait(timeout=10)
         if err is None and len(output) > 32:
             jdata = json.loads(output)
-            _ksr_rpc_commands = _ksr_rpc_commands + jdata["result"]
+            click.echo("(info) connected to " + jdata["result"])
+            if not norpcautocomplete:
+                proc = subprocess.Popen(
+                    sys.argv[0] + " -F json rpc --no-log system.listMethods",
+                    stdout=subprocess.PIPE,
+                    shell=True,
+                )
+                (output, err) = proc.communicate(timeout=10)
+                proc.wait(timeout=10)
+                if err is None and len(output) > 32:
+                    jdata = json.loads(output)
+                    _ksr_rpc_commands = _ksr_rpc_commands + jdata["result"]
+                else:
+                    click.echo(
+                        "(info) unable to fetch the list of rpc commands"
+                    )
         else:
-            click.echo("(info) unable to fetch the list of rpc commands")
+            click.echo("(info) unable to connect to kamailio")
 
     if not nohistory:
         dirName = os.path.expanduser("~/.kamcli")
