@@ -460,7 +460,7 @@ def cli(ctx, nohistory, nosyntax, noconnect, norpcautocomplete):
     if not nosyntax:
         prompt_kwargs.update({"lexer": PygmentsLexer(BashLexer)})
 
-    if "cmd_shell.cmdremap" in ctx._gconfig:
-        SHELL_COMMAND_REMAP.update(ctx._gconfig["cmd_shell.cmdremap"])
+    if "shell.cmdremap" in ctx._gconfig:
+        SHELL_COMMAND_REMAP.update(ctx._gconfig["shell.cmdremap"])
 
     shell_repl(click.get_current_context(), prompt_kwargs=prompt_kwargs)
