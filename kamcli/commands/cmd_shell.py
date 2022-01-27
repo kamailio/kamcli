@@ -411,6 +411,15 @@ def cli(ctx, nohistory, nosyntax, noconnect, norpcautocomplete):
     prompt_kwargs = {}
 
     if not noconnect:
+        noconnect = ctx.gconfig.getboolean(
+            "shell", "noconnect", fallback=False
+        )
+    if not norpcautocomplete:
+        norpcautocomplete = ctx.gconfig.getboolean(
+            "shell", "norpcautocomplete", fallback=False
+        )
+
+    if not noconnect:
         proc = subprocess.Popen(
             sys.argv[0] + " -F json rpc --no-log core.version",
             stdout=subprocess.PIPE,
