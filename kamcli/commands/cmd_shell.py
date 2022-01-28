@@ -449,6 +449,10 @@ def cli(ctx, nohistory, nosyntax, noconnect, norpcautocomplete):
             click.echo("(info) unable to connect to kamailio")
 
     if not nohistory:
+        nohistory = ctx.gconfig.getboolean(
+            "shell", "nohistory", fallback=False
+        )
+    if not nohistory:
         dirName = os.path.expanduser("~/.kamcli")
         if not os.path.exists(dirName):
             os.mkdir(dirName)
@@ -457,6 +461,8 @@ def cli(ctx, nohistory, nosyntax, noconnect, norpcautocomplete):
             {"history": FileHistory(os.path.expanduser("~/.kamcli/history"))}
         )
 
+    if not nosyntax:
+        nosyntax = ctx.gconfig.getboolean("shell", "nosyntax", fallback=False)
     if not nosyntax:
         prompt_kwargs.update({"lexer": PygmentsLexer(BashLexer)})
 
