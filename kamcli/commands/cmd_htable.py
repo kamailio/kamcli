@@ -81,6 +81,23 @@ def htable_seti(ctx, htname, itname, ival):
     command_ctl(ctx, "htable.seti", [htname, itname, ival])
 
 
+@cli.command("setex", short_help="Set expire for $sht(htname=>itname)")
+@click.argument("htname", metavar="<htname>")
+@click.argument("itname", metavar="<itname>")
+@click.argument("ival", metavar="<exval>", type=int)
+@pass_context
+def htable_setex(ctx, htname, itname, exval):
+    """Set expire for $sht(htname=>itname)
+
+    \b
+    Parameters:
+        <htname> - the name of hash table
+        <itname> - the name of item
+        <exval> - the int value
+    """
+    command_ctl(ctx, "htable.setex", [htname, itname, exval])
+
+
 @cli.command("rm", short_help="Remove the item $sht(htname=>itname)")
 @click.option(
     "yes", "--yes", "-y", is_flag=True, help="Do not ask for confirmation",
