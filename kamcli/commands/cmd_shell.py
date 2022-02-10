@@ -429,7 +429,30 @@ def cli(ctx, nohistory, nosyntax, noconnect, norpcautocomplete):
         proc.wait(timeout=10)
         if err is None and len(output) > 32:
             jdata = json.loads(output)
-            click.echo("(info) connected to " + jdata["result"])
+            click.echo("(info) connected to: " + jdata["result"])
+
+            proc = subprocess.Popen(
+                sys.argv[0] + " -F json rpc --no-log core.uptime",
+                stdout=subprocess.PIPE,
+                shell=True,
+            )
+            (output, err) = proc.communicate(timeout=10)
+            proc.wait(timeout=10)
+            if err is None and len(output) > 32:
+                jdata = json.loads(output)
+                uph = int(jdata["result"]["uptime"] / 3600)
+                upm = int((jdata["result"]["uptime"] % 3600) / 60)
+                ups = (jdata["result"]["uptime"] % 3600) % 60
+                click.echo(
+                    "(info) sip server uptime: "
+                    + str(uph)
+                    + "h "
+                    + str(upm)
+                    + "m "
+                    + str(ups)
+                    + "s"
+                )
+
             if not norpcautocomplete:
                 proc = subprocess.Popen(
                     sys.argv[0] + " -F json rpc --no-log system.listMethods",
