@@ -231,3 +231,16 @@ def acc_list(ctx, oformat, ostyle, limit):
         "select * from acc order by id desc limit {0}".format(limit)
     )
     ioutils_dbres_print(ctx, oformat, ostyle, res)
+
+
+@cli.command(
+    "cdrs-generate",
+    help="Run SQL stored procedure to generate CDRS",
+)
+@pass_context
+def acc_cdrs_generate(ctx):
+    """Run SQL stored procedure to generate CDRS
+    """
+    ctx.vlog("Run SQL stored procedure to generate CDRS")
+    e = create_engine(ctx.gconfig.get("db", "rwurl"))
+    e.execute("call kamailio_cdrs()")
