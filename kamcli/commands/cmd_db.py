@@ -853,6 +853,15 @@ def db_create_tables_group(ctx, scriptsdirectory, gname):
     dbutils_exec_sqlfile(ctx, e, fpath)
 
 
+@cli.command("create-table-like", short_help="Create a new table like another one")
+@click.argument("newname", metavar="<newname>")
+@click.argument("oldname", metavar="<oldname>")
+@pass_context
+def db_create_table_like(ctx, newname, oldname):
+    e = create_engine(ctx.gconfig.get("db", "rwurl"))
+    e.execute("CREATE TABLE {0} LIKE {1}".format(newname, oldname))
+
+
 @cli.command("grant", short_help="Create db access users and grant privileges")
 @click.option(
     "dbname",
