@@ -347,7 +347,7 @@ def db_create_mysql_host_users(
         )
     if not nogrants:
         e.execute(
-            "GRANT SELECT PRIVILEGES ON {0}.* TO {1!r}@{2!r}".format(
+            "GRANT SELECT ON {0}.* TO {1!r}@{2!r}".format(
                 dbname, dbrouser, dbhost
             )
         )
@@ -361,7 +361,16 @@ def db_create_mysql_users(ctx, e, dbname, nousers, nogrants):
     dbropassword = ctx.gconfig.get("db", "ropassword")
     dbaccesshost = ctx.gconfig.get("db", "accesshost")
     db_create_mysql_host_users(
-        ctx, e, dbname, dbhost, dbrwuser, dbrwpassword, dbrouser, dbropassword
+        ctx,
+        e,
+        nousers,
+        nogrants,
+        dbname,
+        dbhost,
+        dbrwuser,
+        dbrwpassword,
+        dbrouser,
+        dbropassword,
     )
     if dbhost != "localhost":
         db_create_mysql_host_users(
@@ -370,7 +379,7 @@ def db_create_mysql_users(ctx, e, dbname, nousers, nogrants):
             nousers,
             nogrants,
             dbname,
-            "localhost",
+            dbhost,
             dbrwuser,
             dbrwpassword,
             dbrouser,
@@ -872,13 +881,13 @@ def db_grant(ctx, dbname):
 
 def db_revoke_host_users(ctx, e, dbname, dbhost, dbrwuser, dbrouser):
     e.execute(
-        "REVOKE ALL PRIVILEGES ON {0}.* TO {1!r}@{2!r}".format(
+        "REVOKE ALL PRIVILEGES ON {0}.* FROM {1!r}@{2!r}".format(
             dbname, dbrwuser, dbhost
         )
     )
     e.execute("DROP USER {0!r}@{1!r}".format(dbrwuser, dbhost))
     e.execute(
-        "REVOKE SELECT PRIVILEGES ON {0}.* TO {1!r}@{2!r}".format(
+        "REVOKE SELECT ON {0}.* FROM {1!r}@{2!r}".format(
             dbname, dbrouser, dbhost
         )
     )
