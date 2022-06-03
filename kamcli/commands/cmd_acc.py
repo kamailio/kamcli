@@ -244,3 +244,44 @@ def acc_cdrs_generate(ctx):
     ctx.vlog("Run SQL stored procedure to generate CDRS")
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     e.execute("call kamailio_cdrs()")
+
+
+@cli.command(
+    "cdrs-list", short_help="List call data records",
+)
+@click.option(
+    "oformat",
+    "--output-format",
+    "-F",
+    type=click.Choice(["raw", "json", "table", "dict"]),
+    default=None,
+    help="Format the output",
+)
+@click.option(
+    "ostyle",
+    "--output-style",
+    "-S",
+    default=None,
+    help="Style of the output (tabulate table format)",
+)
+@click.option(
+    "limit",
+    "--limit",
+    "-l",
+    type=int,
+    default=20,
+    help="The limit of listed records (default: 20)",
+)
+@pass_context
+def acc_cdrs_list(ctx, oformat, ostyle, limit):
+    """List call data records
+
+    \b
+    """
+    e = create_engine(ctx.gconfig.get("db", "rwurl"))
+    ctx.vlog("Showing call data records")
+    res = e.execute(
+        "select * from cdrs order by cdr_id desc limit {0}".format(limit)
+    )
+    ioutils_dbres_print(ctx, oformat, ostyle, res)
+
