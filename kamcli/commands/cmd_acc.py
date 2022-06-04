@@ -326,3 +326,38 @@ def acc_rates_add(ctx, dbtname, rate_group, prefix, rate_unit, time_unit):
             time_unit
         )
     )
+
+
+@cli.command("rates-rm", short_help="Remove a rating record from database")
+@click.option(
+    "dbtname",
+    "--dbtname",
+    default="",
+    help='The name of the database table (default: "billing_rates")',
+)
+
+@click.argument("rate_group", metavar="<rate_group>")
+@click.argument("prefix", metavar="<prefix>")
+@pass_context
+def acc_rates_rm(ctx, dbtname, rate_group, prefix):
+    """Remove a rating record from database
+
+    \b
+    Parameters:
+        <rate_group> - name of rating group
+        <prefix> - matching prefix
+    """
+    ctx.vlog(
+        "Remove from db table [%s] record [%s] => [%s]", dbtname, rate_group, prefix
+    )
+    e = create_engine(ctx.gconfig.get("db", "rwurl"))
+    v_dbtname = dbtname.encode("ascii", "ignore").decode()
+    v_rate_group = rate_group.encode("ascii", "ignore").decode()
+    v_prefix = prefix.encode("ascii", "ignore").decode()
+    e.execute(
+        "delete from {0} where rate_group=({1!r} and prefix={2!r}".format(
+            v_dbtname,
+            v_rate_group,
+            v_prefix,
+        )
+    )
