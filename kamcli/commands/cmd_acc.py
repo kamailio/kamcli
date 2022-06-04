@@ -285,3 +285,44 @@ def acc_cdrs_list(ctx, oformat, ostyle, limit):
     )
     ioutils_dbres_print(ctx, oformat, ostyle, res)
 
+
+@cli.command("rates-add", short_help="Add a new rating record to database")
+@click.option(
+    "dbtname",
+    "--dbtname",
+    default="",
+    help='The name of the database table (default: "billing_rates")',
+)
+
+@click.argument("rate_group", metavar="<rate_group>")
+@click.argument("prefix", metavar="<prefix>")
+@click.argument("rate_unit", metavar="<rate_unit>")
+@click.argument("time_unit", metavar="<time_unit>")
+@pass_context
+def acc_rates_add(ctx, dbtname, rate_group, prefix, rate_unit, time_unit):
+    """Add a new rating record in database table
+
+    \b
+    Parameters:
+        <rate_group> - name of rating group
+        <prefix> - matching prefix
+        <rate_unit>  - rate unit
+        <time_unit>  - time unit
+    """
+    ctx.vlog(
+        "Adding to db table [%s] record [%s] => [%s]", dbtname, rate_group, prefix
+    )
+    e = create_engine(ctx.gconfig.get("db", "rwurl"))
+    v_dbtname = dbtname.encode("ascii", "ignore").decode()
+    v_rate_group = rate_group.encode("ascii", "ignore").decode()
+    v_prefix = prefix.encode("ascii", "ignore").decode()
+    e.execute(
+        "insert into {0} (rate_group, prefix, rate_unit, time_unit) values "
+        "({1!r}, {2!r}, {3}, {4})".format(
+            v_dbtname,
+            v_rate_group,
+            v_prefix,
+            rate_unit,
+            time_unit
+        )
+    )
