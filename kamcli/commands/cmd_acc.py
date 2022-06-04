@@ -170,11 +170,11 @@ def acc_cdrs_proc_create(ctx):
 
 
 @cli.command(
-    "rating-table-create",
+    "rates-table-create",
     help="Run SQL statements to create billing_rates table structure",
 )
 @pass_context
-def acc_rating_table_create(ctx):
+def acc_rates_table_create(ctx):
     """Run SQL statements to create billing_rates table structure
     """
     ctx.vlog("Run SQL statements to create billing_rates table structure")
