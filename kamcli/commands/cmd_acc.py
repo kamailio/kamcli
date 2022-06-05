@@ -361,3 +361,47 @@ def acc_rates_rm(ctx, dbtname, rate_group, prefix):
             v_prefix,
         )
     )
+
+
+@cli.command(
+    "rates-proc-create",
+    help="Run SQL statements to create the stored procedure to rate cdrs",
+)
+@pass_context
+def acc_rates_proc_create(ctx):
+    """Run SQL statements to create the stored procedure to rate cdrs
+    """
+    ctx.vlog(
+        "Run SQL statements to create the stored procedure to rate cdrs"
+    )
+    e = create_engine(ctx.gconfig.get("db", "rwurl"))
+    sqltext = """
+        CREATE PROCEDURE `kamailio_rating`(`rgroup` varchar(64))
+        BEGIN
+        DECLARE done, rate_record, vx_cost INT DEFAULT 0;
+        DECLARE v_cdr_id BIGINT DEFAULT 0;
+        DECLARE v_duration, v_rate_unit, v_time_unit INT DEFAULT 0;
+        DECLARE v_dst_username VARCHAR(64);
+        DECLARE cdrs_cursor CURSOR FOR SELECT cdr_id, dst_username, duration
+            FROM cdrs WHERE rated=0;
+        DECLARE CONTINUE HANDLER FOR SQLSTATE '02000' SET done = 1;
+        OPEN cdrs_cursor;
+        REPEAT
+            FETCH cdrs_cursor INTO v_cdr_id, v_dst_username, v_duration;
+            IF NOT done THEN
+            SET rate_record = 0;
+            SELECT 1, rate_unit, time_unit INTO rate_record, v_rate_unit, v_time_unit
+                    FROM billing_rates
+                    WHERE rate_group=rgroup AND v_dst_username LIKE concat(prefix, '%')
+                    ORDER BY prefix DESC LIMIT 1;
+            IF rate_record = 1 THEN
+                SET vx_cost = v_rate_unit * CEIL(v_duration/v_time_unit);
+                UPDATE cdrs SET rated=1, cost=vx_cost WHERE cdr_id=v_cdr_id;
+            END IF;
+            SET done = 0;
+            END IF;
+        UNTIL done END REPEAT;
+        END
+    """
+    e.execute(sqltext)
+
