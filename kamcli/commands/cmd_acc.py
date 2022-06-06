@@ -405,3 +405,15 @@ def acc_rates_proc_create(ctx):
     """
     e.execute(sqltext)
 
+
+@cli.command(
+    "rates-generate",
+    help="Run SQL stored procedure to rate the CDRS and generate the costs",
+)
+@pass_context
+def acc_cdrs_generate(ctx):
+    """Run SQL stored procedure to rate the CDRS and generate the costs
+    """
+    ctx.vlog("Run SQL stored procedure to rate the CDRS and generate the costs")
+    e = create_engine(ctx.gconfig.get("db", "rwurl"))
+    e.execute("call kamailio_rating()")
