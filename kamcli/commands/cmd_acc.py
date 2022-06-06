@@ -34,8 +34,7 @@ def acc_acc_struct_update_exec(ctx, e):
 )
 @pass_context
 def acc_acc_struct_update(ctx):
-    """Run SQL statements to update acc table structure
-    """
+    """Run SQL statements to update acc table structure"""
     ctx.vlog("Run statements to update acc table structure")
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     acc_acc_struct_update_exec(ctx, e)
@@ -60,8 +59,7 @@ def acc_mc_struct_update_exec(ctx, e):
 )
 @pass_context
 def acc_mc_struct_update(ctx):
-    """Run SQL statements to update missed_calls table structure
-    """
+    """Run SQL statements to update missed_calls table structure"""
     ctx.vlog("Run statements to update missed_calls table structure")
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     acc_mc_struct_update_exec(ctx, e)
@@ -73,8 +71,7 @@ def acc_mc_struct_update(ctx):
 )
 @pass_context
 def acc_tables_struct_update(ctx):
-    """Run SQL statements to update acc and missed_calls tables structures
-    """
+    """Run SQL statements to update acc and missed_calls tables structures"""
     ctx.vlog("Run statements to update acc and missed_calls tables structures")
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     acc_acc_struct_update_exec(ctx, e)
@@ -87,8 +84,7 @@ def acc_tables_struct_update(ctx):
 )
 @pass_context
 def acc_cdrs_table_create(ctx):
-    """Run SQL statements to create cdrs table structure
-    """
+    """Run SQL statements to create cdrs table structure"""
     ctx.vlog("Run SQL statements to create cdrs table structure")
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     sqltext = """
@@ -121,8 +117,7 @@ def acc_cdrs_table_create(ctx):
 )
 @pass_context
 def acc_cdrs_proc_create(ctx):
-    """Run SQL statements to create the stored procedure to generate cdrs
-    """
+    """Run SQL statements to create the stored procedure to generate cdrs"""
     ctx.vlog(
         "Run SQL statements to create the stored procedure to generate cdrs"
     )
@@ -175,8 +170,7 @@ def acc_cdrs_proc_create(ctx):
 )
 @pass_context
 def acc_rates_table_create(ctx):
-    """Run SQL statements to create billing_rates table structure
-    """
+    """Run SQL statements to create billing_rates table structure"""
     ctx.vlog("Run SQL statements to create billing_rates table structure")
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     sqltext = """
@@ -194,7 +188,8 @@ def acc_rates_table_create(ctx):
 
 
 @cli.command(
-    "list", short_help="List accounting records",
+    "list",
+    short_help="List accounting records",
 )
 @click.option(
     "oformat",
@@ -239,15 +234,15 @@ def acc_list(ctx, oformat, ostyle, limit):
 )
 @pass_context
 def acc_cdrs_generate(ctx):
-    """Run SQL stored procedure to generate CDRS
-    """
+    """Run SQL stored procedure to generate CDRS"""
     ctx.vlog("Run SQL stored procedure to generate CDRS")
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     e.execute("call kamailio_cdrs()")
 
 
 @cli.command(
-    "cdrs-list", short_help="List call data records",
+    "cdrs-list",
+    short_help="List call data records",
 )
 @click.option(
     "oformat",
@@ -293,7 +288,6 @@ def acc_cdrs_list(ctx, oformat, ostyle, limit):
     default="",
     help='The name of the database table (default: "billing_rates")',
 )
-
 @click.argument("rate_group", metavar="<rate_group>")
 @click.argument("prefix", metavar="<prefix>")
 @click.argument("rate_unit", metavar="<rate_unit>")
@@ -310,7 +304,10 @@ def acc_rates_add(ctx, dbtname, rate_group, prefix, rate_unit, time_unit):
         <time_unit>  - time unit
     """
     ctx.vlog(
-        "Adding to db table [%s] record [%s] => [%s]", dbtname, rate_group, prefix
+        "Adding to db table [%s] record [%s] => [%s]",
+        dbtname,
+        rate_group,
+        prefix,
     )
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     v_dbtname = dbtname.encode("ascii", "ignore").decode()
@@ -319,11 +316,7 @@ def acc_rates_add(ctx, dbtname, rate_group, prefix, rate_unit, time_unit):
     e.execute(
         "insert into {0} (rate_group, prefix, rate_unit, time_unit) values "
         "({1!r}, {2!r}, {3}, {4})".format(
-            v_dbtname,
-            v_rate_group,
-            v_prefix,
-            rate_unit,
-            time_unit
+            v_dbtname, v_rate_group, v_prefix, rate_unit, time_unit
         )
     )
 
@@ -335,7 +328,6 @@ def acc_rates_add(ctx, dbtname, rate_group, prefix, rate_unit, time_unit):
     default="",
     help='The name of the database table (default: "billing_rates")',
 )
-
 @click.argument("rate_group", metavar="<rate_group>")
 @click.argument("prefix", metavar="<prefix>")
 @pass_context
@@ -348,7 +340,10 @@ def acc_rates_rm(ctx, dbtname, rate_group, prefix):
         <prefix> - matching prefix
     """
     ctx.vlog(
-        "Remove from db table [%s] record [%s] => [%s]", dbtname, rate_group, prefix
+        "Remove from db table [%s] record [%s] => [%s]",
+        dbtname,
+        rate_group,
+        prefix,
     )
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     v_dbtname = dbtname.encode("ascii", "ignore").decode()
@@ -369,11 +364,8 @@ def acc_rates_rm(ctx, dbtname, rate_group, prefix):
 )
 @pass_context
 def acc_rates_proc_create(ctx):
-    """Run SQL statements to create the stored procedure to rate cdrs
-    """
-    ctx.vlog(
-        "Run SQL statements to create the stored procedure to rate cdrs"
-    )
+    """Run SQL statements to create the stored procedure to rate cdrs"""
+    ctx.vlog("Run SQL statements to create the stored procedure to rate cdrs")
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     sqltext = """
         CREATE PROCEDURE `kamailio_rating`(`rgroup` varchar(64))
@@ -412,8 +404,9 @@ def acc_rates_proc_create(ctx):
 )
 @pass_context
 def acc_cdrs_generate(ctx):
-    """Run SQL stored procedure to rate the CDRS and generate the costs
-    """
-    ctx.vlog("Run SQL stored procedure to rate the CDRS and generate the costs")
+    """Run SQL stored procedure to rate the CDRS and generate the costs"""
+    ctx.vlog(
+        "Run SQL stored procedure to rate the CDRS and generate the costs"
+    )
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     e.execute("call kamailio_rating()")
