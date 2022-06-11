@@ -222,9 +222,12 @@ def acc_list(ctx, oformat, ostyle, limit):
     """
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     ctx.vlog("Showing accounting records")
-    res = e.execute(
-        "select * from acc order by id desc limit {0}".format(limit)
-    )
+    query = ""
+    if limit==0:
+        query = "select * from acc order by id"
+    else:
+        query = "select * from acc order by id desc limit {0}".format(limit)
+    res = e.execute(query)
     ioutils_dbres_print(ctx, oformat, ostyle, res)
 
 
