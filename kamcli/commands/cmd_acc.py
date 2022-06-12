@@ -223,8 +223,8 @@ def acc_list(ctx, oformat, ostyle, limit):
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     ctx.vlog("Showing accounting records")
     query = ""
-    if limit==0:
-        query = "select * from acc order by id"
+    if limit == 0:
+        query = "select * from acc order by id desc"
     else:
         query = "select * from acc order by id desc limit {0}".format(limit)
     res = e.execute(query)
@@ -278,9 +278,14 @@ def acc_cdrs_list(ctx, oformat, ostyle, limit):
     """
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     ctx.vlog("Showing call data records")
-    res = e.execute(
-        "select * from cdrs order by cdr_id desc limit {0}".format(limit)
-    )
+    query = ""
+    if limit <= 0:
+        query = "select * from cdrs order by cdr_id desc"
+    else:
+        query = "select * from cdrs order by cdr_id desc limit {0}".format(
+            limit
+        )
+    res = e.execute(query)
     ioutils_dbres_print(ctx, oformat, ostyle, res)
 
 
