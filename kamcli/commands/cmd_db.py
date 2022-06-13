@@ -853,7 +853,9 @@ def db_create_tables_group(ctx, scriptsdirectory, gname):
     dbutils_exec_sqlfile(ctx, e, fpath)
 
 
-@cli.command("create-table-like", short_help="Create a new table like another one")
+@cli.command(
+    "create-table-like", short_help="Create a new table like another one"
+)
 @click.argument("newname", metavar="<newname>")
 @click.argument("oldname", metavar="<oldname>")
 @pass_context
