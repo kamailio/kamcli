@@ -22,12 +22,24 @@ def cli(ctx):
     default="speed_dial",
     help="Name of database table (default: speed_dial)",
 )
+@click.option(
+    "fname",
+    "--fname",
+    default="",
+    help='Value for fname column (default: "")',
+)
+@click.option(
+    "lname",
+    "--lname",
+    default="",
+    help='Value for lname column (default: "")',
+)
 @click.argument("userid", metavar="<userid>")
 @click.argument("shortdial", metavar="<shortdial>")
 @click.argument("targeturi", metavar="<targeturi>")
 @click.argument("desc", metavar="<desc>", nargs=-1)
 @pass_context
-def speeddial_add(ctx, table, userid, shortdial, targeturi, desc):
+def speeddial_add(ctx, table, fname, lname, userid, shortdial, targeturi, desc):
     """Add a speed dial record
 
     \b
@@ -54,25 +66,31 @@ def speeddial_add(ctx, table, userid, shortdial, targeturi, desc):
     if not desc:
         e.execute(
             "insert into {0} (username, domain, sd_username, "
-            "sd_domain, new_uri) values ({1!r}, {2!r}, {3!r}, {4!r}, {5!r})".format(
+            "sd_domain, new_uri, fname, lname) values ({1!r}, {2!r}, {3!r}, "
+            "{4!r}, {5!r}, {6!r}, {7!r})".format(
                 table,
                 udata["username"],
                 udata["domain"],
                 sdata["username"],
                 sdata["domain"],
                 uri,
+                fname,
+                lname,
             )
         )
     else:
         e.execute(
             "insert into {0} (username, domain, sd_username, "
-            "sd_domain, new_uri, description) values ({1!r}, {2!r}, {3!r}, {4!r}, {5!r}, {6!r})".format(
+            "sd_domain, new_uri, fname, lname, description) values ({1!r}, {2!r}, {3!r}, "
+            "{4!r}, {5!r}, {6!r}, {7!r}, {8!r})".format(
                 table,
                 udata["username"],
                 udata["domain"],
                 sdata["username"],
                 sdata["domain"],
                 uri,
+                fname,
+                lname,
                 desc,
             )
         )
