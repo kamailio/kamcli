@@ -10,8 +10,9 @@ except ImportError:
 kamcli_formats_list = ["raw", "json", "table", "dict", "yaml"]
 
 COMMAND_ALIASES = {
-    "subs": "subscriber",
+    "acl": "group",
     "rpc": "jsonrpc",
+    "subs": "subscriber",
     "sht": "htable",
 }
 
