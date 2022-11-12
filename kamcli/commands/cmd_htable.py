@@ -98,6 +98,48 @@ def htable_setex(ctx, htname, itname, exval):
     command_ctl(ctx, "htable.setex", [htname, itname, exval])
 
 
+@cli.command(
+    "setxs", short_help="Set $sht(htname=>itname) to string value with expire"
+)
+@click.argument("htname", metavar="<htname>")
+@click.argument("itname", metavar="<itname>")
+@click.argument("sval", metavar="<sval>")
+@click.argument("exp", metavar="<exp>", type=int)
+@pass_context
+def htable_setxs(ctx, htname, itname, sval, exp):
+    """Set $sht(htname=>itname) to string value with expire
+
+    \b
+    Parameters:
+        <htname> - the name of hash table
+        <itname> - the name of item
+        <sval> - the string value
+        <exp> - the expire interval
+    """
+    command_ctl(ctx, "htable.setxs", [htname, itname, sval, exp])
+
+
+@cli.command(
+    "setxi", short_help="Set $sht(htname=>itname) to string value with expire"
+)
+@click.argument("htname", metavar="<htname>")
+@click.argument("itname", metavar="<itname>")
+@click.argument("ival", metavar="<ival>", type=int)
+@click.argument("exp", metavar="<exp>", type=int)
+@pass_context
+def htable_setxi(ctx, htname, itname, ival, exp):
+    """Set $sht(htname=>itname) to string value with expire
+
+    \b
+    Parameters:
+        <htname> - the name of hash table
+        <itname> - the name of item
+        <ival> - the int value
+        <exp> - the expire interval
+    """
+    command_ctl(ctx, "htable.setxi", [htname, itname, ival, exp])
+
+
 @cli.command("rm", short_help="Remove the item $sht(htname=>itname)")
 @click.option(
     "yes", "--yes", "-y", is_flag=True, help="Do not ask for confirmation",
