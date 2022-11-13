@@ -1,6 +1,9 @@
 import click
 from kamcli.cli import pass_context
 from kamcli.iorpc import command_ctl
+import sys
+import json
+import subprocess
 
 
 @click.group("srv", help="Common server interaction commands")
@@ -120,3 +123,38 @@ def srv_debug(ctx, level):
         command_ctl(ctx, "corex.debug")
     else:
         command_ctl(ctx, "corex.debug", [level[0]])
+
+
+@cli.command("runinfo", short_help="Show runtime info")
+@pass_context
+def srv_runinfo(ctx):
+    """Show runtime info
+
+    \b
+    """
+    proc = subprocess.Popen(
+        sys.argv[0] + " -F json rpc --no-log core.version",
+        stdout=subprocess.PIPE,
+        shell=True,
+    )
+    (output, err) = proc.communicate(timeout=10)
+    proc.wait(timeout=10)
+    if err is None and len(output) > 32:
+        jdata = json.loads(output)
+        click.echo("running: " + jdata["result"])
+
+        proc = subprocess.Popen(
+            sys.argv[0] + " -F json rpc --no-log core.uptime",
+            stdout=subprocess.PIPE,
+            shell=True,
+        )
+        (output, err) = proc.communicate(timeout=10)
+        proc.wait(timeout=10)
+        if err is None and len(output) > 32:
+            jdata = json.loads(output)
+            uph = int(jdata["result"]["uptime"] / 3600)
+            upm = int((jdata["result"]["uptime"] % 3600) / 60)
+            ups = (jdata["result"]["uptime"] % 3600) % 60
+            click.echo(
+                "uptime: " + str(uph) + "h " + str(upm) + "m " + str(ups) + "s"
+            )
