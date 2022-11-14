@@ -125,6 +125,16 @@ def srv_debug(ctx, level):
         command_ctl(ctx, "corex.debug", [level[0]])
 
 
+@cli.command("runinfo", short_help="Show runtime info")
+@pass_context
+def srv_runinfo(ctx):
+    """Show runtime info
+
+    \b
+    """
+    command_ctl(ctx, "core.runinfo")
+
+
 @cli.command("rundetails", short_help="Show runtime details")
 @pass_context
 def srv_rundetails(ctx):
