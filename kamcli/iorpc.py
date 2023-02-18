@@ -159,7 +159,15 @@ class IOFifoThread(threading.Thread):
 # }
 #
 def command_jsonrpc_fifo(
-    ctx, dryrun, sndpath, rcvname, oformat, cmd, params=[], cbexec={}
+    ctx,
+    dryrun,
+    sndpath,
+    rcvname,
+    oformat,
+    storepath,
+    cmd,
+    params=[],
+    cbexec={},
 ):
     scmd = '{\n  "jsonrpc": "2.0",\n  "method": "' + cmd + '",\n'
     if params:
@@ -184,6 +192,8 @@ def command_jsonrpc_fifo(
         scmd += "],\n"
 
     scmd += '  "reply_name": "' + rcvname + '",\n'
+    if storepath and len(storepath) > 0:
+        scmd += '  "store_path": "' + storepath + '",\n'
     scmd += '  "id": ' + str(randint(2, 10000)) + "\n"
     scmd += "}\n"
     if dryrun:
@@ -235,7 +245,15 @@ def command_jsonrpc_fifo(
 #   "id": 1
 # }
 def command_jsonrpc_socket(
-    ctx, dryrun, srvaddr, rcvaddr, oformat, cmd, params=[], cbexec={}
+    ctx,
+    dryrun,
+    srvaddr,
+    rcvaddr,
+    oformat,
+    storepath,
+    cmd,
+    params=[],
+    cbexec={},
 ):
     scmd = '{\n  "jsonrpc": "2.0",\n  "method": "' + cmd + '",\n'
     if params:
@@ -256,6 +274,9 @@ def command_jsonrpc_socket(
                 else:
                     scmd += '"' + p + '"'
         scmd += "],\n"
+
+    if storepath and len(storepath) > 0:
+        scmd += '  "store_path": "' + storepath + '",\n'
 
     scmd += '  "id": ' + str(randint(2, 10000)) + "\n"
     scmd += "}\n"
@@ -376,6 +397,7 @@ def command_ctl(ctx, cmd, params=[], cbexec={}):
             ctx.gconfig.get("jsonrpc", "srvaddr"),
             ctx.gconfig.get("jsonrpc", "rcvaddr"),
             ctx.gconfig.get("jsonrpc", "outformat"),
+            "",
             command_ctl_name(cmd, "rpc"),
             params,
             cbexec,
@@ -387,6 +409,7 @@ def command_ctl(ctx, cmd, params=[], cbexec={}):
             ctx.gconfig.get("jsonrpc", "path"),
             ctx.gconfig.get("jsonrpc", "rplnamebase"),
             ctx.gconfig.get("jsonrpc", "outformat"),
+            "",
             command_ctl_name(cmd, "rpc"),
             params,
             cbexec,
