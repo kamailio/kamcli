@@ -18,10 +18,17 @@ from kamcli.iorpc import command_jsonrpc_socket
     is_flag=True,
     help="Do not print the log with executed command",
 )
+@click.option(
+    "storepath",
+    "--store-path",
+    "-s",
+    default="",
+    help="Path on server where to store the result",
+)
 @click.argument("cmd", nargs=1, metavar="[<command>]")
 @click.argument("params", nargs=-1, metavar="[<params>]")
 @pass_context
-def cli(ctx, dryrun, nolog, cmd, params):
+def cli(ctx, dryrun, nolog, storepath, cmd, params):
     """Execute JSONRPC command
 
         \b
@@ -50,6 +57,7 @@ def cli(ctx, dryrun, nolog, cmd, params):
             ctx.gconfig.get("jsonrpc", "srvaddr"),
             ctx.gconfig.get("jsonrpc", "rcvaddr"),
             ctx.gconfig.get("jsonrpc", "outformat"),
+            storepath,
             command_ctl_name(cmd, "rpc"),
             params,
         )
@@ -60,6 +68,7 @@ def cli(ctx, dryrun, nolog, cmd, params):
             ctx.gconfig.get("jsonrpc", "path"),
             ctx.gconfig.get("jsonrpc", "rplnamebase"),
             ctx.gconfig.get("jsonrpc", "outformat"),
+            storepath,
             command_ctl_name(cmd, "rpc"),
             params,
         )
