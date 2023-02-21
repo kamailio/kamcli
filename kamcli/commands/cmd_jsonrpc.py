@@ -43,10 +43,10 @@ def cli(ctx, dryrun, nolog, storepath, cmd, params):
                         - string values can be also prefixed with 's:'
                         - if a parameter starts with 's:', prefix it with 's:'
         Examples:
-            - jsonrpc system.listMethods
-            - jsonrpc core.psx
-            - jsonrpc stats.get_statistics all
-            - jsonrpc pv.shvSet counter i:123
+            - rpc system.listMethods
+            - rpc core.psx
+            - rpc stats.get_statistics all
+            - rpc pv.shvSet counter i:123
     """
     if not nolog:
         ctx.log("Running JSONRPC command: [%s]", cmd)
