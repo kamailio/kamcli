@@ -18,8 +18,15 @@ from kamcli.iorpc import command_ctl
     is_flag=True,
     help="Print all details in the trap file",
 )
+@click.option(
+    "nops",
+    "--no-ps",
+    "-P",
+    is_flag=True,
+    help="Skip rpc command to get the list of processes",
+)
 @pass_context
-def cli(ctx, all):
+def cli(ctx, all, nops):
     """Store runtime details and gdb full backtrace for all Kamailio processes to a file
 
     \b
@@ -48,12 +55,13 @@ def cli(ctx, all):
                 "params": {"ofile": ofile, "otitle": "core.uptime"},
             },
         )
-    command_ctl(
-        ctx,
-        "core.psx",
-        [],
-        {"func": cmd_trap_print, "params": {"ofile": ofile}},
-    )
+    if not nops:
+        command_ctl(
+            ctx,
+            "core.psx",
+            [],
+            {"func": cmd_trap_print, "params": {"ofile": ofile}},
+        )
 
 
 # callback to write backtraces to file using the result of an rpc command
