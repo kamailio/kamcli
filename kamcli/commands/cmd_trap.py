@@ -25,8 +25,15 @@ from kamcli.iorpc import command_ctl
     is_flag=True,
     help="Skip rpc command to get the list of processes",
 )
+@click.option(
+    "sysps",
+    "--sys-ps",
+    "-s",
+    is_flag=True,
+    help="Get the system ps for each PID returned by RPC ps",
+)
 @pass_context
-def cli(ctx, all, norpcps):
+def cli(ctx, all, norpcps, sysps):
     """Store runtime details and gdb full backtrace for all Kamailio processes to a file
 
     \b
@@ -60,16 +67,22 @@ def cli(ctx, all, norpcps):
             ctx,
             "core.psx",
             [],
-            {"func": cmd_trap_print, "params": {"ofile": ofile}},
+            {
+                "func": cmd_trap_print,
+                "params": {"ofile": ofile, "sysps": sysps},
+            },
         )
 
 
 # callback to write backtraces to file using the result of an rpc command
 def cmd_trap_print(ctx, response, params=None):
     ofile = None
+    sysps = False
     if params is not None:
         if "ofile" in params:
             ofile = params["ofile"]
+        if "sysps" in params:
+            sysps = params["sysps"]
     if ofile is None:
         ofile = (
             "/tmp/gdb_kamailio_"
@@ -101,6 +114,13 @@ def cmd_trap_print(ctx, response, params=None):
                 + ' -----------------------------------------------------" >>'
                 + ofile
             )
+            if sysps:
+                os.system(
+                    "ps -o pid,ni,pri,pcpu,stat,pmem,rss,vsz,args -w -p "
+                    + str(r["PID"])
+                    + " >>"
+                    + ofile
+                )
             os.system(
                 "gdb kamailio "
                 + str(r["PID"])
