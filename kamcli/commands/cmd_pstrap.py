@@ -37,7 +37,7 @@ def cli(ctx, all):
     )
 
     os.system(
-        "ps auxw | grep kamailio | grep -v grep | grep -v kamcti | sort >>"
+        "ps auxw | grep kamailio | grep -v grep | grep -v kamcli | sort >>"
         + ofile
     )
 
