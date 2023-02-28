@@ -19,8 +19,15 @@ from kamcli.iorpc import command_ctl
     is_flag=True,
     help="Print all details in the trap file",
 )
+@click.option(
+    "sysps",
+    "--sys-ps",
+    "-s",
+    is_flag=True,
+    help="Get the system ps line for each PID",
+)
 @pass_context
-def cli(ctx, all):
+def cli(ctx, all, sysps):
     """Store runtime details and gdb full backtrace for all Kamailio processes to a file
 
     \b
@@ -63,6 +70,13 @@ def cli(ctx, all):
                 + ' -----------------------------------------------------" >>'
                 + ofile
             )
+            if sysps:
+                os.system(
+                    "ps -o pid,ni,pri,pcpu,stat,pmem,rss,vsz,args -w -p "
+                    + str(pid)
+                    + " >>"
+                    + ofile
+                )
             os.system(
                 "gdb kamailio "
                 + pid
