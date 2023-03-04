@@ -62,7 +62,9 @@ def apiban_show(ctx, key):
     ctx.vlog("fetching APIBan records")
     key = apiban_key(ctx, key)
     if key is None or len(key) == 0:
-        ctx.log("no APIBan key")
+        ctx.log(
+            "no APIBan key - provide it via -k parameter, config file or APIBANKEY environment variable"
+        )
         return
 
     allAddresses = apiban_fetch(ctx, key)
