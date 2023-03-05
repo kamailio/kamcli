@@ -99,7 +99,9 @@ def apiban_load(ctx, key, htname, expire):
     ctx.vlog("loading APIBan records")
     key = apiban_key(ctx, key)
     if key is None or len(key) == 0:
-        ctx.log("no APIBan key")
+        ctx.log(
+            "no APIBan key - provide it via -k parameter, config file or APIBANKEY environment variable"
+        )
         return
 
     if htname is None:
@@ -134,7 +136,9 @@ def apiban_check(ctx, key, ipaddr):
     ctx.vlog("cheking address againt apiban.org")
     key = apiban_key(ctx, key)
     if key is None or len(key) == 0:
-        ctx.log("no APIBan key")
+        ctx.log(
+            "no APIBan key - provide it via -k parameter, config file or APIBANKEY environment variable"
+        )
         return
 
     conn = http.client.HTTPSConnection("apiban.org", timeout=4)
