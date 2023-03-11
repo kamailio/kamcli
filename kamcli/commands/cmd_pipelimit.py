@@ -187,3 +187,16 @@ def pipelimit_set_pipe(ctx, pipeid, alg, limit):
         <limit> - pipe limit
     """
     command_ctl(ctx, "pl.set_pipe", [pipeid, alg, limit])
+
+
+@cli.command("reset-pipe", short_help="Reset values associated with the pipe")
+@click.argument("pipeid", metavar="<pipeid>")
+@pass_context
+def pipelimit_reset_pipe(ctx, pipeid):
+    """Reset values associated with the pipe
+
+    \b
+    Parameters:
+        <pipeid> - pipe name id
+    """
+    command_ctl(ctx, "pl.reset_pipe", [pipeid])
