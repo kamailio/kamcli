@@ -178,7 +178,7 @@ def pipelimit_stats(ctx):
 @click.argument("limit", metavar="<limit>", type=click.INT)
 @pass_context
 def pipelimit_set_pipe(ctx, pipeid, alg, limit):
-    """Show pipelimit stats
+    """Set pipe algorithm and limit
 
     \b
     Parameters:
