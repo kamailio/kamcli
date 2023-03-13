@@ -145,11 +145,11 @@ def pipelimit_dbrm(ctx, dbtname, yes, pipeid):
     )
 
 
-@cli.command("list", short_help="Lists the details of one or all pipes")
+@cli.command("list", short_help="List the details of one or all pipes")
 @click.argument("pipeid", nargs=-1, metavar="[<pipeid>]")
 @pass_context
 def pipelimit_list(ctx, pipeid):
-    """Show details for dialog records in memory
+    """List the details of one or all pipes
 
     \b
     Parameters:
