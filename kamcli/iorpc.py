@@ -31,19 +31,45 @@ except ImportError:
 # - command_ctl(...) will use rpc variant
 #   based on config options
 COMMAND_NAMES = {
-    "dispatcher.list": {"rpc": "dispatcher.list",},
-    "dispatcher.reload": {"rpc": "dispatcher.reload",},
-    "permissions.addressDump": {"rpc": "permissions.addressDump",},
-    "permissions.addressReload": {"rpc": "permissions.addressReload",},
-    "permissions.domainDump": {"rpc": "permissions.domainDump",},
-    "permissions.subnetDump": {"rpc": "permissions.subnetDump",},
-    "stats.clear_statistics": {"rpc": "stats.clear_statistics",},
-    "stats.get_statistics": {"rpc": "stats.get_statistics",},
-    "stats.reset_statistics": {"rpc": "stats.reset_statistics",},
-    "ul.add": {"rpc": "ul.add",},
-    "ul.dump": {"rpc": "ul.dump",},
-    "ul.rm": {"rpc": "ul.rm",},
-    "ul.lookup": {"rpc": "ul.lookup",},
+    "dispatcher.list": {
+        "rpc": "dispatcher.list",
+    },
+    "dispatcher.reload": {
+        "rpc": "dispatcher.reload",
+    },
+    "permissions.addressDump": {
+        "rpc": "permissions.addressDump",
+    },
+    "permissions.addressReload": {
+        "rpc": "permissions.addressReload",
+    },
+    "permissions.domainDump": {
+        "rpc": "permissions.domainDump",
+    },
+    "permissions.subnetDump": {
+        "rpc": "permissions.subnetDump",
+    },
+    "stats.clear_statistics": {
+        "rpc": "stats.clear_statistics",
+    },
+    "stats.get_statistics": {
+        "rpc": "stats.get_statistics",
+    },
+    "stats.reset_statistics": {
+        "rpc": "stats.reset_statistics",
+    },
+    "ul.add": {
+        "rpc": "ul.add",
+    },
+    "ul.dump": {
+        "rpc": "ul.dump",
+    },
+    "ul.rm": {
+        "rpc": "ul.rm",
+    },
+    "ul.lookup": {
+        "rpc": "ul.lookup",
+    },
 }
 
 
@@ -108,7 +134,7 @@ def command_ctl_response(ctx, response, oformat, cbexec={}):
 
 
 class IOFifoThread(threading.Thread):
-    """ Thread to listen on a reply fifo file """
+    """Thread to listen on a reply fifo file"""
 
     def __init__(self, ctx, rplpath, oformat, cbexec={}):
         threading.Thread.__init__(self)
@@ -323,6 +349,39 @@ def command_jsonrpc_socket(
             sys.exit()
         except socket.error as emsg:
             ctx.log("Error udp sock: " + str(emsg[0]) + " - " + emsg[1])
+            sys.exit()
+    elif srvaddr.startswith("tcp:"):
+        ctx.vlog("tcp socket provided: " + srvaddr)
+        sproto, saddr = srvaddr.split(":", 1)
+        if saddr.find("[", 0, 2) == -1:
+            ctx.vlog("IPv4 socket address")
+            host, port = saddr.split(":")
+        else:
+            ctx.vlog("IPv6 socket address")
+            ehost, port = saddr.rsplit(":", 1)
+            host = ehost.strip("[]")
+            socktype = "IPv6"
+
+        # create datagram udp socket
+        try:
+            if socktype == "IPv6":
+                sockclient = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+            else:
+                sockclient = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+            sockclient.settimeout(4.0)
+            sockclient.connect((host, int(port)))
+            sockclient.sendall(scmd.encode())
+            # receive the response (content, sockserver)
+            response = sockclient.recv(84000)
+
+            ctx.vlog("Server response: " + response.decode())
+
+        except socket.timeout:
+            ctx.log("Timeout receiving response on tcp socket")
+            sys.exit()
+        except socket.error as emsg:
+            ctx.log("Error tcp sock: " + str(emsg[0]) + " - " + emsg[1])
             sys.exit()
     else:
         ctx.vlog("unix socket provided: " + srvaddr)
