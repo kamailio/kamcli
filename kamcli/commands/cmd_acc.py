@@ -392,7 +392,7 @@ def acc_rates_proc_create(ctx):
             SET rate_record = 0;
             SELECT 1, rate_unit, time_unit INTO rate_record, v_rate_unit, v_time_unit
                     FROM billing_rates
-                    WHERE rate_group=rgroup AND v_dst_username LIKE concat(prefix, '%')
+                    WHERE rate_group=rgroup AND v_dst_username LIKE concat(prefix, '%%')
                     ORDER BY prefix DESC LIMIT 1;
             IF rate_record = 1 THEN
                 SET vx_cost = v_rate_unit * CEIL(v_duration/v_time_unit);
