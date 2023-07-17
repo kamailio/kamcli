@@ -379,7 +379,7 @@ def db_create_mysql_users(ctx, e, dbname, nousers, nogrants):
             nousers,
             nogrants,
             dbname,
-            dbhost,
+            "localhost",
             dbrwuser,
             dbrwpassword,
             dbrouser,
