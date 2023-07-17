@@ -413,7 +413,7 @@ def acc_rates_proc_create(ctx):
     help="Run SQL stored procedure to rate the CDRS and generate the costs",
 )
 @pass_context
-def acc_cdrs_generate(ctx):
+def acc_rates_generate(ctx):
     """Run SQL stored procedure to rate the CDRS and generate the costs"""
     ctx.vlog(
         "Run SQL stored procedure to rate the CDRS and generate the costs"
