@@ -295,7 +295,7 @@ def acc_cdrs_list(ctx, oformat, ostyle, limit):
 @click.option(
     "dbtname",
     "--dbtname",
-    default="",
+    default="billing_rates",
     help='The name of the database table (default: "billing_rates")',
 )
 @click.argument("rate_group", metavar="<rate_group>")
@@ -335,7 +335,7 @@ def acc_rates_add(ctx, dbtname, rate_group, prefix, rate_unit, time_unit):
 @click.option(
     "dbtname",
     "--dbtname",
-    default="",
+    default="billing_rates",
     help='The name of the database table (default: "billing_rates")',
 )
 @click.argument("rate_group", metavar="<rate_group>")
