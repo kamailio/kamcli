@@ -241,8 +241,9 @@ def acc_cdrs_generate(ctx):
     ctx.vlog("Run SQL stored procedure to generate CDRS")
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     with e.connect() as c:
+        t = c.begin()
         c.execute("call kamailio_cdrs()")
-        c.commit()
+        t.commit()
 
 
 @cli.command(
@@ -420,5 +421,6 @@ def acc_rates_generate(ctx):
     )
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     with e.connect() as c:
+        t = c.begin()
         c.execute("call kamailio_rating()")
-        c.commit()
+        t.commit()
