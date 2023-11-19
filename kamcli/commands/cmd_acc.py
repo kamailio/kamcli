@@ -30,7 +30,7 @@ def acc_acc_struct_update_exec(ctx, e):
 
 @cli.command(
     "acc-struct-update",
-    help="Run SQL statements to update acc table structure",
+    short_help="Run SQL statements to update acc table structure",
 )
 @pass_context
 def acc_acc_struct_update(ctx):
@@ -55,7 +55,7 @@ def acc_mc_struct_update_exec(ctx, e):
 
 @cli.command(
     "mc-struct-update",
-    help="Run SQL statements to update missed_calls table structure",
+    short_help="Run SQL statements to update missed_calls table structure",
 )
 @pass_context
 def acc_mc_struct_update(ctx):
@@ -67,7 +67,7 @@ def acc_mc_struct_update(ctx):
 
 @cli.command(
     "tables-struct-update",
-    help="Run SQL statements to update acc and missed_calls tables structures",
+    short_help="Run SQL statements to update acc and missed_calls tables structures",
 )
 @pass_context
 def acc_tables_struct_update(ctx):
@@ -80,7 +80,7 @@ def acc_tables_struct_update(ctx):
 
 @cli.command(
     "cdrs-table-create",
-    help="Run SQL statements to create cdrs table structure",
+    short_help="Run SQL statements to create cdrs table structure",
 )
 @pass_context
 def acc_cdrs_table_create(ctx):
@@ -113,7 +113,7 @@ def acc_cdrs_table_create(ctx):
 
 @cli.command(
     "cdrs-proc-create",
-    help="Run SQL statements to create the stored procedure to generate cdrs",
+    short_help="Run SQL statements to create the stored procedure to generate cdrs",
 )
 @pass_context
 def acc_cdrs_proc_create(ctx):
@@ -166,7 +166,7 @@ def acc_cdrs_proc_create(ctx):
 
 @cli.command(
     "rates-table-create",
-    help="Run SQL statements to create billing_rates table structure",
+    short_help="Run SQL statements to create billing_rates table structure",
 )
 @pass_context
 def acc_rates_table_create(ctx):
@@ -233,7 +233,7 @@ def acc_list(ctx, oformat, ostyle, limit):
 
 @cli.command(
     "cdrs-generate",
-    help="Run SQL stored procedure to generate CDRS",
+    short_help="Run SQL stored procedure to generate CDRS",
 )
 @pass_context
 def acc_cdrs_generate(ctx):
@@ -371,7 +371,7 @@ def acc_rates_rm(ctx, dbtname, rate_group, prefix):
 
 @cli.command(
     "rates-proc-create",
-    help="Run SQL statements to create the stored procedure to rate cdrs",
+    short_help="Run SQL statements to create the stored procedure to rate cdrs",
 )
 @pass_context
 def acc_rates_proc_create(ctx):
@@ -411,7 +411,7 @@ def acc_rates_proc_create(ctx):
 
 @cli.command(
     "rates-generate",
-    help="Run SQL stored procedure to rate the CDRS and generate the costs",
+    short_help="Run SQL stored procedure to rate the CDRS and generate the costs",
 )
 @click.argument("rate_group", nargs=-1, metavar="[<rate_group>]")
 @pass_context
