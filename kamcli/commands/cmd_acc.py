@@ -413,14 +413,24 @@ def acc_rates_proc_create(ctx):
     "rates-generate",
     help="Run SQL stored procedure to rate the CDRS and generate the costs",
 )
+@click.argument("rate_group", nargs=-1, metavar="[<rate_group>]")
 @pass_context
-def acc_rates_generate(ctx):
-    """Run SQL stored procedure to rate the CDRS and generate the costs"""
+def acc_rates_generate(ctx, rate_group):
+    """Run SQL stored procedure to rate the CDRS and generate the costs
+
+    \b
+    Parameters:
+        <rate_group> - name of rating group
+    """
     ctx.vlog(
         "Run SQL stored procedure to rate the CDRS and generate the costs"
     )
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     with e.connect() as c:
         t = c.begin()
-        c.execute("call kamailio_rating()")
+        if not rate_group:
+            c.execute('call kamailio_rating("default")')
+        else:
+            for rg in rate_group:
+                c.execute("call kamailio_rating({0!r})".format(rg))
         t.commit()
