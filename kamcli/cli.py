@@ -19,7 +19,7 @@ COMMAND_ALIASES = {
 
 def read_global_config(config_paths):
     """Get config."""
-    parser = configparser.SafeConfigParser()
+    parser = configparser.ConfigParser()
     if config_paths:
         parser.read(config_paths)
     else:
