@@ -252,7 +252,7 @@ def command_jsonrpc_fifo(
     while waitrun:
         try:
             tiofifo.join(500)
-            if not tiofifo.isAlive():
+            if not tiofifo.is_alive():
                 waitrun = False
                 break
         except KeyboardInterrupt:
