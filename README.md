@@ -296,6 +296,14 @@ sudo kamcli config install -u
 Edit `/root/.kamcli/kamcli.ini` or `/home/$USER/.kamcli/kamcli.ini` and update
 the config values as needed.
 
+### Using Docker ###
+
+Attatch you config dir to ``/etc/kamcli`` volumen
+
+```
+docker run -i -t --rm -v $(realpath ~/.kamcli):/etc/kamcli ghcr.io/kamailio/kamcli:master kamcli
+```
+
 ### Configuration File ###
 
 Kamcli uses a configuration file with INI format. The name is `kamcli.ini` and it looks for it in:
