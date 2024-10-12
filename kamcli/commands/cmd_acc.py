@@ -270,10 +270,11 @@ def acc_mc_list(ctx, oformat, ostyle, limit):
     if limit == 0:
         query = "select * from missed_calls order by id desc"
     else:
-        query = "select * from missed_calls order by id desc limit {0}".format(limit)
+        query = "select * from missed_calls order by id desc limit {0}".format(
+            limit
+        )
     res = e.execute(query)
     ioutils_dbres_print(ctx, oformat, ostyle, res)
-
 
 
 @cli.command(
@@ -479,3 +480,48 @@ def acc_rates_generate(ctx, rate_group):
             for rg in rate_group:
                 c.execute("call kamailio_rating({0!r})".format(rg))
         t.commit()
+
+
+@cli.command(
+    "acc-report",
+    short_help="Show various accounting reports",
+)
+@click.option(
+    "oformat",
+    "--output-format",
+    "-F",
+    type=click.Choice(["raw", "json", "table", "dict"]),
+    default=None,
+    help="Format the output",
+)
+@click.option(
+    "ostyle",
+    "--output-style",
+    "-S",
+    default=None,
+    help="Style of the output (tabulate table format)",
+)
+@click.option(
+    "limit",
+    "--limit",
+    "-l",
+    type=int,
+    default=20,
+    help="The limit of listed records (default: 20)",
+)
+@click.argument("name", metavar="<name>")
+@pass_context
+def acc_report(ctx, oformat, ostyle, limit, name):
+    """Show various accounting reports
+
+    \b
+    Parameters:
+        <name> - name of the report (top-src)
+    """
+    e = create_engine(ctx.gconfig.get("db", "rwurl"))
+    ctx.vlog("Showing accounting report: " + name)
+    query = "SELECT `src_user`, count(*) AS `count` FROM acc GROUP BY `src_user` ORDER BY count DESC"
+    if limit > 0:
+        query = query + " LIMIT {0}".format(limit)
+    res = e.execute(query)
+    ioutils_dbres_print(ctx, oformat, ostyle, res)
