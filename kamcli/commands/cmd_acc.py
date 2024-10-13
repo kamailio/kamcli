@@ -483,7 +483,7 @@ def acc_rates_generate(ctx, rate_group):
 
 
 @cli.command(
-    "acc-report",
+    "report",
     short_help="Show various accounting reports",
 )
 @click.option(
@@ -509,9 +509,17 @@ def acc_rates_generate(ctx, rate_group):
     default=20,
     help="The limit of listed records (default: 20)",
 )
+@click.option(
+    "interval",
+    "--interval",
+    "-i",
+    type=int,
+    default=24,
+    help="The time interval in hours (default: 24)",
+)
 @click.argument("name", metavar="<name>")
 @pass_context
-def acc_report(ctx, oformat, ostyle, limit, name):
+def acc_report(ctx, oformat, ostyle, limit, interval, name):
     """Show various accounting reports
 
     \b
@@ -520,8 +528,14 @@ def acc_report(ctx, oformat, ostyle, limit, name):
     """
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     ctx.vlog("Showing accounting report: " + name)
-    query = "SELECT `src_user`, count(*) AS `count` FROM acc GROUP BY `src_user` ORDER BY count DESC"
+    query = "SELECT `src_user`, count(*) AS `count` FROM acc"
+    query = query + " WHERE DATE_SUB(NOW(), INTERVAL {0} HOUR) <= time".format(
+        interval
+    )
+    query = query + " GROUP BY `src_user` ORDER BY count DESC"
+
     if limit > 0:
         query = query + " LIMIT {0}".format(limit)
+
     res = e.execute(query)
     ioutils_dbres_print(ctx, oformat, ostyle, res)
