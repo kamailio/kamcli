@@ -524,12 +524,18 @@ def acc_report(ctx, oformat, ostyle, limit, interval, name):
 
     \b
     Parameters:
-        <name> - name of the report (top-src)
+        <name> - name of the report:
+            - top-src: most active callers
+            - top-dst: most active callees
     """
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     ctx.vlog("Showing accounting report: " + name)
 
-    query = "SELECT `src_user`, count(*) AS `count` FROM acc"
+    userfield = "src_user"
+    if name == "top-dst":
+        userfield = "dst_user"
+
+    query = "SELECT `" + userfield + "`, count(*) AS `count` FROM acc"
 
     if interval > 0:
         query = (
@@ -539,7 +545,7 @@ def acc_report(ctx, oformat, ostyle, limit, interval, name):
             )
         )
 
-    query = query + " GROUP BY `src_user` ORDER BY count DESC"
+    query = query + " GROUP BY `" + userfield + "` ORDER BY count DESC"
 
     if limit > 0:
         query = query + " LIMIT {0}".format(limit)
