@@ -528,10 +528,17 @@ def acc_report(ctx, oformat, ostyle, limit, interval, name):
     """
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     ctx.vlog("Showing accounting report: " + name)
+
     query = "SELECT `src_user`, count(*) AS `count` FROM acc"
-    query = query + " WHERE DATE_SUB(NOW(), INTERVAL {0} HOUR) <= time".format(
-        interval
-    )
+
+    if interval > 0:
+        query = (
+            query
+            + " WHERE DATE_SUB(NOW(), INTERVAL {0} HOUR) <= time".format(
+                interval
+            )
+        )
+
     query = query + " GROUP BY `src_user` ORDER BY count DESC"
 
     if limit > 0:
