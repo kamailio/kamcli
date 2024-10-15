@@ -24,7 +24,7 @@ ioutils_formats_list = ["raw", "json", "table", "dict", "yaml"]
 
 
 def ioutils_dbres_print(ctx, oformat, ostyle, res):
-    """ print a database result using different formats and styles """
+    """print a database result using different formats and styles"""
     if oformat is None:
         oformat = ctx.gconfig.get("db", "outformat", fallback=None)
         if oformat is None:
@@ -74,3 +74,43 @@ def ioutils_dbres_print(ctx, oformat, ostyle, res):
     else:
         allrows = res.fetchall()
         print(allrows)
+
+
+def ioutils_dict_print(ctx, oformat, ostyle, res):
+    """print a dictionary using different formats and styles"""
+    if oformat is None:
+        oformat = "json"
+
+    if oformat == "table":
+        if ioutils_tabulate_format is False:
+            ctx.log("Package tabulate is not installed")
+            sys.exit()
+
+    if oformat == "yaml":
+        if ioutils_yaml_format is False:
+            ctx.log("Package yaml is not installed")
+            sys.exit()
+
+    if ostyle is None:
+        ostyle = "grid"
+
+    if oformat == "json":
+        jdata = []
+        jdata.append(res)
+        print(json.dumps(jdata, indent=4))
+        print()
+    elif oformat == "yaml":
+        ydata = []
+        ydata.append(res)
+        print(yaml.dump(ydata, indent=4))
+        print()
+    elif oformat == "dict":
+        print(res)
+        # pprint.pprint(dict(row), indent=4)
+        print()
+    elif oformat == "table":
+        gstring = tabulate(res, headers="keys", tablefmt=ostyle)
+        print(gstring)
+    else:
+        print(res)
+        print()
