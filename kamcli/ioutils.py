@@ -109,7 +109,7 @@ def ioutils_dict_print(ctx, oformat, ostyle, res):
         # pprint.pprint(dict(row), indent=4)
         print()
     elif oformat == "table":
-        gstring = tabulate(res, headers="keys", tablefmt=ostyle)
+        gstring = tabulate([res.values()], headers=res.keys(), tablefmt=ostyle)
         print(gstring)
     else:
         print(res)
