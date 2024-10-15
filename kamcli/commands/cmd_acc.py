@@ -527,6 +527,7 @@ def acc_report(ctx, oformat, ostyle, limit, interval, name):
         <name> - name of the report:
             - top-src: most active callers
             - top-dst: most active callees
+            - top-odst: most active original callees
     """
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     ctx.vlog("Showing accounting report: " + name)
@@ -534,6 +535,8 @@ def acc_report(ctx, oformat, ostyle, limit, interval, name):
     userfield = "src_user"
     if name == "top-dst":
         userfield = "dst_user"
+    elif name == "top-odst":
+        userfield = "dst_ouser"
 
     query = "SELECT `" + userfield + "`, count(*) AS `count` FROM acc"
 
