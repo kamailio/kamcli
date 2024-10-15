@@ -1,6 +1,7 @@
 import click
 from sqlalchemy import create_engine
 from kamcli.ioutils import ioutils_dbres_print
+from kamcli.ioutils import ioutils_dict_print
 from sqlalchemy.sql import text
 from sqlalchemy.exc import SQLAlchemyError
 from kamcli.cli import pass_context
@@ -555,3 +556,93 @@ def acc_report(ctx, oformat, ostyle, limit, interval, name):
 
     res = e.execute(query)
     ioutils_dbres_print(ctx, oformat, ostyle, res)
+
+
+@cli.command(
+    "method-stats",
+    short_help="Show method statistics",
+)
+@click.option(
+    "oformat",
+    "--output-format",
+    "-F",
+    type=click.Choice(["raw", "json", "table", "dict"]),
+    default=None,
+    help="Format the output",
+)
+@click.option(
+    "ostyle",
+    "--output-style",
+    "-S",
+    default=None,
+    help="Style of the output (tabulate table format)",
+)
+@click.option(
+    "limit",
+    "--limit",
+    "-l",
+    type=int,
+    default=20,
+    help="The limit of listed records (default: 20)",
+)
+@click.option(
+    "interval",
+    "--interval",
+    "-i",
+    type=int,
+    default=24,
+    help="The time interval in hours (default: 24)",
+)
+@pass_context
+def acc_method_stats(ctx, oformat, ostyle, limit, interval):
+    """Show method statistics
+
+    \b
+    """
+    e = create_engine(ctx.gconfig.get("db", "rwurl"))
+    ctx.vlog("Showing method statistics")
+
+    query = "SELECT method, sip_code, time, UNIX_TIMESTAMP(time) as tstamp FROM acc"
+
+    if interval > 0:
+        query = (
+            query
+            + " WHERE DATE_SUB(NOW(), INTERVAL {0} HOUR) <= time".format(
+                interval
+            )
+        )
+
+    if limit > 0:
+        query = query + " LIMIT {0}".format(limit)
+
+    res = e.execute(query)
+
+    acc_records = {}
+    acc_records["invite"] = 0
+    acc_records["bye"] = 0
+    acc_records["message"] = 0
+    acc_records["other"] = 0
+    acc_records["invite200"] = 0
+    acc_records["invite404"] = 0
+    acc_records["invite487"] = 0
+    acc_records["inviteXYZ"] = 0
+
+    for row in res:
+        if row["method"] == "INVITE":
+            acc_records["invite"] += 1
+            if row["sip_code"] == "200":
+                acc_records["invite200"] += 1
+            elif row["sip_code"] == "404":
+                acc_records["invite404"] += 1
+            elif row["sip_code"] == "487":
+                acc_records["invite487"] += 1
+            else:
+                acc_records["inviteXYZ"] += 1
+        elif row["method"] == "BYE":
+            acc_records["bye"] += 1
+        elif row["method"] == "MESSAGE":
+            acc_records["message"] += 1
+        else:
+            acc_records["other"] += 1
+
+    ioutils_dict_print(ctx, oformat, ostyle, acc_records)
