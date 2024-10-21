@@ -200,7 +200,7 @@ def db_clishowg(ctx, table):
     dbtype = ctx.gconfig.get("db", "type")
     if dbtype == "mysql":
         scmd = (
-            r'mysql -h {0} -u {1} -p{2} -e "select * from {3} \G" {4}'
+            r'mysql -h {0} -u {1} -p{2} -e "select * from {3} \\G" {4}'
         ).format(
             ctx.gconfig.get("db", "host"),
             ctx.gconfig.get("db", "rwuser"),
