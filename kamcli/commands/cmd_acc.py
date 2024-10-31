@@ -533,13 +533,13 @@ def acc_report(ctx, oformat, ostyle, limit, interval, name):
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     ctx.vlog("Showing accounting report: " + name)
 
-    userfield = "src_user"
+    qfield = "src_user"
     if name == "top-dst":
-        userfield = "dst_user"
+        qfield = "dst_user"
     elif name == "top-odst":
-        userfield = "dst_ouser"
+        qfield = "dst_ouser"
 
-    query = "SELECT `" + userfield + "`, count(*) AS `count` FROM acc"
+    query = "SELECT `" + qfield + "`, count(*) AS `count` FROM acc"
 
     if interval > 0:
         query = (
@@ -549,7 +549,7 @@ def acc_report(ctx, oformat, ostyle, limit, interval, name):
             )
         )
 
-    query = query + " GROUP BY `" + userfield + "` ORDER BY count DESC"
+    query = query + " GROUP BY `" + qfield + "` ORDER BY count DESC"
 
     if limit > 0:
         query = query + " LIMIT {0}".format(limit)
