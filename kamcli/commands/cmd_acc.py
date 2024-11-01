@@ -529,6 +529,7 @@ def acc_report(ctx, oformat, ostyle, limit, interval, name):
             - top-src: most active callers
             - top-dst: most active callees
             - top-odst: most active original callees
+            - top-srcip: most active source IP addresses
     """
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     ctx.vlog("Showing accounting report: " + name)
@@ -538,6 +539,8 @@ def acc_report(ctx, oformat, ostyle, limit, interval, name):
         qfield = "dst_user"
     elif name == "top-odst":
         qfield = "dst_ouser"
+    elif name == "top-srcip":
+        qfield = "src_ip"
 
     query = "SELECT `" + qfield + "`, count(*) AS `count` FROM acc"
 
