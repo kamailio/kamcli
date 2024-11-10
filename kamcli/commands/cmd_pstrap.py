@@ -57,7 +57,7 @@ def cli(ctx, all, sysps):
     ctx.printf("Trapping Kamailio processes with gdb. It can take a while.")
 
     child = subprocess.Popen(
-        ["pgrep", "kamailio"], stdout=subprocess.PIPE, shell=False
+        ["pgrep", "kamailio"], stdout=subprocess.PIPE, shell=False, text=True
     )
     response = child.communicate()[0]
     if len(response) > 0:
