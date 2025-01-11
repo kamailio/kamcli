@@ -1,5 +1,5 @@
 FROM python:3-bookworm
-LABEL org.opencontainers.image.authors Victor Seva <linuxmaniac@torreviejawireless.org>
+LABEL org.opencontainers.image.authors="Victor Seva <linuxmaniac@torreviejawireless.org>"
 
 WORKDIR /project
 VOLUME /etc/kamcli
