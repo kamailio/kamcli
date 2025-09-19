@@ -1,0 +1,23 @@
+kamcli (3.0.0~dev0) unstable; urgency=medium
+
+  * devel version
+
+ -- Victor Seva <vseva@debian.org>  Wed, 02 Oct 2019 15:54:12 +0200
+
+kamcli (2.0.0) unstable; urgency=medium
+
+  * Official release
+
+ -- Victor Seva <vseva@debian.org>  Wed, 02 Oct 2019 14:24:24 +0200
+
+kamcli (1.1.0) unstable; urgency=medium
+
+  * Official release
+
+ -- Victor Seva <vseva@debian.org>  Tue, 16 Oct 2018 10:10:19 +0200
+
+kamcli (1.1.0~dev0) unstable; urgency=medium
+
+  * Initial release (Closes: #910283)
+
+ -- Victor Seva <vseva@debian.org>  Sat, 29 Sep 2018 11:22:00 +0200
