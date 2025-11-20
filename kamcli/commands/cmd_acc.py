@@ -41,6 +41,31 @@ def acc_acc_struct_update(ctx):
     acc_acc_struct_update_exec(ctx, e)
 
 
+def acc_acc_struct_reset_exec(ctx, e):
+    sqltext = """
+      ALTER TABLE acc DROP COLUMN src_user;
+      ALTER TABLE acc DROP COLUMN src_domain;
+      ALTER TABLE acc DROP COLUMN src_ip;
+      ALTER TABLE acc DROP COLUMN dst_ouser;
+      ALTER TABLE acc DROP COLUMN dst_user;
+      ALTER TABLE acc DROP COLUMN dst_domain;
+      ALTER TABLE acc DROP COLUMN cdr_id;
+    """
+    dbutils_exec_sqltext(ctx, e, sqltext)
+
+
+@cli.command(
+    "acc-struct-reset",
+    short_help="Run SQL statements to reset acc table structure",
+)
+@pass_context
+def acc_acc_struct_reset(ctx):
+    """Run SQL statements to reset acc table structure"""
+    ctx.vlog("Run statements to reset acc table structure")
+    e = create_engine(ctx.gconfig.get("db", "rwurl"))
+    acc_acc_struct_reset_exec(ctx, e)
+
+
 def acc_mc_struct_update_exec(ctx, e):
     sqltext = """
       ALTER TABLE missed_calls ADD COLUMN src_user VARCHAR(64) NOT NULL DEFAULT '';
