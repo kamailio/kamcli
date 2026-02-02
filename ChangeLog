@@ -1,3 +1,271 @@
+Release: Kamcli v3.0.0 (TBA)
+
+New features:
+  * cmd_acc: added command to reset missed calls table structure
+  * cmd_acc: added command to reset acc table structure
+  * cmd_pstrap: open subprocess output in text mode
+  * cmd_acc: added report for most active source IP addresses
+  * cmd_acc: rename variable used for query field
+  * ioutils: array for table values of ioutils_dict_print()
+  * cmd_acc: new command method-stats
+  * ioutils: helper function to print a dictionary with different formats
+  * cmd_acc: added report top-odst
+  * cmd_acc: added report for top dst
+  * cmd_acc: check if interval is greater than 0
+  * cmd_acc: added time interval cli option for acc report
+  * cmd_acc: adde command to print acc reports
+  * cmd_acc: added command to list missed calls records
+  * cli.py: replace deprecated SafeConfigParser() with ConfigParser()
+  * iorpc.py: replace deprecated isAlive() with is_alive()
+  * cmd_acc: use short_help for command description
+  * cmd_acc: provide rate_group parameter for rates generate command
+  * cmd_acc: explicit sql transaction begin for cdrs and rates generation
+  * cmd_acc: set default value for table names cli parameters
+  * cmd_db: proper user create for localhost for remote db
+  * cmd_acc: proper name for rates generate function
+  * cmd_acc: use connection to commit call of stored procedures
+  * cmd_acc: explicit commit after store procedure call to go around implicit sqlachemy rollback
+  * cmd_acc: fix use of % inside store procedure create statement
+  * requirements/base: simplify sqlalchemy version condition
+  * requirements: SQLAlchemy version has to be < 2.0.0
+  * kamcli.ini: sample tcp socket for jsonrpc
+  * iorpc: initial support for tcp transport
+  * cmd_pipelimit: update help message for list command
+  * cmd_pipelimit: proper help message for set pipe command
+  * cmd_pipelimit: command to reset the pipe
+  * cmd_apiban: log message with options to set the key
+  * cmd_pstrap: option to print ps line for each pid
+  * cmd_trap: option to print system ps for each pid from rpc ps result
+  * cmd_trap: renaemd option --no-ps to --no-rpc-ps
+  * cmd_trap: option to skip rpc command to get the list of processes
+  * cmd_jsonrpc: use shorter alias command in help message
+  * cmd_jsonrpc: cli option to set store path for rpc commands
+  * iorpc: option to set store path for udp and fifo rpc commands
+  * cmd_srv: reimplemented cmd runinfo to execute rpc core.runinfo
+  * cmd_srv: renamed runinfo to rundetails
+  * cmd_srv: added runinfo command
+  * cmd_htable: added commands for rpc setxs and setxi
+  * kamcli: aliased acl to command group
+  * cmd_speedial: added cli options to set fname and lname
+  * kamcli.ini: added mt command alias to mtree
+  * cmd_db: format the code with black
+  * cmd_acc: no limit condition for cdrs list
+  * cmd_acc: list prints all acc records if --limit=0
+  * cmd_acc: formatted code
+  * cmd_acc: added rates-generate command
+  * cmd_acc: added rates-proc-create command
+  * cmd_acc: renamed rating-table-create to rates-table-create
+  * cmd_acc: added rates-rm command
+  * cmd_acc: added rates-add command
+  * cmd_acc: added cdrs-list command
+  * cmd_acc: added cdrs-generate command
+  * cmd_db: added create-table-like command
+  * cmd_db: updates to grant and revoke commands
+  * cmd_shell: display sip server uptime on start
+  * cmd_htable: added command to set expire
+  * kamcli.ini: sample config and docs for shell options
+  * cmd_shell: get nohistory and nosyntax also from config
+  * kamcli.ini: renamed section to shell.cmdremap
+  * cmd_shell: updates to get the entries for shell.cmdremap
+  * kamcli.ini: config section for shell command
+  * cmd_shell: check the options for no connect and no rpc autocomplete in config
+  * cmd_shell: connect on starting to running kamailio and display its version
+  * cmd_shell: auto-complete options for srv rpchelp
+  * cmd_apiban: try also to get apiban.org key from env variable $APIBANKEY
+  * cmd_shell: info message if it cannot fetch the list of rpc commands
+  * cmd_apiban: added option to set expire for loaded item in htable
+  * cmd_shell: check length of output fetching rpc commands
+  * cmd_sell: set timeout for popen() operations to fetch rpc commands
+  * cmd_shell: option to siable rpc command auto complete
+  * cmd_shell: load the list of rpc commands at init for completion
+  * cmd_jsonrpc: option for not printing log message
+  * cmd_apiban: added check subcommand
+  * kamcli.ini: section for apiban command
+  * cmd_apiban: added command for apiban records management
+  * tls: added subcommand to generate self signed certs using openssl
+  * cmd_acc: added list command
+  * cmd_acc: create cdr_id column for acc and cdrs tables
+  * requirements: set requirement to Click~=7.0
+  * ioutils: convert rows to dict for tabulate output of db result
+  * cmd_subscriber: added cli parameter to specify database table name
+  * cmd_subscriber: use string format to build sql queries
+  * ioutils: add fallback options for getting config outformat and outstyle
+  * cmd_db: list userblocklist module
+  * dbutils: cope with sql files of renamed modules
+  * cmd_srv: added debug subcommand
+  * ioutils: read outstyle db config option
+  * kamcli.ini: config option outstyle for db section
+  * cmd_sipreq: skip adding Contact header if --curi=none
+  * cmd_sipreq: added option to set additional headers
+  * kamcli.ini: added outformat attribute to db section
+  * ioutils: support yaml output for db results
+  * cli: overwrite [jsonrpc/outformat] config value with -F parameter
+  * cmd_sipreq: send SIP request via RPC command
+  * cmd_ping: fix rpc command for nowait option
+  * cmd_ping: --nowait cli option to skip waiting for sip response
+  * cmd_ping: added option to set from uri
+  * kamcli: added ping subcommand
+  * cmd_htable: option to ask confirmation for remove commands
+  * cmd_subscriber: ask confirmation when removing user
+  * cmd_mtree: ask confirmation when removing prefix
+  * cmd_pipelimit: ask confirmation when removing a pipe
+  * cmd_pipelimit: added db-rm command
+  * mtree: db-show with many prefixes
+  * cmd_pipelimit: set type to int for limit argument in set pipe command
+  * cmd_pipelimit: added db add and show commands
+  * kamcli.ini: aliased pl to pipelimit
+  * cmd_pipelimit: added commands for rpc stats and set pipe
+  * cmd_pipelimit: added command for pipelimit management
+  * cmd_db: fix invalid syntax error and some typos
+  * cmd_db: get the scriptsdirectory cfg attribute if not provided as argument
+  * cmd_db: use scripts directory name instead of sql directory
+  * kamcli.ini: scriptsdirectory - new option to set path to db tables create scripts
+  * cmd_db: use psql tool to create database
+  * cmd_db: create subcommand for postgresql, additional options
+  * cmd_db: option to create all tables without interactive confirmation
+  * cmd_db: create functionality for sqlite
+  * cmd_db: option to confirm dropping database
+  * cmd_db: drop for sqlite
+  * cmd_db: no-grant option for create command
+  * cmd_db: postgres support for create-dbonly and drop
+  * cmd_db: use rwurl for version subcommands
+  * cmd_db: show create for postgres and sqlite
+  * cmd_db: slite support for cli subcommands
+  * kamcli.ini: added comments with sqlite options
+  * cmd_db: remove use of CMD_BASE for mysql cli commands
+  * cmd_db: postgresql support for clirun, clishow and clishowg
+  * kamcli: restore default database type to mysql
+  * cmd_db: connect subcommand for postgresql
+  * cmd_db: move CMD_BASE per db dtriver handling
+  * kamcli.ini: showing postgres settings
+  * cmd_shell: create ~/.kamcli folder if not exists and history is enabled
+  * cmd_shm: added subcommand for shm related rpc commands
+  * cmd_pike: removed unused import
+  * cmd_pkg: added subcommand for pkg related rpc commands
+  * Fix small typo on cmd_srv.py comments
+  * README.md: details about the order of how configuration files are loaded
+  * cli: reorder loading paths for config files
+  * cmd_shell: internal command ':c' to print command remapping associations
+  * kamcli.ini: new section [cmd_shell.cmdremap]
+  * cmd_shell: support for commands remapping
+  * cmd_uacreg: added group short help
+  * cmd_tcp: added group short help
+  * cmd_ul: added group short help
+  * cmd_config: print subcommand aliases as an ordered json document
+  * cli: read config at startup and update command aliases
+  * kamcli.ini: section for command aliases
+  * cmd_subscriber: added group short help
+  * cmd_shell: option -S to disable command line syntax highlighting
+  * added pygments to requirements
+  * cmd_shell: bash syntax highlighting for command line using pygments
+  * cmd_shell: added auto suggest from history
+  * cmd_speeddial: added group short help
+  * cmd_shv: added group short help
+  * added -h as option to print help message
+  * cmd_db: added query subcommand
+  * cmd_rtpengine: added group short help
+  * cmd_avp: added db rm and show subcommands
+  * cmd_avp: new command to mange avp records in usr preferences
+  * cmd_trap: reorganize help messages
+  * cmd_pstrap: reorganized help messages
+  * cmd_pike: added group short help
+  * cmd_mtree: added group short help
+  * cmd_jsonrpc: small adjustment to the help text
+  * cmd_htable: added group short help
+  * cmd_group: added group short help
+  * cmd_config: added group short help
+  * cmd_alias: added group short help
+  * cmd_address: added group short help
+  * cmd_domain: added group short help
+  * cmd_dlgs: added group short help
+  * cmd_dialplan: added group short help
+  * cmd_dialog: added group short help
+  * cmd_dispatcher: added group short help
+  * cmd_acc: added group short help
+  * cmd_db: added group short help
+  * cmd_shell: make the prompt bold style
+  * cmd_shell: option to run without saving commands history
+  * cmd_config: option to install config in user directory
+  * added prompt-toolkit to setup requirements
+  * cmd_shell: interactive shell subcommand
+  * cmd_htable: option to set the type for value in db-add
+  * iorpc: allow write to temporary response unixsocket file
+  * cmd_mtree: renamed commands for db operations
+  * cmd_htable: decode database table name value
+  * cmd_htable: added db-show subcommand
+  * cmd_htable: dbtname is now option
+  * cmd_htable: added db-add and db-rm subcommands
+  * iorpc: decode() on read from file
+  * iorpc: encode() on fifo command string
+  * cmd_pike: subcommand to manage the pike module
+  * cmd_dlgs: added briefieng and getall subcommands
+  * cmd_dlgs: update function name to match the command
+  * cmd_dlgs: added dlgs subcommand
+  * cmd_htable: added store subcommand
+  * commands: added pstrap command
+  * cmd_tap: decode() on rpc command response
+  * cmd_trap: option to print more runtime details to output file
+  * cmd_trap: use bytes decode() for string conversion
+  * cmd_trap: convert json reponse to string for writing to file
+  * cmd_trap: print output of core.psx in the trap file
+  * cmd_trap: output file name computed in the main function
+  * cmd_config: command to install config file to /etc/kamcli/kamcli.ini
+  * cmd_htable: command to print htable stats
+  * cmd_htable: command to list the hash tables
+  * ioutils: handle context output format
+  * kamcli: added output format (-F) generic cli option
+  * cmd_htable: added reload subcommand
+  * kamcli: aliased sht to htable command
+  * kamcli: cli - look for kamcli.ini in current directory and ./kamcli/ subfolder
+  * cmd_htable: command to remove an item from hash table
+  * cmd_htable: added flush command to remove all the content from an hash table
+  * cmd_htable: command to manage htable items
+  * cmd_srv: subcommand to manage shared value variables - $shv(name)
+  * cmd_address: fixed mode option name for list command
+  * cmd_stats: option to fetch stats with numeric values
+  * cmd_stats: replaced stats.get_statistics with stats.fetch
+  * iorpc: decode response from the server
+  * iorpc - encode string to be sent on inet sockets
+  * cmd_db: fix version table management
+  * cmd_db: added command to get version number for a table structure
+  * cmd_db: added command to set version number for specific table
+  * cmd_db: added command to revoke access to database
+  * cmd_db: added database drop command
+  * cmd_db: add users in create full database command
+  * cmd_db: use short_help attribute when defining command
+  * cmd_db: added command to create a specific extension group of tables
+  * cmd_db: added commands to create specific group of database tables
+  * cmd_db: added command to create users and grant privileges
+  * kamcli.ini: added db accesshost option
+  * cmd_db: added subcommand to create database only
+  * cmd_db: added subcommand to create database structure
+  * kamcli.ini: add db admin access attributes
+  * cmd_acc: added command to create rating table
+  * cmd_acc: use sql execute to create tables and procedures
+  * cmd_acc: add subcommand to create cdrs stored procedure
+  * cmd_acc: added subcommand to create the cdrs table
+  * cmd_acc: separate commands to update acc or missed_calls tables structures
+  * cmd_acc: command for accounting management
+  * dbutils.py - added file to collect common functions for db operations
+  * cmd_db: run pre-commit hooks for black formatting
+  * cmd_db: added subcommand to update acc and missed calls table structure
+  * cmd_trap: added the gdb trap command
+  * added ctx function to print without new line
+  * cmd_srv: subscommand to print rpc method help
+  * cmd_uacreg: proper function name to match command scope
+  * added srv shm subcommand
+  * requirements strcuture update (#10)
+  * iorpc: remove variables not used
+  * ioutils: remove variable not used
+  * cmd_db: add missing import
+  * cmd_dialplan: fix dialplan_translate cmd
+  * cmd_srv: match function names with commands
+  * cmd_srv: subcommand to print pre-processor defines
+  * cmd_dispatcher: aded subcommands for add/remove in memory records
+  * cmd_dialog: added match subcommand
+  * cmd_dialog: fix terminate function name
+  * add kamgroup config to set group ownership of the file created at path
+
 Release: Kamcli v2.0.0 (Sep 30, 2019)
 
 New features:
