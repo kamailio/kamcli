@@ -1,4 +1,4 @@
-Release: Kamcli v3.0.0 (TBA)
+Release: Kamcli v3.0.0 (Feb 21, 2026)
 
 New features:
   * cmd_acc: added command to reset missed calls table structure
