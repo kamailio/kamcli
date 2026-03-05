@@ -1,5 +1,6 @@
 import click
 from sqlalchemy import create_engine
+from sqlalchemy import text
 from kamcli.ioutils import ioutils_dbres_print
 from kamcli.cli import pass_context
 from kamcli.iorpc import command_ctl
@@ -39,7 +40,8 @@ def dialog_showdb(ctx, oformat, ostyle):
     """
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     ctx.vlog("Showing all dialog records")
-    res = e.execute("select * from dialog")
+    with e.connect() as c:
+        res = c.execute(text("select * from dialog"))
     ioutils_dbres_print(ctx, oformat, ostyle, res)
 
 
