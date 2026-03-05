@@ -1,5 +1,6 @@
 import click
 from sqlalchemy import create_engine
+from sqlalchemy import text
 from kamcli.ioutils import ioutils_dbres_print
 from kamcli.cli import pass_context
 from kamcli.cli import parse_user_spec
@@ -39,7 +40,9 @@ def cli(ctx):
 @click.argument("targeturi", metavar="<targeturi>")
 @click.argument("desc", metavar="<desc>", nargs=-1)
 @pass_context
-def speeddial_add(ctx, table, fname, lname, userid, shortdial, targeturi, desc):
+def speeddial_add(
+    ctx, table, fname, lname, userid, shortdial, targeturi, desc
+):
     """Add a speed dial record
 
     \b
@@ -64,7 +67,7 @@ def speeddial_add(ctx, table, fname, lname, userid, shortdial, targeturi, desc):
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     uri = "sip:{}@{}".format(tdata["username"], tdata["domain"])
     if not desc:
-        e.execute(
+        sqlquery = (
             "insert into {0} (username, domain, sd_username, "
             "sd_domain, new_uri, fname, lname) values ({1!r}, {2!r}, {3!r}, "
             "{4!r}, {5!r}, {6!r}, {7!r})".format(
@@ -79,7 +82,7 @@ def speeddial_add(ctx, table, fname, lname, userid, shortdial, targeturi, desc):
             )
         )
     else:
-        e.execute(
+        sqlquery = (
             "insert into {0} (username, domain, sd_username, "
             "sd_domain, new_uri, fname, lname, description) values ({1!r}, {2!r}, {3!r}, "
             "{4!r}, {5!r}, {6!r}, {7!r}, {8!r})".format(
@@ -94,6 +97,9 @@ def speeddial_add(ctx, table, fname, lname, userid, shortdial, targeturi, desc):
                 desc,
             )
         )
+    with e.connect() as c:
+        c.execute(text(sqlquery))
+        c.commit()
 
 
 @cli.command("rm", short_help="Remove speed dial records")
@@ -122,24 +128,32 @@ def speeddial_rm(ctx, table, userid, shortdial):
     )
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     if not shortdial:
-        e.execute(
+        sqlquery = (
             "delete from {0} where username={1!r} and domain={2!r}".format(
-                table, udata["username"], udata["domain"],
+                table,
+                udata["username"],
+                udata["domain"],
             )
         )
+        with e.connect() as c:
+            c.execute(text(sqlquery))
+            c.commit()
     else:
-        for s in shortdial:
-            sdata = parse_user_spec(ctx, s)
-            e.execute(
-                "delete from {0} where username={1!r} and domain={2!r} "
-                "and sd_username={3!r} and sd_domain={4!r}".format(
-                    table,
-                    udata["username"],
-                    udata["domain"],
-                    sdata["username"],
-                    sdata["domain"],
+        with e.connect() as c:
+            for s in shortdial:
+                sdata = parse_user_spec(ctx, s)
+                sqlquery = (
+                    "delete from {0} where username={1!r} and domain={2!r} "
+                    "and sd_username={3!r} and sd_domain={4!r}".format(
+                        table,
+                        udata["username"],
+                        udata["domain"],
+                        sdata["username"],
+                        sdata["domain"],
+                    )
                 )
-            )
+                c.execute(text(sqlquery))
+            c.commit()
 
 
 @cli.command("show", short_help="Show speed dial records")
@@ -184,23 +198,29 @@ def speeddial_show(ctx, oformat, ostyle, table, userid, shortdial):
         udata["domain"],
     )
     if not shortdial:
-        res = e.execute(
+        sqlquery = (
             "select * from {0} where username={1!r} and domain={2!r}".format(
-                table, udata["username"], udata["domain"],
+                table,
+                udata["username"],
+                udata["domain"],
             )
         )
+        with e.connect() as c:
+            res = c.execute(text(sqlquery))
         ioutils_dbres_print(ctx, oformat, ostyle, res)
     else:
-        for s in shortdial:
-            sdata = parse_user_spec(ctx, s)
-            res = e.execute(
-                "select * from {0} where username={1!r} and domain={2!r} "
-                "and sd_username={3!r} and sd_domain={4!r}".format(
-                    table,
-                    udata["username"],
-                    udata["domain"],
-                    sdata["username"],
-                    sdata["domain"],
+        with e.connect() as c:
+            for s in shortdial:
+                sdata = parse_user_spec(ctx, s)
+                sqlquery = (
+                    "select * from {0} where username={1!r} and domain={2!r} "
+                    "and sd_username={3!r} and sd_domain={4!r}".format(
+                        table,
+                        udata["username"],
+                        udata["domain"],
+                        sdata["username"],
+                        sdata["domain"],
+                    )
                 )
-            )
-            ioutils_dbres_print(ctx, oformat, ostyle, res)
+                res = c.execute(text(sqlquery))
+                ioutils_dbres_print(ctx, oformat, ostyle, res)
