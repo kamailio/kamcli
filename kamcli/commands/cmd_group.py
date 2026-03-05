@@ -1,5 +1,6 @@
 import click
 from sqlalchemy import create_engine
+from sqlalchemy import text
 from kamcli.ioutils import ioutils_dbres_print
 from kamcli.cli import pass_context
 from kamcli.cli import parse_user_spec
@@ -35,11 +36,14 @@ def group_grant(ctx, userid, groupid):
         groupid,
     )
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
-    e.execute(
-        "insert into grp (username, domain, grp) values ({0!r}, {1!r}, {2!r})".format(
-            udata["username"], udata["domain"], groupid,
-        )
+    sqlquery = "insert into grp (username, domain, grp) values ({0!r}, {1!r}, {2!r})".format(
+        udata["username"],
+        udata["domain"],
+        groupid,
     )
+    with e.connect() as c:
+        c.execute(text(sqlquery))
+        c.commit()
 
 
 @cli.command("revoke", short_help="Remove a user from groups")
@@ -60,17 +64,21 @@ def group_revoke(ctx, userid, groupid):
     )
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     if not groupid:
-        e.execute(
+        sqlquery = (
             "delete from grp where username={0!r} and domain={1!r}".format(
-                udata["username"], udata["domain"],
+                udata["username"],
+                udata["domain"],
             )
         )
     else:
-        e.execute(
-            "delete from grp where username={0!r} and domain={1!r} and grp={2!r}".format(
-                udata["username"], udata["domain"], groupid,
-            )
+        sqlquery = "delete from grp where username={0!r} and domain={1!r} and grp={2!r}".format(
+            udata["username"],
+            udata["domain"],
+            groupid,
         )
+    with e.connect() as c:
+        c.execute(text(sqlquery))
+        c.commit()
 
 
 @cli.command("show", short_help="Show group membership details")
@@ -103,8 +111,9 @@ def group_show(ctx, oformat, ostyle, userid):
     if not userid:
         ctx.vlog("Showing all records")
         e = create_engine(ctx.gconfig.get("db", "rwurl"))
-        res = e.execute("select * from grp")
-        ioutils_dbres_print(ctx, oformat, ostyle, res)
+        with e.connect() as c:
+            res = c.execute(text("select * from grp"))
+            ioutils_dbres_print(ctx, oformat, ostyle, res)
     else:
         for u in userid:
             udata = parse_user_spec(ctx, u)
@@ -114,9 +123,10 @@ def group_show(ctx, oformat, ostyle, userid):
                 udata["domain"],
             )
             e = create_engine(ctx.gconfig.get("db", "rwurl"))
-            res = e.execute(
-                "select * from grp where username={0!r} and domain={1!r}".format(
-                    udata["username"], udata["domain"],
-                )
+            sqlquery = "select * from grp where username={0!r} and domain={1!r}".format(
+                udata["username"],
+                udata["domain"],
             )
+            with e.connect() as c:
+                res = c.execute(text(sqlquery))
             ioutils_dbres_print(ctx, oformat, ostyle, res)
