@@ -16,7 +16,7 @@ def cli(ctx):
     pass
 
 
-def acc_acc_struct_update_exec(ctx, e):
+def acc_acc_struct_update_exec(ctx, c):
     sqltext = """
       ALTER TABLE acc ADD COLUMN src_user VARCHAR(64) NOT NULL DEFAULT '';
       ALTER TABLE acc ADD COLUMN src_domain VARCHAR(128) NOT NULL DEFAULT '';
@@ -26,7 +26,7 @@ def acc_acc_struct_update_exec(ctx, e):
       ALTER TABLE acc ADD COLUMN dst_domain VARCHAR(128) NOT NULL DEFAULT '';
       ALTER TABLE acc ADD COLUMN cdr_id INTEGER NOT NULL DEFAULT 0;
     """
-    dbutils_exec_sqltext(ctx, e, sqltext)
+    dbutils_exec_sqltext(ctx, c, sqltext)
 
 
 @cli.command(
@@ -38,10 +38,12 @@ def acc_acc_struct_update(ctx):
     """Run SQL statements to update acc table structure"""
     ctx.vlog("Run statements to update acc table structure")
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
-    acc_acc_struct_update_exec(ctx, e)
+    with e.connect() as c:
+        acc_acc_struct_update_exec(ctx, e)
+        c.commit()
 
 
-def acc_acc_struct_reset_exec(ctx, e):
+def acc_acc_struct_reset_exec(ctx, c):
     sqltext = """
       ALTER TABLE acc DROP COLUMN src_user;
       ALTER TABLE acc DROP COLUMN src_domain;
@@ -51,7 +53,7 @@ def acc_acc_struct_reset_exec(ctx, e):
       ALTER TABLE acc DROP COLUMN dst_domain;
       ALTER TABLE acc DROP COLUMN cdr_id;
     """
-    dbutils_exec_sqltext(ctx, e, sqltext)
+    dbutils_exec_sqltext(ctx, c, sqltext)
 
 
 @cli.command(
@@ -63,10 +65,12 @@ def acc_acc_struct_reset(ctx):
     """Run SQL statements to reset acc table structure"""
     ctx.vlog("Run statements to reset acc table structure")
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
-    acc_acc_struct_reset_exec(ctx, e)
+    with e.connect() as c:
+        acc_acc_struct_reset_exec(ctx, c)
+        c.commit()
 
 
-def acc_mc_struct_update_exec(ctx, e):
+def acc_mc_struct_update_exec(ctx, c):
     sqltext = """
       ALTER TABLE missed_calls ADD COLUMN src_user VARCHAR(64) NOT NULL DEFAULT '';
       ALTER TABLE missed_calls ADD COLUMN src_domain VARCHAR(128) NOT NULL DEFAULT '';
@@ -76,7 +80,7 @@ def acc_mc_struct_update_exec(ctx, e):
       ALTER TABLE missed_calls ADD COLUMN dst_domain VARCHAR(128) NOT NULL DEFAULT '';
       ALTER TABLE missed_calls ADD COLUMN cdr_id INTEGER NOT NULL DEFAULT 0;
     """
-    dbutils_exec_sqltext(ctx, e, sqltext)
+    dbutils_exec_sqltext(ctx, c, sqltext)
 
 
 @cli.command(
@@ -88,10 +92,12 @@ def acc_mc_struct_update(ctx):
     """Run SQL statements to update missed_calls table structure"""
     ctx.vlog("Run statements to update missed_calls table structure")
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
-    acc_mc_struct_update_exec(ctx, e)
+    with e.connect() as c:
+        acc_mc_struct_update_exec(ctx, c)
+        c.commit()
 
 
-def acc_mc_struct_reset_exec(ctx, e):
+def acc_mc_struct_reset_exec(ctx, c):
     sqltext = """
       ALTER TABLE missed_calls DROP COLUMN src_user;
       ALTER TABLE missed_calls DROP COLUMN src_domain;
@@ -101,7 +107,7 @@ def acc_mc_struct_reset_exec(ctx, e):
       ALTER TABLE missed_calls DROP COLUMN dst_domain;
       ALTER TABLE missed_calls DROP COLUMN cdr_id;
     """
-    dbutils_exec_sqltext(ctx, e, sqltext)
+    dbutils_exec_sqltext(ctx, c, sqltext)
 
 
 @cli.command(
@@ -113,7 +119,9 @@ def acc_mc_struct_reset(ctx):
     """Run SQL statements to reset missed_calls table structure"""
     ctx.vlog("Run statements to reset missed_calls table structure")
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
-    acc_mc_struct_reset_exec(ctx, e)
+    with e.connect() as c:
+        acc_mc_struct_reset_exec(ctx, c)
+        c.commit()
 
 
 @cli.command(
@@ -125,8 +133,10 @@ def acc_tables_struct_update(ctx):
     """Run SQL statements to update acc and missed_calls tables structures"""
     ctx.vlog("Run statements to update acc and missed_calls tables structures")
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
-    acc_acc_struct_update_exec(ctx, e)
-    acc_mc_struct_update_exec(ctx, e)
+    with e.connect() as c:
+        acc_acc_struct_update_exec(ctx, c)
+        acc_mc_struct_update_exec(ctx, c)
+        c.commit()
 
 
 @cli.command(
@@ -159,7 +169,9 @@ def acc_cdrs_table_create(ctx):
       UNIQUE KEY `uk_cft` (`sip_call_id`,`sip_from_tag`,`sip_to_tag`)
       );
     """
-    e.execute(sqltext)
+    with e.connect() as c:
+        c.execute(text(sqltext))
+        c.commit()
 
 
 @cli.command(
@@ -212,7 +224,9 @@ def acc_cdrs_proc_create(ctx):
         UNTIL done END REPEAT;
       END
     """
-    e.execute(sqltext)
+    with e.connect() as c:
+        c.execute(text(sqltext))
+        c.commit()
 
 
 @cli.command(
@@ -235,7 +249,9 @@ def acc_rates_table_create(ctx):
       UNIQUE KEY `uk_rp` (`rate_group`,`prefix`)
       );
     """
-    e.execute(sqltext)
+    with e.connect() as c:
+        c.execute(text(sqltext))
+        c.commit()
 
 
 @cli.command(
@@ -278,7 +294,8 @@ def acc_list(ctx, oformat, ostyle, limit):
         query = "select * from acc order by id desc"
     else:
         query = "select * from acc order by id desc limit {0}".format(limit)
-    res = e.execute(query)
+    with e.connect() as c:
+        res = c.execute(text(query))
     ioutils_dbres_print(ctx, oformat, ostyle, res)
 
 
@@ -324,7 +341,8 @@ def acc_mc_list(ctx, oformat, ostyle, limit):
         query = "select * from missed_calls order by id desc limit {0}".format(
             limit
         )
-    res = e.execute(query)
+    with e.connect() as c:
+        res = c.execute(text(query))
     ioutils_dbres_print(ctx, oformat, ostyle, res)
 
 
@@ -339,7 +357,7 @@ def acc_cdrs_generate(ctx):
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     with e.connect() as c:
         t = c.begin()
-        c.execute("call kamailio_cdrs()")
+        c.execute(text("call kamailio_cdrs()"))
         t.commit()
 
 
@@ -385,7 +403,8 @@ def acc_cdrs_list(ctx, oformat, ostyle, limit):
         query = "select * from cdrs order by cdr_id desc limit {0}".format(
             limit
         )
-    res = e.execute(query)
+    with e.connect() as c:
+        res = c.execute(text(query))
     ioutils_dbres_print(ctx, oformat, ostyle, res)
 
 
@@ -421,12 +440,15 @@ def acc_rates_add(ctx, dbtname, rate_group, prefix, rate_unit, time_unit):
     v_dbtname = dbtname.encode("ascii", "ignore").decode()
     v_rate_group = rate_group.encode("ascii", "ignore").decode()
     v_prefix = prefix.encode("ascii", "ignore").decode()
-    e.execute(
+    sqltext = (
         "insert into {0} (rate_group, prefix, rate_unit, time_unit) values "
         "({1!r}, {2!r}, {3}, {4})".format(
             v_dbtname, v_rate_group, v_prefix, rate_unit, time_unit
         )
     )
+    with e.connect() as c:
+        c.execute(text(sqltext))
+        c.commit()
 
 
 @cli.command("rates-rm", short_help="Remove a rating record from database")
@@ -457,13 +479,17 @@ def acc_rates_rm(ctx, dbtname, rate_group, prefix):
     v_dbtname = dbtname.encode("ascii", "ignore").decode()
     v_rate_group = rate_group.encode("ascii", "ignore").decode()
     v_prefix = prefix.encode("ascii", "ignore").decode()
-    e.execute(
+
+    sqltext = (
         "delete from {0} where rate_group=({1!r} and prefix={2!r}".format(
             v_dbtname,
             v_rate_group,
             v_prefix,
         )
     )
+    with e.connect() as c:
+        c.execute(text(sqltext))
+        c.commit()
 
 
 @cli.command(
@@ -503,7 +529,9 @@ def acc_rates_proc_create(ctx):
         UNTIL done END REPEAT;
         END
     """
-    e.execute(sqltext)
+    with e.connect() as c:
+        c.execute(text(sqltext))
+        c.commit()
 
 
 @cli.command(
@@ -526,10 +554,10 @@ def acc_rates_generate(ctx, rate_group):
     with e.connect() as c:
         t = c.begin()
         if not rate_group:
-            c.execute('call kamailio_rating("default")')
+            c.execute(text('call kamailio_rating("default")'))
         else:
             for rg in rate_group:
-                c.execute("call kamailio_rating({0!r})".format(rg))
+                c.execute(text("call kamailio_rating({0!r})".format(rg)))
         t.commit()
 
 
@@ -607,7 +635,8 @@ def acc_report(ctx, oformat, ostyle, limit, interval, name):
     if limit > 0:
         query = query + " LIMIT {0}".format(limit)
 
-    res = e.execute(query)
+    with e.connect() as c:
+        res = c.execute(text(query))
     ioutils_dbres_print(ctx, oformat, ostyle, res)
 
 
@@ -668,7 +697,8 @@ def acc_method_stats(ctx, oformat, ostyle, limit, interval):
     if limit > 0:
         query = query + " LIMIT {0}".format(limit)
 
-    res = e.execute(query)
+    with e.connect() as c:
+        res = c.execute(text(query))
 
     acc_records = {}
     acc_records["invite"] = 0
@@ -680,7 +710,7 @@ def acc_method_stats(ctx, oformat, ostyle, limit, interval):
     acc_records["invite487"] = 0
     acc_records["inviteXYZ"] = 0
 
-    for row in res:
+    for row in res.mappings():
         if row["method"] == "INVITE":
             acc_records["invite"] += 1
             if row["sip_code"] == "200":

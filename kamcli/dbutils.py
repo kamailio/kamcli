@@ -38,7 +38,7 @@ def dbutils_exec_sqlfile(ctx, sqlengine, fname):
                     sql_command = ""
 
 
-def dbutils_exec_sqltext(ctx, sqlengine, sqltext):
+def dbutils_exec_sqltext(ctx, conn, sqltext):
     sql_command = ""
     for line in sqltext.splitlines():
         tline = line.strip(" \t\r\n")
@@ -46,7 +46,7 @@ def dbutils_exec_sqltext(ctx, sqlengine, sqltext):
             sql_command += " " + tline
             if sql_command.endswith(";"):
                 try:
-                    sqlengine.execute(text(sql_command))
+                    conn.execute(text(sql_command))
                 except SQLAlchemyError:
                     ctx.log(
                         "failed to execute sql statements [%s]",
