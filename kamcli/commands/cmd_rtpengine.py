@@ -1,5 +1,6 @@
 import click
 from sqlalchemy import create_engine
+from sqlalchemy import text
 from kamcli.ioutils import ioutils_dbres_print
 from kamcli.cli import pass_context
 from kamcli.iorpc import command_ctl
@@ -41,7 +42,8 @@ def rtpengine_showdb(ctx, oformat, ostyle):
     """
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     ctx.vlog("Showing all rtpengine database records")
-    res = e.execute("select * from rtpengine")
+    with e.connect() as c:
+        res = c.execute(text("select * from rtpengine"))
     ioutils_dbres_print(ctx, oformat, ostyle, res)
 
 
