@@ -1,5 +1,6 @@
 import click
 from sqlalchemy import create_engine
+from sqlalchemy import text
 from kamcli.ioutils import ioutils_dbres_print
 from kamcli.cli import pass_context
 from kamcli.iorpc import command_ctl
@@ -142,7 +143,11 @@ def htable_setxi(ctx, htname, itname, ival, exp):
 
 @cli.command("rm", short_help="Remove the item $sht(htname=>itname)")
 @click.option(
-    "yes", "--yes", "-y", is_flag=True, help="Do not ask for confirmation",
+    "yes",
+    "--yes",
+    "-y",
+    is_flag=True,
+    help="Do not ask for confirmation",
 )
 @click.argument("htname", metavar="<htname>")
 @click.argument("itname", metavar="<itname>")
@@ -212,7 +217,8 @@ def htable_store(ctx, htname):
 
 
 @cli.command(
-    "list-tables", short_help="List the hash tables",
+    "list-tables",
+    short_help="List the hash tables",
 )
 @pass_context
 def htable_list_tables(ctx):
@@ -224,7 +230,8 @@ def htable_list_tables(ctx):
 
 
 @cli.command(
-    "stats", short_help="Print statistics for hash tables",
+    "stats",
+    short_help="Print statistics for hash tables",
 )
 @pass_context
 def htable_stats(ctx):
@@ -295,23 +302,22 @@ def htable_dbadd(
     kvalue = keyvalue.encode("ascii", "ignore").decode()
 
     if valtype == 0:
-        e.execute(
-            "insert into {0} ({1}, {2}) values ({3!r}, {4!r})".format(
-                dbname, col_kname, col_kvalue, kname, kvalue
-            )
+        sqltext = "insert into {0} ({1}, {2}) values ({3!r}, {4!r})".format(
+            dbname, col_kname, col_kvalue, kname, kvalue
         )
     else:
-        e.execute(
-            "insert into {0} ({1}, {2}, {3}) values ({4!r}, {5}, {6!r})".format(
-                dbname,
-                col_kname,
-                col_valtype,
-                col_kvalue,
-                kname,
-                valtype,
-                kvalue,
-            )
+        sqltext = "insert into {0} ({1}, {2}, {3}) values ({4!r}, {5}, {6!r})".format(
+            dbname,
+            col_kname,
+            col_valtype,
+            col_kvalue,
+            kname,
+            valtype,
+            kvalue,
         )
+    with e.connect() as c:
+        c.execute(text(sqltext))
+        c.commit()
 
 
 @cli.command("db-rm", short_help="Remove a record from htable database")
@@ -328,7 +334,11 @@ def htable_dbadd(
     help='Column name for key name (default: "key_name")',
 )
 @click.option(
-    "yes", "--yes", "-y", is_flag=True, help="Do not ask for confirmation",
+    "yes",
+    "--yes",
+    "-y",
+    is_flag=True,
+    help="Do not ask for confirmation",
 )
 @click.argument("keyname", metavar="<keyname>")
 @pass_context
@@ -346,13 +356,14 @@ def htable_dbrm(ctx, dbtname, colkeyname, yes, keyname):
             ctx.vlog("Skip removing item [%s]", keyname)
             return
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
-    e.execute(
-        "delete from {0} where {1}={2!r}".format(
-            dbtname.encode("ascii", "ignore").decode(),
-            colkeyname.encode("ascii", "ignore").decode(),
-            keyname.encode("ascii", "ignore").decode(),
-        )
+    sqltext = "delete from {0} where {1}={2!r}".format(
+        dbtname.encode("ascii", "ignore").decode(),
+        colkeyname.encode("ascii", "ignore").decode(),
+        keyname.encode("ascii", "ignore").decode(),
     )
+    with e.connect() as c:
+        c.execute(text(sqltext))
+        c.commit()
 
 
 @cli.command("db-show", short_help="Show htable records in database")
@@ -395,20 +406,20 @@ def htable_dbshow(ctx, oformat, ostyle, dbtname, colkeyname, keyname):
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     if not keyname:
         ctx.vlog("Showing all htable database records")
-        res = e.execute(
-            "select * from {0}".format(
-                dbtname.encode("ascii", "ignore").decode()
-            )
+        sqlquery = "select * from {0}".format(
+            dbtname.encode("ascii", "ignore").decode()
         )
+        with e.connect() as c:
+            res = c.execute(text(sqlquery))
         ioutils_dbres_print(ctx, oformat, ostyle, res)
     else:
         ctx.vlog("Showing htable database records for key name")
-        for k in keyname:
-            res = e.execute(
-                "select * from {0} where {1}={2!r}".format(
+        with e.connect() as c:
+            for k in keyname:
+                sqlquery = "select * from {0} where {1}={2!r}".format(
                     dbtname.encode("ascii", "ignore").decode(),
                     colkeyname.encode("ascii", "ignore").decode(),
                     k.encode("ascii", "ignore").decode(),
                 )
-            )
-            ioutils_dbres_print(ctx, oformat, ostyle, res)
+                res = c.execute(text(sqlquery))
+                ioutils_dbres_print(ctx, oformat, ostyle, res)
