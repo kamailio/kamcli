@@ -2,6 +2,7 @@ import sys
 import os
 import click
 from sqlalchemy import create_engine
+from sqlalchemy import text
 from kamcli.ioutils import ioutils_dbres_print
 from kamcli.cli import pass_context
 from kamcli.iorpc import command_ctl
@@ -37,7 +38,8 @@ def tls_showdb(ctx, oformat, ostyle):
     """
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     ctx.vlog("Showing all tlscfg records")
-    res = e.execute("select * from tlscfg")
+    with e.connect() as c:
+        res = c.execute(text("select * from tlscfg"))
     ioutils_dbres_print(ctx, oformat, ostyle, res)
 
 
@@ -61,7 +63,8 @@ def tls_cfgprint(ctx, odir, cfgpath):
     """
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     ctx.vlog("Generating TLS config from database records")
-    res = e.execute("select * from tlscfg")
+    with e.connect() as c:
+        res = c.execute(text("select * from tlscfg"))
 
     if cfgpath:
         cfgpath = cfgpath[0]
@@ -76,7 +79,7 @@ def tls_cfgprint(ctx, odir, cfgpath):
         sys.stdout = cfgsock
 
     pcount = 0
-    for row in res:
+    for row in res.mappings():
         if pcount > 0:
             print("\n")
 
@@ -245,7 +248,11 @@ CREATE TABLE `tlscfg` (
     short_help="Generate self signed certificates in current directory",
 )
 @click.option(
-    "domain", "--domain", "-d", default=None, help="Domain of the certificate",
+    "domain",
+    "--domain",
+    "-d",
+    default=None,
+    help="Domain of the certificate",
 )
 @click.option(
     "expiredays",
