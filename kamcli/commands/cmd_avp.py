@@ -1,5 +1,6 @@
 import click
 from sqlalchemy import create_engine
+from sqlalchemy import text
 from kamcli.ioutils import ioutils_dbres_print
 from kamcli.cli import pass_context
 from kamcli.cli import parse_user_spec
@@ -129,55 +130,52 @@ def avp_dbadd(
     v_value = value.encode("ascii", "ignore").decode()
 
     if isuuid:
-        e.execute(
-            "insert into {0} ({1}, {2}, {3}, {4}) values ({5!r}, {6!r}, {7}, {8!r})".format(
-                dbname,
-                c_uuid,
-                c_attribute,
-                c_type,
-                c_value,
-                v_userid,
-                v_attribute,
-                atype,
-                v_value,
-            )
+        sqltext = "insert into {0} ({1}, {2}, {3}, {4}) values ({5!r}, {6!r}, {7}, {8!r})".format(
+            dbname,
+            c_uuid,
+            c_attribute,
+            c_type,
+            c_value,
+            v_userid,
+            v_attribute,
+            atype,
+            v_value,
         )
     else:
         udata = parse_user_spec(ctx, userid)
         if setuuid:
-            e.execute(
-                "insert into {0} ({1}, {2}, {3}, {4}, {5}, {6}) values ({7!r}, {8!r}, {9!r}, {10!r}, {11}, {12!r})".format(
-                    dbname,
-                    c_uuid,
-                    c_username,
-                    c_domain,
-                    c_attribute,
-                    c_type,
-                    c_value,
-                    udata["username"],
-                    udata["username"],
-                    udata["domain"],
-                    v_attribute,
-                    atype,
-                    v_value,
-                )
+            sqltext = "insert into {0} ({1}, {2}, {3}, {4}, {5}, {6}) values ({7!r}, {8!r}, {9!r}, {10!r}, {11}, {12!r})".format(
+                dbname,
+                c_uuid,
+                c_username,
+                c_domain,
+                c_attribute,
+                c_type,
+                c_value,
+                udata["username"],
+                udata["username"],
+                udata["domain"],
+                v_attribute,
+                atype,
+                v_value,
             )
         else:
-            e.execute(
-                "insert into {0} ({1}, {2}, {3}, {4}, {5}) values ({6!r}, {7!r}, {8!r}, {9}, {10!r})".format(
-                    dbname,
-                    c_username,
-                    c_domain,
-                    c_attribute,
-                    c_type,
-                    c_value,
-                    udata["username"],
-                    udata["domain"],
-                    v_attribute,
-                    atype,
-                    v_value,
-                )
+            sqltext = "insert into {0} ({1}, {2}, {3}, {4}, {5}) values ({6!r}, {7!r}, {8!r}, {9}, {10!r})".format(
+                dbname,
+                c_username,
+                c_domain,
+                c_attribute,
+                c_type,
+                c_value,
+                udata["username"],
+                udata["domain"],
+                v_attribute,
+                atype,
+                v_value,
             )
+    with e.connect() as c:
+        c.execute(text(sqltext))
+        c.commit()
 
 
 @cli.command("db-rm", short_help="Delete AVPs from database")
@@ -309,7 +307,9 @@ def avp_dbrm(
     if v_value != "*":
         sqlquery += " AND {0}={1!r}".format(c_value, v_value)
 
-    e.execute(sqlquery)
+    with e.connect() as c:
+        c.execute(text(sqlquery))
+        c.commit()
 
 
 @cli.command("db-show", short_help="Show AVPs from database")
@@ -458,5 +458,6 @@ def avp_dbshow(
     if v_value != "*":
         sqlquery += " AND {0}={1!r}".format(c_value, v_value)
 
-    res = e.execute(sqlquery)
+    with e.connect() as c:
+        res = c.execute(text(sqlquery))
     ioutils_dbres_print(ctx, oformat, ostyle, res)
