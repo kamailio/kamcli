@@ -1,5 +1,6 @@
 import click
 from sqlalchemy import create_engine
+from sqlalchemy import text
 from kamcli.ioutils import ioutils_dbres_print
 from kamcli.cli import pass_context
 from kamcli.iorpc import command_ctl
@@ -50,11 +51,12 @@ def pipelimit_dbadd(ctx, dbtname, alg, pipeid, limit):
     dbtval = dbtname.encode("ascii", "ignore").decode()
     pidval = pipeid.encode("ascii", "ignore").decode()
     algval = alg.encode("ascii", "ignore").decode()
-    e.execute(
-        "insert into {0} (pipeid, algorithm, plimit) values ({1!r}, {2!r}, {3})".format(
-            dbtval, pidval, algval, limit
-        )
+    sqlquery = "insert into {0} (pipeid, algorithm, plimit) values ({1!r}, {2!r}, {3})".format(
+        dbtval, pidval, algval, limit
     )
+    with e.connect() as c:
+        c.execute(text(sqlquery))
+        c.commit()
 
 
 @cli.command("db-show", short_help="Show pipelimit records in database")
@@ -91,24 +93,26 @@ def pipelimit_dbshow(ctx, oformat, ostyle, dbtname, pipeid):
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     if not pipeid:
         ctx.vlog("Showing all pipelimit database records")
-        res = e.execute(
-            "select * from {0}".format(
-                dbtname.encode("ascii", "ignore").decode()
-            )
+        sqlquery = "select * from {0}".format(
+            dbtname.encode("ascii", "ignore").decode()
         )
+        with e.connect() as c:
+            res = c.execute(text(sqlquery))
         ioutils_dbres_print(ctx, oformat, ostyle, res)
     else:
-        for p in pipeid:
-            ctx.vlog(
-                "Showing pipelimit database records for pipeid {0}".format(p)
-            )
-            res = e.execute(
-                "select * from {0} where pipeid={1!r}".format(
+        with e.connect() as c:
+            for p in pipeid:
+                ctx.vlog(
+                    "Showing pipelimit database records for pipeid {0}".format(
+                        p
+                    )
+                )
+                sqlquery = "select * from {0} where pipeid={1!r}".format(
                     dbtname.encode("ascii", "ignore").decode(),
                     p.encode("ascii", "ignore").decode(),
                 )
-            )
-            ioutils_dbres_print(ctx, oformat, ostyle, res)
+                res = c.execute(text(sqlquery))
+                ioutils_dbres_print(ctx, oformat, ostyle, res)
 
 
 @cli.command("db-rm", short_help="Remove a record from pipelimit table")
@@ -119,7 +123,11 @@ def pipelimit_dbshow(ctx, oformat, ostyle, dbtname, pipeid):
     help='The name of database table (default: "pl_pipes")',
 )
 @click.option(
-    "yes", "--yes", "-y", is_flag=True, help="Do not ask for confirmation",
+    "yes",
+    "--yes",
+    "-y",
+    is_flag=True,
+    help="Do not ask for confirmation",
 )
 @click.argument("pipeid", metavar="<pipeid>")
 @pass_context
@@ -137,12 +145,13 @@ def pipelimit_dbrm(ctx, dbtname, yes, pipeid):
             ctx.vlog("Skip removing pipe [%s]", pipeid)
             return
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
-    e.execute(
-        "delete from {0} where pipeid={1!r}".format(
+    with e.connect() as c:
+        sqlquery = "delete from {0} where pipeid={1!r}".format(
             dbtname.encode("ascii", "ignore").decode(),
             pipeid.encode("ascii", "ignore").decode(),
         )
-    )
+        c.execute(text(sqlquery))
+        c.commit()
 
 
 @cli.command("list", short_help="List the details of one or all pipes")
