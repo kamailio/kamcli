@@ -1,5 +1,6 @@
 import click
 from sqlalchemy import create_engine
+from sqlalchemy import text
 from kamcli.ioutils import ioutils_dbres_print
 from kamcli.cli import pass_context
 from kamcli.iorpc import command_ctl
@@ -27,11 +28,12 @@ def domain_add(ctx, domain):
     """
     ctx.vlog("Adding a new domain [%s]", domain)
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
-    e.execute(
-        "insert into domain (domain) values ({0!r})".format(
-            domain.encode("ascii", "ignore").decode()
-        )
+    sqlquery = "insert into domain (domain) values ({0!r})".format(
+        domain.encode("ascii", "ignore").decode()
     )
+    with e.connect() as c:
+        c.execute(text(sqlquery))
+        c.commit()
 
 
 @cli.command("rm", short_help="Remove a record from domain table")
@@ -45,11 +47,12 @@ def domain_rm(ctx, domain):
         <domain> - domain value
     """
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
-    e.execute(
-        "delete from domain where domain={0!r}".format(
-            domain.encode("ascii", "ignore").decode()
-        )
+    sqlquery = "delete from domain where domain={0!r}".format(
+        domain.encode("ascii", "ignore").decode()
     )
+    with e.connect() as c:
+        c.execute(text(sqlquery))
+        c.commit()
 
 
 ##
@@ -81,17 +84,19 @@ def domain_showdb(ctx, oformat, ostyle, domain):
         [<domain>] - domain value (optional)
     """
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
-    if not domain:
-        ctx.vlog("Showing all domain records")
-        res = e.execute("select * from domain")
-        ioutils_dbres_print(ctx, oformat, ostyle, res)
-    else:
-        for d in domain:
-            ctx.vlog("Showing a specific domain record")
-            res = e.execute(
-                "select * from domain where domain={0!r}".format(d)
-            )
+    with e.connect() as c:
+        if not domain:
+            ctx.vlog("Showing all domain records")
+            res = c.execute(text("select * from domain"))
             ioutils_dbres_print(ctx, oformat, ostyle, res)
+        else:
+            for d in domain:
+                ctx.vlog("Showing a specific domain record")
+                res = c.execute(
+                    text("select * from domain where domain={0!r}".format(d))
+                )
+                ioutils_dbres_print(ctx, oformat, ostyle, res)
+        c.commit()
 
 
 @cli.command("list", short_help="Show details for domain records in memory")
