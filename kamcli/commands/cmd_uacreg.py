@@ -1,5 +1,6 @@
 import click
 from sqlalchemy import create_engine
+from sqlalchemy import text
 from kamcli.ioutils import ioutils_dbres_print
 from kamcli.cli import pass_context
 from kamcli.iorpc import command_ctl
@@ -85,7 +86,7 @@ def uacreg_add(
     else:
         pwval = auth_password
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
-    e.execute(
+    sqlquery = (
         "insert into uacreg (l_uuid, l_username, l_domain, r_username, "
         "r_domain, realm, auth_username, auth_password, auth_ha1, auth_proxy, "
         "expires, flags, reg_delay, socket) values "
@@ -108,6 +109,9 @@ def uacreg_add(
             socket.encode("ascii", "ignore").decode(),
         )
     )
+    with e.connect() as c:
+        c.execute(text(sqlquery))
+        c.commit()
 
 
 @cli.command(
@@ -138,7 +142,7 @@ def uacreg_passwd(ctx, realm, authha1, l_uuid, auth_password):
     else:
         pwval = auth_password
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
-    e.execute(
+    sqlquery = (
         "update uacreg set auth_password={0!r}, auth_ha1={1!r} "
         "where l_uuid={2!r}".format(
             pwval.encode("ascii", "ignore").decode(),
@@ -146,6 +150,9 @@ def uacreg_passwd(ctx, realm, authha1, l_uuid, auth_password):
             l_uuid.encode("ascii", "ignore").decode(),
         )
     )
+    with e.connect() as c:
+        c.execute(text(sqlquery))
+        c.commit()
 
 
 @cli.command("showdb", short_help="Show dialplan records in database")
@@ -176,14 +183,15 @@ def uacreg_showdb(ctx, oformat, ostyle, l_uuid):
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     if not l_uuid:
         ctx.vlog("Showing all uacreg records")
-        res = e.execute("select * from uacreg")
+        with e.connect() as c:
+            res = c.execute(text("select * from uacreg"))
         ioutils_dbres_print(ctx, oformat, ostyle, res)
     else:
         for record in l_uuid:
             ctx.vlog("Showing uacreg records for l_uuid: " + record)
-            res = e.execute(
-                "select * from uacreg where l_uuid={0!r}".format(record)
-            )
+            sqlquery = "select * from uacreg where l_uuid={0!r}".format(record)
+            with e.connect() as c:
+                res = c.execute(text(sqlquery))
             ioutils_dbres_print(ctx, oformat, ostyle, res)
 
 
@@ -205,6 +213,5 @@ def uacreg_list(ctx):
 )
 @pass_context
 def uacreg_reload(ctx):
-    """Reload remote registration records from database into memory
-    """
+    """Reload remote registration records from database into memory"""
     command_ctl(ctx, "uac.reg_reload", [])
