@@ -10,7 +10,7 @@ KDB_IGNORE_MISSING = [
 ]
 
 
-def dbutils_exec_sqlfile(ctx, sqlengine, fname):
+def dbutils_exec_sqlfile(ctx, conn, fname):
     if not os.path.exists(fname):
         for i in KDB_IGNORE_MISSING:
             if i in fname:
@@ -27,7 +27,7 @@ def dbutils_exec_sqlfile(ctx, sqlengine, fname):
             sql_command += line.strip("\n")
             if sql_command.endswith(";"):
                 try:
-                    sqlengine.execute(text(sql_command))
+                    conn.execute(text(sql_command))
                 except SQLAlchemyError:
                     ctx.log(
                         "failed to execute sql statement [%s] from file [%s]",

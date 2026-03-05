@@ -93,7 +93,10 @@ def cli(ctx):
 @pass_context
 def db_query(ctx, oformat, ostyle, query):
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
-    res = e.execute(query.encode("ascii", "ignore").decode())
+    sqlquery = query.encode("ascii", "ignore").decode()
+    with e.connect() as c:
+        res = c.execute(text(sqlquery))
+        c.commit()
     ioutils_dbres_print(ctx, oformat, ostyle, res)
 
 
@@ -250,7 +253,9 @@ def db_clishowg(ctx, table):
 def db_show(ctx, oformat, ostyle, table):
     ctx.vlog("Content of database table [%s]", table)
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
-    res = e.execute("select * from {0}".format(table))
+    sqlquery = "select * from {0}".format(table)
+    with e.connect() as c:
+        res = c.execute(text(sqlquery))
     ioutils_dbres_print(ctx, oformat, ostyle, res)
 
 
@@ -279,7 +284,9 @@ def db_showcreate(ctx, oformat, ostyle, table):
     dbtype = ctx.gconfig.get("db", "type")
     if dbtype == "mysql":
         e = create_engine(ctx.gconfig.get("db", "rwurl"))
-        res = e.execute("show create table {0}".format(table))
+        sqlquery = "show create table {0}".format(table)
+        with e.connect() as c:
+            res = c.execute(text(sqlquery))
         ioutils_dbres_print(ctx, oformat, ostyle, res)
     elif dbtype == "postgresql":
         scmd = ('psql "postgresql://{0}:{1}@{2}/{3}" -c "\\d {4} "').format(
@@ -312,12 +319,14 @@ def db_runfile(ctx, fname):
     """
     ctx.vlog("Run statements in the file [%s]", fname)
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
-    dbutils_exec_sqlfile(ctx, e, fname)
+    with e.connect() as c:
+        dbutils_exec_sqlfile(ctx, c, fname)
+        c.commit()
 
 
 def db_create_mysql_host_users(
     ctx,
-    e,
+    c,
     nousers,
     nogrants,
     dbname,
@@ -328,32 +337,28 @@ def db_create_mysql_host_users(
     dbropassword,
 ):
     if not nousers:
-        e.execute(
-            "CREATE USER {0!r}@{1!r} IDENTIFIED BY {2!r}".format(
-                dbrwuser, dbhost, dbrwpassword
-            )
+        sqlquery = "CREATE USER {0!r}@{1!r} IDENTIFIED BY {2!r}".format(
+            dbrwuser, dbhost, dbrwpassword
         )
+        c.execute(text(sqlquery))
     if not nogrants:
-        e.execute(
-            "GRANT ALL PRIVILEGES ON {0}.* TO {1!r}@{2!r}".format(
-                dbname, dbrwuser, dbhost
-            )
+        sqlquery = "GRANT ALL PRIVILEGES ON {0}.* TO {1!r}@{2!r}".format(
+            dbname, dbrwuser, dbhost
         )
+        c.execute(text(sqlquery))
     if not nousers:
-        e.execute(
-            "CREATE USER {0!r}@{1!r} IDENTIFIED BY {2!r}".format(
-                dbrouser, dbhost, dbropassword
-            )
+        sqlquery = "CREATE USER {0!r}@{1!r} IDENTIFIED BY {2!r}".format(
+            dbrouser, dbhost, dbropassword
         )
+        c.execute(text(sqlquery))
     if not nogrants:
-        e.execute(
-            "GRANT SELECT ON {0}.* TO {1!r}@{2!r}".format(
-                dbname, dbrouser, dbhost
-            )
+        sqlquery = "GRANT SELECT ON {0}.* TO {1!r}@{2!r}".format(
+            dbname, dbrouser, dbhost
         )
+        c.execute(text(sqlquery))
 
 
-def db_create_mysql_users(ctx, e, dbname, nousers, nogrants):
+def db_create_mysql_users(ctx, c, dbname, nousers, nogrants):
     dbhost = ctx.gconfig.get("db", "host")
     dbrwuser = ctx.gconfig.get("db", "rwuser")
     dbrwpassword = ctx.gconfig.get("db", "rwpassword")
@@ -362,7 +367,7 @@ def db_create_mysql_users(ctx, e, dbname, nousers, nogrants):
     dbaccesshost = ctx.gconfig.get("db", "accesshost")
     db_create_mysql_host_users(
         ctx,
-        e,
+        c,
         nousers,
         nogrants,
         dbname,
@@ -375,7 +380,7 @@ def db_create_mysql_users(ctx, e, dbname, nousers, nogrants):
     if dbhost != "localhost":
         db_create_mysql_host_users(
             ctx,
-            e,
+            c,
             nousers,
             nogrants,
             dbname,
@@ -388,7 +393,7 @@ def db_create_mysql_users(ctx, e, dbname, nousers, nogrants):
     if len(dbaccesshost) > 0:
         db_create_mysql_host_users(
             ctx,
-            e,
+            c,
             nousers,
             nogrants,
             dbname,
@@ -400,42 +405,44 @@ def db_create_mysql_users(ctx, e, dbname, nousers, nogrants):
         )
 
 
-def db_create_sql_group(ctx, e, dirpath, dbgroup):
+def db_create_sql_group(ctx, c, dirpath, dbgroup):
     for t in dbgroup:
         fname = dirpath + "/" + t + "-create.sql"
-        dbutils_exec_sqlfile(ctx, e, fname)
+        dbutils_exec_sqlfile(ctx, c, fname)
 
 
-def db_create_sql_table_groups(ctx, e, ldirectory, alltables):
-    db_create_sql_group(ctx, e, ldirectory, KDB_GROUP_BASIC)
-    db_create_sql_group(ctx, e, ldirectory, KDB_GROUP_STANDARD)
+def db_create_sql_table_groups(ctx, c, ldirectory, alltables):
+    db_create_sql_group(ctx, c, ldirectory, KDB_GROUP_BASIC)
+    db_create_sql_group(ctx, c, ldirectory, KDB_GROUP_STANDARD)
 
     option = "y"
     if not alltables:
         print("Do you want to create extra tables? (y/n):", end=" ")
         option = input()
     if option == "y":
-        db_create_sql_group(ctx, e, ldirectory, KDB_GROUP_EXTRA)
+        db_create_sql_group(ctx, c, ldirectory, KDB_GROUP_EXTRA)
 
     if not alltables:
         print("Do you want to create presence tables? (y/n):", end=" ")
         option = input()
     if option == "y":
-        db_create_sql_group(ctx, e, ldirectory, KDB_GROUP_PRESENCE)
+        db_create_sql_group(ctx, c, ldirectory, KDB_GROUP_PRESENCE)
 
     if not alltables:
         print("Do you want to create uid tables? (y/n):", end=" ")
         option = input()
     if option == "y":
-        db_create_sql_group(ctx, e, ldirectory, KDB_GROUP_UID)
+        db_create_sql_group(ctx, c, ldirectory, KDB_GROUP_UID)
 
 
 def db_create_mysql(ctx, ldbname, ldirectory, nousers, nogrants, alltables):
     e = create_engine(ctx.gconfig.get("db", "adminurl"))
-    e.execute("create database {0}".format(ldbname))
-    db_create_mysql_users(ctx, e, ldbname, nousers, nogrants)
-    e.execute("use {0}".format(ldbname))
-    db_create_sql_table_groups(ctx, e, ldirectory, alltables)
+    with e.connect() as c:
+        c.execute(text("create database {0}".format(ldbname)))
+        db_create_mysql_users(ctx, c, ldbname, nousers, nogrants)
+        c.execute(text("use {0}".format(ldbname)))
+        db_create_sql_table_groups(ctx, c, ldirectory, alltables)
+        c.commit()
 
 
 def db_create_postgresql(
@@ -451,33 +458,32 @@ def db_create_postgresql(
     )
     os.system(scmd)
     e = create_engine(ctx.gconfig.get("db", "adminurl"))
-    if not nogrants:
-        e.execute(
-            "CREATE USER {0} WITH PASSWORD '{1}';".format(
+    with e.connect() as c:
+        if not nogrants:
+            sqlquery = "CREATE USER {0} WITH PASSWORD '{1}';".format(
                 ctx.gconfig.get("db", "rwuser"),
                 ctx.gconfig.get("db", "rwpassword"),
             )
-        )
-        e.execute(
-            "GRANT CONNECT ON DATABASE {0} TO {1};".format(
+            c.execute(text(sqlquery))
+            sqlquery = "GRANT CONNECT ON DATABASE {0} TO {1};".format(
                 ldbname,
                 ctx.gconfig.get("db", "rwuser"),
             )
-        )
-        if ctx.gconfig.get("db", "rwuser") != ctx.gconfig.get("db", "rouser"):
-            e.execute(
-                "CREATE USER {0} WITH PASSWORD '{1}';".format(
+            c.execute(text(sqlquery))
+            if ctx.gconfig.get("db", "rwuser") != ctx.gconfig.get(
+                "db", "rouser"
+            ):
+                sqlquery = "CREATE USER {0} WITH PASSWORD '{1}';".format(
                     ctx.gconfig.get("db", "rouser"),
                     ctx.gconfig.get("db", "ropassword"),
                 )
-            )
-            e.execute(
-                "GRANT CONNECT ON DATABASE {0} TO {1};".format(
+                c.execute(text(sqlquery))
+                sqlquery = "GRANT CONNECT ON DATABASE {0} TO {1};".format(
                     ldbname,
                     ctx.gconfig.get("db", "rouser"),
                 )
-            )
-    e.dispose()
+                c.execute(text(sqlquery))
+        c.commit()
     e = create_engine(
         "{0}+{1}://{2}:{3}@{4}/{5}".format(
             ctx.gconfig.get("db", "type"),
@@ -488,30 +494,31 @@ def db_create_postgresql(
             ldbname,
         )
     )
-    if not nofunctions:
-        e.execute(
-            "CREATE FUNCTION concat(text, text) RETURNS text AS 'SELECT $1 || $2;' LANGUAGE 'sql';"
-        )
-        e.execute(
-            "CREATE FUNCTION rand() RETURNS double precision AS 'SELECT random();' LANGUAGE 'sql';"
-        )
-    db_create_sql_table_groups(ctx, e, ldirectory, alltables)
-    e.dispose()
+    with e.connect() as c:
+        if not nofunctions:
+            sqlquery = "CREATE FUNCTION concat(text, text) RETURNS text AS 'SELECT $1 || $2;' LANGUAGE 'sql';"
+            c.execute(text(sqlquery))
+            sqlquery = "CREATE FUNCTION rand() RETURNS double precision AS 'SELECT random();' LANGUAGE 'sql';"
+            c.execute(text(sqlquery))
+        db_create_sql_table_groups(ctx, c, ldirectory, alltables)
+        c.commit()
     e = create_engine(ctx.gconfig.get("db", "adminurl"))
-    if not nogrants:
-        e.execute(
-            "GRANT ALL PRIVILEGES ON DATABASE {0} TO {1};".format(
+    with e.connect() as c:
+        if not nogrants:
+            sqlquery = "GRANT ALL PRIVILEGES ON DATABASE {0} TO {1};".format(
                 ldbname,
                 ctx.gconfig.get("db", "rwuser"),
             )
-        )
-        if ctx.gconfig.get("db", "rwuser") != ctx.gconfig.get("db", "rouser"):
-            e.execute(
-                "GRANT SELECT ON DATABASE {0} TO {1};".format(
+            c.execute(text(sqlquery))
+            if ctx.gconfig.get("db", "rwuser") != ctx.gconfig.get(
+                "db", "rouser"
+            ):
+                sqlquery = "GRANT SELECT ON DATABASE {0} TO {1};".format(
                     ldbname,
                     ctx.gconfig.get("db", "rouser"),
                 )
-            )
+                c.execute(text(sqlquery))
+        c.commit()
 
 
 def db_create_sqlite(ctx, ldbname, ldirectory, alltables):
@@ -522,7 +529,9 @@ def db_create_sqlite(ctx, ldbname, ldirectory, alltables):
             ldbname,
         )
     )
-    db_create_sql_table_groups(ctx, e, ldirectory, alltables)
+    with e.connect() as c:
+        db_create_sql_table_groups(ctx, c, ldirectory, alltables)
+        c.commit()
 
 
 @cli.command("create", short_help="Create database structure")
@@ -630,7 +639,9 @@ def db_create_dbonly(ctx, dbname):
 
     if dbtype == "mysql":
         e = create_engine(ctx.gconfig.get("db", "adminurl"))
-        e.execute("create database {0}".format(ldbname))
+        with e.connect() as c:
+            c.execute(text("create database {0}".format(ldbname)))
+            c.commit()
     elif dbtype == "postgresql":
         scmd = (
             'psql "postgresql://{0}:{1}@{2}" -c "create database {3} "'
@@ -687,7 +698,9 @@ def db_drop(ctx, dbname, yes):
 
     if dbtype == "mysql":
         e = create_engine(ctx.gconfig.get("db", "adminurl"))
-        e.execute("drop database {0}".format(ldbname))
+        with e.connect() as c:
+            c.execute(text("drop database {0}".format(ldbname)))
+            c.commit()
     elif dbtype == "postgresql":
         scmd = (
             'psql "postgresql://{0}:{1}@{2}" -c "drop database {3} "'
@@ -718,7 +731,9 @@ def db_create_tables_list(ctx, directory, group):
     if len(directory) > 0:
         ldirectory = directory
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
-    db_create_sql_group(ctx, e, ldirectory, group)
+    with e.connect() as c:
+        db_create_sql_group(ctx, c, ldirectory, group)
+        c.commit()
 
 
 @cli.command("create-tables-basic", short_help="Create basic database tables")
@@ -850,7 +865,9 @@ def db_create_tables_group(ctx, scriptsdirectory, gname):
         ldirectory = scriptsdirectory
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     fpath = ldirectory + "/" + gname + "-create.sql"
-    dbutils_exec_sqlfile(ctx, e, fpath)
+    with e.connect() as c:
+        dbutils_exec_sqlfile(ctx, c, fpath)
+        c.commit()
 
 
 @cli.command(
@@ -861,7 +878,9 @@ def db_create_tables_group(ctx, scriptsdirectory, gname):
 @pass_context
 def db_create_table_like(ctx, newname, oldname):
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
-    e.execute("CREATE TABLE {0} LIKE {1}".format(newname, oldname))
+    with e.connect() as c:
+        c.execute(text("CREATE TABLE {0} LIKE {1}".format(newname, oldname)))
+        c.commit()
 
 
 @cli.command("grant", short_help="Create db access users and grant privileges")
@@ -887,34 +906,34 @@ def db_grant(ctx, dbname):
         ldbname = dbname
     ctx.vlog("Creating only database [%s]", ldbname)
     e = create_engine(ctx.gconfig.get("db", "adminurl"))
-    db_create_mysql_users(ctx, e, ldbname, False, False)
+    with e.connect() as c:
+        db_create_mysql_users(ctx, c, ldbname, False, False)
+        c.commit()
 
 
-def db_revoke_host_users(ctx, e, dbname, dbhost, dbrwuser, dbrouser):
-    e.execute(
-        "REVOKE ALL PRIVILEGES ON {0}.* FROM {1!r}@{2!r}".format(
-            dbname, dbrwuser, dbhost
-        )
+def db_revoke_host_users(ctx, c, dbname, dbhost, dbrwuser, dbrouser):
+    sqlquery = "REVOKE ALL PRIVILEGES ON {0}.* FROM {1!r}@{2!r}".format(
+        dbname, dbrwuser, dbhost
     )
-    e.execute("DROP USER {0!r}@{1!r}".format(dbrwuser, dbhost))
-    e.execute(
-        "REVOKE SELECT ON {0}.* FROM {1!r}@{2!r}".format(
-            dbname, dbrouser, dbhost
-        )
+    c.execute(text(sqlquery))
+    c.execute(text("DROP USER {0!r}@{1!r}".format(dbrwuser, dbhost)))
+    sqlquery = "REVOKE SELECT ON {0}.* FROM {1!r}@{2!r}".format(
+        dbname, dbrouser, dbhost
     )
-    e.execute("DROP USER {0!r}@{1!r}".format(dbrouser, dbhost))
+    c.execute(text(sqlquery))
+    c.execute(text("DROP USER {0!r}@{1!r}".format(dbrouser, dbhost)))
 
 
-def db_revoke_users(ctx, e, dbname):
+def db_revoke_users(ctx, c, dbname):
     dbhost = ctx.gconfig.get("db", "host")
     dbrwuser = ctx.gconfig.get("db", "rwuser")
     dbrouser = ctx.gconfig.get("db", "rouser")
     dbaccesshost = ctx.gconfig.get("db", "accesshost")
-    db_revoke_host_users(ctx, e, dbname, dbhost, dbrwuser, dbrouser)
+    db_revoke_host_users(ctx, c, dbname, dbhost, dbrwuser, dbrouser)
     if dbhost != "localhost":
         db_revoke_host_users(
             ctx,
-            e,
+            c,
             dbname,
             "localhost",
             dbrwuser,
@@ -923,7 +942,7 @@ def db_revoke_users(ctx, e, dbname):
     if len(dbaccesshost) > 0:
         db_revoke_host_users(
             ctx,
-            e,
+            c,
             dbname,
             dbaccesshost,
             dbrwuser,
@@ -954,7 +973,9 @@ def db_revoke(ctx, dbname):
         ldbname = dbname
     ctx.vlog("Revoke access to database [%s]", ldbname)
     e = create_engine(ctx.gconfig.get("db", "adminurl"))
-    db_revoke_users(ctx, e, ldbname)
+    with e.connect() as c:
+        db_revoke_users(ctx, c, ldbname)
+        c.commit()
 
 
 @cli.command(
@@ -978,19 +999,19 @@ def db_version_set(ctx, vertable, table, version):
         <version> - Version number
     """
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
-    e.execute(
-        "delete from {0} where table_name={1!r}".format(
+    with e.connect() as c:
+        sqlquery = "delete from {0} where table_name={1!r}".format(
             vertable.encode("ascii", "ignore").decode(),
             table.encode("ascii", "ignore").decode(),
         )
-    )
-    e.execute(
-        "insert into {0} (table_name, table_version) values ({1!r}, {2})".format(
+        c.execute(text(sqlquery))
+        sqlquery = "insert into {0} (table_name, table_version) values ({1!r}, {2})".format(
             vertable.encode("ascii", "ignore").decode(),
             table.encode("ascii", "ignore").decode(),
             version,
         )
-    )
+        c.execute(text(sqlquery))
+        c.commit()
 
 
 @cli.command(
@@ -1027,10 +1048,10 @@ def db_version_get(ctx, vertable, oformat, ostyle, table):
         <table> - Name of the table to get the version for
     """
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
-    res = e.execute(
-        "select * from {0} where table_name={1!r}".format(
-            vertable.encode("ascii", "ignore").decode(),
-            table.encode("ascii", "ignore").decode(),
-        )
+    sqlquery = "select * from {0} where table_name={1!r}".format(
+        vertable.encode("ascii", "ignore").decode(),
+        table.encode("ascii", "ignore").decode(),
     )
+    with e.connect() as c:
+        res = c.execute(text(sqlquery))
     ioutils_dbres_print(ctx, oformat, ostyle, res)
