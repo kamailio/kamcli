@@ -1,5 +1,6 @@
 import click
 from sqlalchemy import create_engine
+from sqlalchemy import text
 from kamcli.ioutils import ioutils_dbres_print
 from kamcli.cli import pass_context
 from kamcli.iorpc import command_ctl
@@ -39,7 +40,7 @@ def dispatcher_add(
     """
     ctx.vlog("Adding to setid [%d] destination [%s]", setid, destination)
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
-    e.execute(
+    sqlquery = (
         "insert into dispatcher "
         "(setid, destination, flags, priority, attrs, description) "
         "values ({0}, {1!r}, {2}, {3}, {4!r}, {5!r})".format(
@@ -51,6 +52,9 @@ def dispatcher_add(
             description.encode("ascii", "ignore").decode(),
         )
     )
+    with e.connect() as c:
+        c.execute(text(sqlquery))
+        c.commit()
 
 
 @cli.command("rm", short_help="Remove a destination from dispatcher table")
@@ -66,11 +70,14 @@ def dispatcher_rm(ctx, setid, destination):
         <destination> - SIP URI for destination
     """
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
-    e.execute(
+    sqlquery = (
         "delete from dispatcher where setid={0} and destination={1!r}".format(
             setid, destination.encode("ascii", "ignore").decode()
         )
     )
+    with e.connect() as c:
+        c.execute(text(sqlquery))
+        c.commit()
 
 
 @cli.command("showdb", short_help="Show dispatcher records in database")
@@ -99,17 +106,18 @@ def dispatcher_showdb(ctx, oformat, ostyle, setid):
         [<setid>] - dispatching set id
     """
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
-    if not setid:
-        ctx.vlog("Showing all dispatcher records")
-        res = e.execute("select * from dispatcher")
-        ioutils_dbres_print(ctx, oformat, ostyle, res)
-    else:
-        for s in setid:
-            ctx.vlog("Showing dispatcher records for set id")
-            res = e.execute(
-                "select * from dispatcher where setid={0}".format(s)
-            )
+    with e.connect() as c:
+        if not setid:
+            ctx.vlog("Showing all dispatcher records")
+            res = c.execute(text("select * from dispatcher"))
             ioutils_dbres_print(ctx, oformat, ostyle, res)
+        else:
+            for s in setid:
+                ctx.vlog("Showing dispatcher records for set id")
+                res = c.execute(
+                    text("select * from dispatcher where setid={0}".format(s))
+                )
+                ioutils_dbres_print(ctx, oformat, ostyle, res)
 
 
 @cli.command(
