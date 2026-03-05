@@ -1,5 +1,6 @@
 import click
 from sqlalchemy import create_engine
+from sqlalchemy import text
 from kamcli.ioutils import ioutils_dbres_print
 from kamcli.cli import pass_context
 from kamcli.cli import parse_user_spec
@@ -43,7 +44,7 @@ def aliasdb_add(ctx, table, userid, aliasid):
         adata["domain"],
     )
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
-    e.execute(
+    sqltext = (
         "insert into {0} (username, domain, alias_username, "
         "alias_domain) values ({1!r}, {2!r}, {3!r}, {4!r})".format(
             table,
@@ -53,6 +54,9 @@ def aliasdb_add(ctx, table, userid, aliasid):
             adata["domain"],
         )
     )
+    with e.connect() as c:
+        c.execute(text(sqltext))
+        c.commit()
 
 
 @cli.command("rm", short_help="Remove records for a user and/or alias")
@@ -86,22 +90,26 @@ def aliasdb_rm(ctx, table, matchalias, userid, aliasid):
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     if not aliasid:
         if matchalias:
-            e.execute(
+            sqltext = (
                 "delete from {0} where alias_username={1!r} and "
                 "alias_domain={2!r}".format(
-                    table, udata["username"], udata["domain"],
+                    table,
+                    udata["username"],
+                    udata["domain"],
                 )
             )
         else:
-            e.execute(
+            sqltext = (
                 "delete from {0} where username={1!r} and domain={2!r}".format(
-                    table, udata["username"], udata["domain"],
+                    table,
+                    udata["username"],
+                    udata["domain"],
                 )
             )
     else:
         for a in aliasid:
             adata = parse_user_spec(ctx, a)
-            e.execute(
+            sqltext = (
                 "delete from {0} where username={1!r} and domain={2!r} "
                 "and alias_username={3!r} and alias_domain={4!r}".format(
                     table,
@@ -111,6 +119,9 @@ def aliasdb_rm(ctx, table, matchalias, userid, aliasid):
                     adata["domain"],
                 )
             )
+    with e.connect() as c:
+        c.execute(text(sqltext))
+        c.commit()
 
 
 @cli.command("show", short_help="Show user aliases")
@@ -155,7 +166,7 @@ def aliasdb_show(ctx, oformat, ostyle, table, matchalias, userid):
     if not userid:
         ctx.vlog("Showing all records")
         e = create_engine(ctx.gconfig.get("db", "rwurl"))
-        res = e.execute("select * from {0}".format(table))
+        res = e.execute(text("select * from {0}".format(table)))
         ioutils_dbres_print(ctx, oformat, ostyle, res)
     else:
         for u in userid:
@@ -168,10 +179,12 @@ def aliasdb_show(ctx, oformat, ostyle, table, matchalias, userid):
                     udata["username"],
                     udata["domain"],
                 )
-                res = e.execute(
+                sqltext = (
                     "select * from {0} where alias_username={1!r} "
                     "and alias_domain={2!r}".format(
-                        table, udata["username"], udata["domain"],
+                        table,
+                        udata["username"],
+                        udata["domain"],
                     )
                 )
             else:
@@ -180,10 +193,14 @@ def aliasdb_show(ctx, oformat, ostyle, table, matchalias, userid):
                     udata["username"],
                     udata["domain"],
                 )
-                res = e.execute(
+                sqltext = (
                     "select * from {0} where username={1!r} and "
                     "domain={2!r}".format(
-                        table, udata["username"], udata["domain"],
+                        table,
+                        udata["username"],
+                        udata["domain"],
                     )
                 )
+            with e.connect() as c:
+                c.execute(text(sqltext))
             ioutils_dbres_print(ctx, oformat, ostyle, res)
