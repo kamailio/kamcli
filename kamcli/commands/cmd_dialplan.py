@@ -1,5 +1,6 @@
 import click
 from sqlalchemy import create_engine
+from sqlalchemy import text
 from kamcli.ioutils import ioutils_dbres_print
 from kamcli.cli import pass_context
 from kamcli.iorpc import command_ctl
@@ -72,7 +73,7 @@ def dialplan_add(
         matchexp,
     )
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
-    e.execute(
+    sqlquery = (
         "insert into dialplan (dpid, pr, match_op, match_exp, match_len, "
         "subst_exp, repl_exp, attrs) values "
         "({0}, {1}, {2}, {3!r}, {4}, {5!r}, {6!r}, {7!r})".format(
@@ -86,6 +87,9 @@ def dialplan_add(
             attrs.encode("ascii", "ignore").decode(),
         )
     )
+    with e.connect() as c:
+        c.execute(text(sqlquery))
+        c.commit()
 
 
 @cli.command("rm", short_help="Remove records from dialplan")
@@ -101,16 +105,16 @@ def dialplan_rm(ctx, dpid, matchexp):
         [<matchexp>] - match expression
     """
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
-    if not matchexp:
-        e.execute("delete from dialplan where dpid={0}".format(dpid))
-    else:
-        for m in matchexp:
-            e.execute(
-                "delete from dialplan where "
-                "dpid={0} and match_exp={1!r}".format(
+    with e.connect() as c:
+        if not matchexp:
+            c.execute(text("delete from dialplan where dpid={0}".format(dpid)))
+        else:
+            for m in matchexp:
+                sqlquery = "delete from dialplan where dpid={0} and match_exp={1!r}".format(
                     dpid, matchexp.encode("ascii", "ignore").decode()
                 )
-            )
+                c.execute(text(sqlquery))
+        c.commit()
 
 
 @cli.command("showdb", short_help="Show dialplan records in database")
@@ -141,12 +145,15 @@ def dialplan_showdb(ctx, oformat, ostyle, dpid):
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     if not dpid:
         ctx.vlog("Showing all dialplan records")
-        res = e.execute("select * from dialplan")
+        res = e.execute(text("select * from dialplan"))
         ioutils_dbres_print(ctx, oformat, ostyle, res)
     else:
         for d in dpid:
             ctx.vlog("Showing dialplan records for set id: " + d)
-            res = e.execute("select * from dialplan where dpid={0}".format(d))
+            with e.connect() as c:
+                res = c.execute(
+                    text("select * from dialplan where dpid={0}".format(d))
+                )
             ioutils_dbres_print(ctx, oformat, ostyle, res)
 
 
@@ -168,8 +175,7 @@ def dialplan_list(ctx, dpid):
 )
 @pass_context
 def dialplan_reload(ctx):
-    """Reload dialplan records from database into memory
-    """
+    """Reload dialplan records from database into memory"""
     command_ctl(ctx, "dialplan.reload", [])
 
 
