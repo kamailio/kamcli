@@ -1,5 +1,6 @@
 import click
 from sqlalchemy import create_engine
+from sqlalchemy import text
 from kamcli.ioutils import ioutils_dbres_print
 from kamcli.cli import pass_context
 from kamcli.iorpc import command_ctl
@@ -57,13 +58,11 @@ def mtree_dbadd(ctx, tname, coltprefix, coltvalue, dbtname, tprefix, tvalue):
     prefix = tprefix.encode("ascii", "ignore").decode()
     val = tvalue.encode("ascii", "ignore").decode()
     if not tname:
-        e.execute(
-            "insert into {0} ({1}, {2}) values ({3!r}, {4!r})".format(
-                dbname, col_pref, col_val, prefix, val
-            )
+        sqlquery = "insert into {0} ({1}, {2}) values ({3!r}, {4!r})".format(
+            dbname, col_pref, col_val, prefix, val
         )
     else:
-        e.execute(
+        sqlquery = (
             "insert into {0} (tname, {1}, {2}) values "
             "({3!r}, {4!r}, {5!r})".format(
                 dbname,
@@ -74,6 +73,9 @@ def mtree_dbadd(ctx, tname, coltprefix, coltvalue, dbtname, tprefix, tvalue):
                 val,
             )
         )
+    with e.connect() as c:
+        c.execute(text(sqlquery))
+        c.commit()
 
 
 @cli.command("db-rm", short_help="Remove a record from mtree table")
@@ -84,7 +86,11 @@ def mtree_dbadd(ctx, tname, coltprefix, coltvalue, dbtname, tprefix, tvalue):
     help='Column name for prefix (default: "tprefix")',
 )
 @click.option(
-    "yes", "--yes", "-y", is_flag=True, help="Do not ask for confirmation",
+    "yes",
+    "--yes",
+    "-y",
+    is_flag=True,
+    help="Do not ask for confirmation",
 )
 @click.argument("dbtname", metavar="<dbtname>")
 @click.argument("tprefix", metavar="<tprefix>")
@@ -104,13 +110,14 @@ def mtree_dbrm(ctx, coltprefix, yes, dbtname, tprefix):
             ctx.vlog("Skip removing prefix [%s]", tprefix)
             return
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
-    e.execute(
-        "delete from {0} where {1}={2!r}".format(
-            dbtname.encode("ascii", "ignore").decode(),
-            coltprefix.encode("ascii", "ignore").decode(),
-            tprefix.encode("ascii", "ignore").decode(),
-        )
+    sqlquery = "delete from {0} where {1}={2!r}".format(
+        dbtname.encode("ascii", "ignore").decode(),
+        coltprefix.encode("ascii", "ignore").decode(),
+        tprefix.encode("ascii", "ignore").decode(),
     )
+    with e.connect() as c:
+        c.execute(text(sqlquery))
+        c.commit()
 
 
 @cli.command("db-show", short_help="Show mtree records in database")
@@ -149,23 +156,25 @@ def mtree_dbshow(ctx, oformat, ostyle, coltprefix, dbtname, tprefix):
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     if not tprefix:
         ctx.vlog("Showing all tree database records")
-        res = e.execute(
-            "select * from {0}".format(
-                dbtname.encode("ascii", "ignore").decode()
-            )
+        sqlquery = "select * from {0}".format(
+            dbtname.encode("ascii", "ignore").decode()
         )
+        with e.connect() as c:
+            res = c.execute(text(sqlquery))
         ioutils_dbres_print(ctx, oformat, ostyle, res)
     else:
-        for tp in tprefix:
-            ctx.vlog("Showing tree database records for prefix {0}".format(tp))
-            res = e.execute(
-                "select * from {0} where {1}={2!r}".format(
+        with e.connect() as c:
+            for tp in tprefix:
+                ctx.vlog(
+                    "Showing tree database records for prefix {0}".format(tp)
+                )
+                sqlquery = "select * from {0} where {1}={2!r}".format(
                     dbtname.encode("ascii", "ignore").decode(),
                     coltprefix.encode("ascii", "ignore").decode(),
                     tp.encode("ascii", "ignore").decode(),
                 )
-            )
-            ioutils_dbres_print(ctx, oformat, ostyle, res)
+                res = c.execute(text(sqlquery))
+                ioutils_dbres_print(ctx, oformat, ostyle, res)
 
 
 @cli.command("list", short_help="Show the records in memory tree")

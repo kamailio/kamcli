@@ -50,18 +50,18 @@ def ioutils_dbres_print(ctx, oformat, ostyle, res):
 
     if oformat == "json":
         jdata = []
-        for row in res:
+        for row in res.mappings():
             jdata.append(dict(row))
         print(json.dumps(jdata, indent=4))
         print()
     elif oformat == "yaml":
         ydata = []
-        for row in res:
+        for row in res.mappings():
             ydata.append(dict(row))
         print(yaml.dump(ydata, indent=4))
         print()
     elif oformat == "dict":
-        for row in res:
+        for row in res.mappings():
             print(dict(row))
             # pprint.pprint(dict(row), indent=4)
             print()

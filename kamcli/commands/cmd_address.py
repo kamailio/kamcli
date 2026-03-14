@@ -1,5 +1,6 @@
 import click
 from sqlalchemy import create_engine
+from sqlalchemy import text
 from kamcli.ioutils import ioutils_dbres_print
 from kamcli.cli import pass_context
 from kamcli.iorpc import command_ctl
@@ -36,7 +37,7 @@ def address_add(ctx, mask, port, tag, group, address):
     """
     ctx.vlog("Adding to group id [%d] address [%s]", group, address)
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
-    e.execute(
+    sqltext = (
         "insert into address (grp, ip_addr, mask, port, tag) values "
         "({0}, {1!r}, {2}, {3}, {4!r})".format(
             group,
@@ -46,6 +47,9 @@ def address_add(ctx, mask, port, tag, group, address):
             tag.encode("ascii", "ignore").decode(),
         )
     )
+    with e.connect() as c:
+        c.execute(text(sqltext))
+        c.commit()
 
 
 @cli.command("rm", short_help="Remove a record from address db table")
@@ -66,27 +70,34 @@ def address_rm(ctx, mask, port, group, address):
     addr = address.encode("ascii", "ignore").decode()
     if not mask:
         if not port:
-            e.execute(
+            sqltext = (
                 "delete from address where grp={0} and ip_addr={1!r}".format(
                     group, addr
                 )
             )
+
         else:
-            e.execute(
-                "delete from address where grp={0} and ip_addr={1!r} "
-                "and port={2}".format(group, addr, port)
+            sqltext = (
+                "delete from address where grp={0} "
+                "and ip_addr={1!r} and port={2}".format(group, addr, port)
             )
     else:
         if not port:
-            e.execute(
-                "delete from address where grp={0} and "
-                "ip_addr={1!r} and mask={2}".format(group, addr, mask)
+            sqltext = (
+                "delete from address where grp={0} "
+                "and ip_addr={1!r} and mask={2}".format(group, addr, mask)
             )
+
         else:
-            e.execute(
-                "delete from address where setid={0} and destination={1!r} "
-                "and mask={2} and port={3}".format(group, addr, mask, port)
+            sqltext = (
+                "delete from address where setid={0} "
+                "and destination={1!r} and mask={2} and port={3}".format(
+                    group, addr, mask, port
+                )
             )
+    with e.connect() as c:
+        c.execute(text(sqltext))
+        c.commit()
 
 
 @cli.command("showdb", short_help="Show address records in database")
@@ -117,10 +128,12 @@ def address_showdb(ctx, oformat, ostyle, group):
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     if not group:
         ctx.vlog("Showing all address records")
-        res = e.execute("select * from address")
+        sqltext = "select * from address"
     else:
         ctx.vlog("Showing address records for group")
-        res = e.execute("select * from address where group={0}".format(group))
+        sqltext = "select * from address where group={0}".format(group)
+    with e.connect() as c:
+        res = c.execute(text(sqltext))
     ioutils_dbres_print(ctx, oformat, ostyle, res)
 
 
@@ -159,6 +172,5 @@ def address_list(ctx, mode, group):
 )
 @pass_context
 def address_reload(ctx):
-    """Reload address records from database into memory
-    """
+    """Reload address records from database into memory"""
     command_ctl(ctx, "permissions.addressReload", [])

@@ -1,5 +1,6 @@
 import click
 from sqlalchemy import create_engine
+from sqlalchemy import text
 from kamcli.ioutils import ioutils_dbres_print
 from kamcli.ioutils import ioutils_formats_list
 from kamcli.cli import pass_context
@@ -156,10 +157,11 @@ def ul_showdb(ctx, oformat, ostyle, userid):
                    - it can be a list of userids
                    - if not provided then all records are shown
     """
+    e = create_engine(ctx.gconfig.get("db", "rwurl"))
     if not userid:
         ctx.vlog("Showing all records")
-        e = create_engine(ctx.gconfig.get("db", "rwurl"))
-        res = e.execute("select * from location")
+        with e.connect() as c:
+            res = c.execute(text("select * from location"))
         ioutils_dbres_print(ctx, oformat, ostyle, res)
     else:
         for u in userid:
@@ -169,10 +171,10 @@ def ul_showdb(ctx, oformat, ostyle, userid):
                 udata["username"],
                 udata["domain"],
             )
-            e = create_engine(ctx.gconfig.get("db", "rwurl"))
-            res = e.execute(
-                "select * from location where username={0!r} and domain={1!r}".format(
-                    udata["username"], udata["domain"],
-                )
+            sqlquery = "select * from location where username={0!r} and domain={1!r}".format(
+                udata["username"],
+                udata["domain"],
             )
+            with e.connect() as c:
+                res = c.execute(text(sqlquery))
             ioutils_dbres_print(ctx, oformat, ostyle, res)
