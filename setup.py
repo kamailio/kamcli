@@ -11,7 +11,7 @@ setup(
         "prompt-toolkit",
         "pyaml",
         "pygments",
-        "sqlalchemy",
+        "sqlalchemy>=2.0",
         "tabulate",
         "wheel",
     ],
