@@ -145,11 +145,12 @@ def dialplan_showdb(ctx, oformat, ostyle, dpid):
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     if not dpid:
         ctx.vlog("Showing all dialplan records")
-        res = e.execute(text("select * from dialplan"))
-        ioutils_dbres_print(ctx, oformat, ostyle, res)
+        with e.connect() as c:
+            res = c.execute(text("select * from dialplan"))
+            ioutils_dbres_print(ctx, oformat, ostyle, res)
     else:
         for d in dpid:
-            ctx.vlog("Showing dialplan records for set id: " + d)
+            ctx.vlog("Showing dialplan records for set id: %d", d)
             with e.connect() as c:
                 res = c.execute(
                     text("select * from dialplan where dpid={0}".format(d))
