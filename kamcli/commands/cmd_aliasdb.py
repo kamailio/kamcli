@@ -166,8 +166,9 @@ def aliasdb_show(ctx, oformat, ostyle, table, matchalias, userid):
     if not userid:
         ctx.vlog("Showing all records")
         e = create_engine(ctx.gconfig.get("db", "rwurl"))
-        res = e.execute(text("select * from {0}".format(table)))
-        ioutils_dbres_print(ctx, oformat, ostyle, res)
+        with e.connect() as c:
+            res = c.execute(text("select * from {0}".format(table)))
+            ioutils_dbres_print(ctx, oformat, ostyle, res)
     else:
         for u in userid:
             udata = parse_user_spec(ctx, u)
@@ -202,5 +203,5 @@ def aliasdb_show(ctx, oformat, ostyle, table, matchalias, userid):
                     )
                 )
             with e.connect() as c:
-                c.execute(text(sqltext))
+                res = c.execute(text(sqltext))
             ioutils_dbres_print(ctx, oformat, ostyle, res)
