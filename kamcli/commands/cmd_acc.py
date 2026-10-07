@@ -39,7 +39,7 @@ def acc_acc_struct_update(ctx):
     ctx.vlog("Run statements to update acc table structure")
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     with e.connect() as c:
-        acc_acc_struct_update_exec(ctx, e)
+        acc_acc_struct_update_exec(ctx, c)
         c.commit()
 
 
