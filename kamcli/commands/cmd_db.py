@@ -897,8 +897,13 @@ def db_create_tables_group(ctx, scriptsdirectory, gname):
 @pass_context
 def db_create_table_like(ctx, newname, oldname):
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
+    sqlquery = "CREATE TABLE {0} LIKE {1}".format(newname, oldname)
+    if ctx.gconfig.get("db", "type") == "postgresql":
+        sqlquery = "CREATE TABLE {0} (LIKE {1} INCLUDING ALL)".format(
+            newname, oldname
+        )
     with e.connect() as c:
-        c.execute(text("CREATE TABLE {0} LIKE {1}".format(newname, oldname)))
+        c.execute(text(sqlquery))
         c.commit()
 
 
