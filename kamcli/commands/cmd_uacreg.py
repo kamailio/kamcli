@@ -123,7 +123,7 @@ def uacreg_add(
 @click.argument("l_uuid", metavar="<l_uuid>")
 @click.argument("auth_password", metavar="<auth_password>")
 @pass_context
-def uacreg_passwd(ctx, realm, authha1, l_uuid, auth_password):
+def uacreg_passwd(ctx, authha1, l_uuid, auth_password):
     """Set password for a remote registration account
 
     \b
