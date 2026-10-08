@@ -117,7 +117,7 @@ cmd_folder = os.path.abspath(
 )
 
 
-class KamCLI(click.MultiCommand):
+class KamCLI(click.Group):
     def list_commands(self, ctx):
         rv = []
         for filename in os.listdir(cmd_folder):
