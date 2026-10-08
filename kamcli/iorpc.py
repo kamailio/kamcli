@@ -116,7 +116,7 @@ def command_ctl_response_print(response, oformat):
                 )
             )
     else:
-        print(response)
+        print(response.decode())
 
 
 def command_ctl_response(ctx, response, oformat, cbexec={}):
