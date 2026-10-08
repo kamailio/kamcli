@@ -348,7 +348,7 @@ def command_jsonrpc_socket(
             ctx.log("Timeout receiving response on udp socket")
             sys.exit()
         except socket.error as emsg:
-            ctx.log("Error udp sock: " + str(emsg[0]) + " - " + emsg[1])
+            ctx.log("Error udp sock: %s - %s", emsg.errno, emsg.strerror)
             sys.exit()
     elif srvaddr.startswith("tcp:"):
         ctx.vlog("tcp socket provided: " + srvaddr)
@@ -381,7 +381,7 @@ def command_jsonrpc_socket(
             ctx.log("Timeout receiving response on tcp socket")
             sys.exit()
         except socket.error as emsg:
-            ctx.log("Error tcp sock: " + str(emsg[0]) + " - " + emsg[1])
+            ctx.log("Error tcp sock: %s - %s", emsg.errno, emsg.strerror)
             sys.exit()
     else:
         ctx.vlog("unix socket provided: " + srvaddr)
@@ -422,7 +422,7 @@ def command_jsonrpc_socket(
             os.remove(rcvaddr)
             sys.exit()
         except socket.error as emsg:
-            ctx.log("Error unix sock: " + str(emsg[0]) + " - " + emsg[1])
+            ctx.log("Error unix sock: %s - %s", emsg.errno, emsg.strerror)
             sockclient.close()
             os.remove(rcvaddr)
             sys.exit()
