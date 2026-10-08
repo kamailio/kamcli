@@ -212,7 +212,7 @@ class ClickCompleter(Completer):
                             Completion(str(choice), -len(incomplete))
                         )
 
-        if isinstance(ctx.command, click.MultiCommand):
+        if isinstance(ctx.command, click.Group):
             for name in ctx.command.list_commands(ctx):
                 command = ctx.command.get_command(ctx, name)
                 choices.append(
