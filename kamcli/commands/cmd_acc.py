@@ -171,7 +171,8 @@ def acc_cdrs_table_create(ctx):
       UNIQUE KEY `uk_cft` (`sip_call_id`,`sip_from_tag`,`sip_to_tag`)
       );
     """
-    if ctx.gconfig.get("db", "type") == "postgresql":
+    dbtype = ctx.gconfig.get("db", "type")
+    if dbtype in ("postgresql", "sqlite"):
         sqltext = """
       CREATE TABLE IF NOT EXISTS cdrs (
       cdr_id BIGSERIAL PRIMARY KEY NOT NULL,
@@ -193,6 +194,8 @@ def acc_cdrs_table_create(ctx):
       CONSTRAINT cdrs_uk_cft UNIQUE (sip_call_id, sip_from_tag, sip_to_tag)
       );
     """
+        if dbtype == "sqlite":
+            sqltext = sqltext.replace("BIGSERIAL", "INTEGER")
     with e.connect() as c:
         c.execute(text(sqltext))
         c.commit()
@@ -317,7 +320,8 @@ def acc_rates_table_create(ctx):
       UNIQUE KEY `uk_rp` (`rate_group`,`prefix`)
       );
     """
-    if ctx.gconfig.get("db", "type") == "postgresql":
+    dbtype = ctx.gconfig.get("db", "type")
+    if dbtype in ("postgresql", "sqlite"):
         sqltext = """
       CREATE TABLE IF NOT EXISTS billing_rates (
       rate_id BIGSERIAL PRIMARY KEY NOT NULL,
@@ -328,6 +332,8 @@ def acc_rates_table_create(ctx):
       CONSTRAINT billing_rates_uk_rp UNIQUE (rate_group, prefix)
       );
     """
+        if dbtype == "sqlite":
+            sqltext = sqltext.replace("BIGSERIAL", "INTEGER")
     with e.connect() as c:
         c.execute(text(sqltext))
         c.commit()
