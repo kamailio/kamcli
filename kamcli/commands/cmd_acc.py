@@ -4,6 +4,7 @@ from kamcli.ioutils import ioutils_dbres_print
 from kamcli.ioutils import ioutils_dict_print
 from sqlalchemy.sql import text
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import OperationalError
 from kamcli.cli import pass_context
 from kamcli.dbutils import dbutils_exec_sqltext
 
@@ -225,8 +226,13 @@ def acc_cdrs_proc_create(ctx):
       END
     """
     with e.connect() as c:
-        c.execute(text(sqltext))
-        c.commit()
+        try:
+            c.execute(text(sqltext))
+            c.commit()
+        except OperationalError as ex:
+            if ex.orig.args[0] != 1304:
+                raise
+            ctx.log("stored procedure [kamailio_cdrs] already exists")
 
 
 @cli.command(
@@ -530,8 +536,13 @@ def acc_rates_proc_create(ctx):
         END
     """
     with e.connect() as c:
-        c.execute(text(sqltext))
-        c.commit()
+        try:
+            c.execute(text(sqltext))
+            c.commit()
+        except OperationalError as ex:
+            if ex.orig.args[0] != 1304:
+                raise
+            ctx.log("stored procedure [kamailio_rating] already exists")
 
 
 @cli.command(
