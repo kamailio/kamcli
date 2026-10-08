@@ -36,7 +36,7 @@ def cli(ctx, nowait, furi, uri):
         + lfrom
         + ">\r\nTo: <"
         + uri
-        + ">\r\n Contact: <"
+        + ">\r\nContact: <"
         + lfrom
         + ">\r\n",
     ]
