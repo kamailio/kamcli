@@ -5,6 +5,7 @@ from kamcli.ioutils import ioutils_dict_print
 from sqlalchemy.sql import text
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.exc import OperationalError
+from sqlalchemy.exc import ProgrammingError
 from kamcli.cli import pass_context
 from kamcli.dbutils import dbutils_exec_sqltext
 
@@ -170,6 +171,28 @@ def acc_cdrs_table_create(ctx):
       UNIQUE KEY `uk_cft` (`sip_call_id`,`sip_from_tag`,`sip_to_tag`)
       );
     """
+    if ctx.gconfig.get("db", "type") == "postgresql":
+        sqltext = """
+      CREATE TABLE IF NOT EXISTS cdrs (
+      cdr_id BIGSERIAL PRIMARY KEY NOT NULL,
+      src_username VARCHAR(64) DEFAULT '' NOT NULL,
+      src_domain VARCHAR(128) DEFAULT '' NOT NULL,
+      dst_username VARCHAR(64) DEFAULT '' NOT NULL,
+      dst_domain VARCHAR(128) DEFAULT '' NOT NULL,
+      dst_ousername VARCHAR(64) DEFAULT '' NOT NULL,
+      call_start_time TIMESTAMP WITHOUT TIME ZONE
+          DEFAULT '2000-01-01 00:00:00' NOT NULL,
+      duration INTEGER DEFAULT 0 NOT NULL,
+      sip_call_id VARCHAR(128) DEFAULT '' NOT NULL,
+      sip_from_tag VARCHAR(128) DEFAULT '' NOT NULL,
+      sip_to_tag VARCHAR(128) DEFAULT '' NOT NULL,
+      src_ip VARCHAR(64) DEFAULT '' NOT NULL,
+      cost INTEGER DEFAULT 0 NOT NULL,
+      rated INTEGER DEFAULT 0 NOT NULL,
+      created TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+      CONSTRAINT cdrs_uk_cft UNIQUE (sip_call_id, sip_from_tag, sip_to_tag)
+      );
+    """
     with e.connect() as c:
         c.execute(text(sqltext))
         c.commit()
@@ -225,12 +248,51 @@ def acc_cdrs_proc_create(ctx):
         UNTIL done END REPEAT;
       END
     """
+    if ctx.gconfig.get("db", "type") == "postgresql":
+        sqltext = """
+      CREATE PROCEDURE kamailio_cdrs()
+      LANGUAGE plpgsql
+      AS $$
+      DECLARE
+        inv RECORD;
+        v_bye_time TIMESTAMP WITHOUT TIME ZONE;
+        v_cdr_id BIGINT;
+      BEGIN
+        FOR inv IN SELECT src_user, src_domain, dst_user, dst_domain,
+            dst_ouser, time, callid, from_tag, to_tag, src_ip
+            FROM acc WHERE method='INVITE' AND cdr_id=0
+        LOOP
+          SELECT time INTO v_bye_time FROM acc WHERE
+              method='BYE' AND callid=inv.callid AND ((from_tag=inv.from_tag
+              AND to_tag=inv.to_tag)
+              OR (from_tag=inv.to_tag AND to_tag=inv.from_tag))
+              ORDER BY time ASC LIMIT 1;
+          IF FOUND THEN
+            INSERT INTO cdrs (src_username, src_domain, dst_username,
+                dst_domain, dst_ousername, call_start_time, duration,
+                sip_call_id, sip_from_tag, sip_to_tag, src_ip, created)
+                VALUES (inv.src_user, inv.src_domain, inv.dst_user,
+                inv.dst_domain, inv.dst_ouser, inv.time,
+                CAST(EXTRACT(EPOCH FROM (v_bye_time - inv.time)) AS INTEGER),
+                inv.callid, inv.from_tag, inv.to_tag, inv.src_ip, NOW())
+                RETURNING cdr_id INTO v_cdr_id;
+            UPDATE acc SET cdr_id=v_cdr_id WHERE callid=inv.callid
+                AND from_tag=inv.from_tag AND to_tag=inv.to_tag;
+          END IF;
+        END LOOP;
+      END
+      $$
+    """
     with e.connect() as c:
         try:
             c.execute(text(sqltext))
             c.commit()
         except OperationalError as ex:
             if ex.orig.args[0] != 1304:
+                raise
+            ctx.log("stored procedure [kamailio_cdrs] already exists")
+        except ProgrammingError as ex:
+            if getattr(ex.orig, "pgcode", None) != "42723":
                 raise
             ctx.log("stored procedure [kamailio_cdrs] already exists")
 
@@ -253,6 +315,17 @@ def acc_rates_table_create(ctx):
       `time_unit` integer NOT NULL default '60',
       PRIMARY KEY  (`rate_id`),
       UNIQUE KEY `uk_rp` (`rate_group`,`prefix`)
+      );
+    """
+    if ctx.gconfig.get("db", "type") == "postgresql":
+        sqltext = """
+      CREATE TABLE IF NOT EXISTS billing_rates (
+      rate_id BIGSERIAL PRIMARY KEY NOT NULL,
+      rate_group VARCHAR(64) DEFAULT 'default' NOT NULL,
+      prefix VARCHAR(64) DEFAULT '' NOT NULL,
+      rate_unit INTEGER DEFAULT 0 NOT NULL,
+      time_unit INTEGER DEFAULT 60 NOT NULL,
+      CONSTRAINT billing_rates_uk_rp UNIQUE (rate_group, prefix)
       );
     """
     with e.connect() as c:
@@ -533,12 +606,41 @@ def acc_rates_proc_create(ctx):
         UNTIL done END REPEAT;
         END
     """
+    if ctx.gconfig.get("db", "type") == "postgresql":
+        sqltext = """
+        CREATE PROCEDURE kamailio_rating(rgroup VARCHAR(64))
+        LANGUAGE plpgsql
+        AS $$
+        DECLARE
+          cdr RECORD;
+          rate RECORD;
+        BEGIN
+          FOR cdr IN SELECT cdr_id, dst_username, duration
+              FROM cdrs WHERE rated=0
+          LOOP
+            SELECT rate_unit, time_unit INTO rate
+                FROM billing_rates
+                WHERE rate_group=rgroup AND cdr.dst_username LIKE prefix || '%'
+                ORDER BY prefix DESC LIMIT 1;
+            IF FOUND THEN
+              UPDATE cdrs SET rated=1, cost=rate.rate_unit
+                  * CEIL(CAST(cdr.duration AS NUMERIC) / rate.time_unit)
+                  WHERE cdr_id=cdr.cdr_id;
+            END IF;
+          END LOOP;
+        END
+        $$
+    """
     with e.connect() as c:
         try:
             c.execute(text(sqltext))
             c.commit()
         except OperationalError as ex:
             if ex.orig.args[0] != 1304:
+                raise
+            ctx.log("stored procedure [kamailio_rating] already exists")
+        except ProgrammingError as ex:
+            if getattr(ex.orig, "pgcode", None) != "42723":
                 raise
             ctx.log("stored procedure [kamailio_rating] already exists")
 
