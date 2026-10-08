@@ -427,9 +427,16 @@ def cli(ctx, nohistory, nosyntax, noconnect, norpcautocomplete):
             "shell", "norpcautocomplete", fallback=False
         )
 
+    kcmd = sys.argv[0]
+    rparams = click.get_current_context().find_root().params
+    if rparams.get("nodefaultconfigs"):
+        kcmd += " -n"
+    if rparams.get("config"):
+        kcmd += " -c " + shlex.quote(rparams["config"])
+
     if not noconnect:
         proc = subprocess.Popen(
-            sys.argv[0] + " -F json rpc --no-log core.version",
+            kcmd + " -F json rpc --no-log core.version",
             stdout=subprocess.PIPE,
             shell=True,
         )
@@ -440,7 +447,7 @@ def cli(ctx, nohistory, nosyntax, noconnect, norpcautocomplete):
             click.echo("(info) connected to: " + jdata["result"])
 
             proc = subprocess.Popen(
-                sys.argv[0] + " -F json rpc --no-log core.uptime",
+                kcmd + " -F json rpc --no-log core.uptime",
                 stdout=subprocess.PIPE,
                 shell=True,
             )
@@ -463,7 +470,7 @@ def cli(ctx, nohistory, nosyntax, noconnect, norpcautocomplete):
 
             if not norpcautocomplete:
                 proc = subprocess.Popen(
-                    sys.argv[0] + " -F json rpc --no-log system.listMethods",
+                    kcmd + " -F json rpc --no-log system.listMethods",
                     stdout=subprocess.PIPE,
                     shell=True,
                 )
