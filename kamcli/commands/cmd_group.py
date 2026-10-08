@@ -70,15 +70,19 @@ def group_revoke(ctx, userid, groupid):
                 udata["domain"],
             )
         )
+        with e.connect() as c:
+            c.execute(text(sqlquery))
+            c.commit()
     else:
-        sqlquery = "delete from grp where username={0!r} and domain={1!r} and grp={2!r}".format(
-            udata["username"],
-            udata["domain"],
-            groupid,
-        )
-    with e.connect() as c:
-        c.execute(text(sqlquery))
-        c.commit()
+        with e.connect() as c:
+            for g in groupid:
+                sqlquery = "delete from grp where username={0!r} and domain={1!r} and grp={2!r}".format(
+                    udata["username"],
+                    udata["domain"],
+                    g,
+                )
+                c.execute(text(sqlquery))
+            c.commit()
 
 
 @cli.command("show", short_help="Show group membership details")
