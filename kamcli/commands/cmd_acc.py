@@ -1,4 +1,5 @@
 import click
+import math
 from sqlalchemy import create_engine
 from kamcli.ioutils import ioutils_dbres_print
 from kamcli.ioutils import ioutils_dict_print
@@ -211,6 +212,9 @@ def acc_cdrs_proc_create(ctx):
     ctx.vlog(
         "Run SQL statements to create the stored procedure to generate cdrs"
     )
+    if ctx.gconfig.get("db", "type") == "sqlite":
+        ctx.log("no stored procedure needed for sqlite")
+        return
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     sqltext = """
       CREATE PROCEDURE `kamailio_cdrs`()
@@ -431,6 +435,53 @@ def acc_mc_list(ctx, oformat, ostyle, limit):
     ioutils_dbres_print(ctx, oformat, ostyle, res)
 
 
+def acc_cdrs_generate_sqlite(ctx, c):
+    """Generate CDRS without stored procedure (not supported by sqlite)"""
+    invites = (
+        c.execute(
+            text(
+                "SELECT src_user, src_domain, dst_user, dst_domain, dst_ouser, "
+                "time, callid, from_tag, to_tag, src_ip FROM acc "
+                "WHERE method='INVITE' AND cdr_id=0"
+            )
+        )
+        .mappings()
+        .all()
+    )
+    for inv in invites:
+        bye = c.execute(
+            text(
+                "SELECT time FROM acc WHERE method='BYE' AND callid=:callid "
+                "AND ((from_tag=:from_tag AND to_tag=:to_tag) "
+                "OR (from_tag=:to_tag AND to_tag=:from_tag)) "
+                "ORDER BY time ASC LIMIT 1"
+            ),
+            dict(inv),
+        ).first()
+        if bye is None:
+            continue
+        res = c.execute(
+            text(
+                "INSERT INTO cdrs (src_username, src_domain, dst_username, "
+                "dst_domain, dst_ousername, call_start_time, duration, "
+                "sip_call_id, sip_from_tag, sip_to_tag, src_ip, created) "
+                "VALUES (:src_user, :src_domain, :dst_user, :dst_domain, "
+                ":dst_ouser, :time, "
+                "strftime('%s', :bye_time) - strftime('%s', :time), "
+                ":callid, :from_tag, :to_tag, :src_ip, "
+                "datetime('now', 'localtime'))"
+            ),
+            dict(inv, bye_time=bye[0]),
+        )
+        c.execute(
+            text(
+                "UPDATE acc SET cdr_id=:cdr_id WHERE callid=:callid "
+                "AND from_tag=:from_tag AND to_tag=:to_tag"
+            ),
+            dict(inv, cdr_id=res.lastrowid),
+        )
+
+
 @cli.command(
     "cdrs-generate",
     short_help="Run SQL stored procedure to generate CDRS",
@@ -442,7 +493,10 @@ def acc_cdrs_generate(ctx):
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     with e.connect() as c:
         t = c.begin()
-        c.execute(text("call kamailio_cdrs()"))
+        if ctx.gconfig.get("db", "type") == "sqlite":
+            acc_cdrs_generate_sqlite(ctx, c)
+        else:
+            c.execute(text("call kamailio_cdrs()"))
         t.commit()
 
 
@@ -583,6 +637,9 @@ def acc_rates_rm(ctx, dbtname, rate_group, prefix):
 def acc_rates_proc_create(ctx):
     """Run SQL statements to create the stored procedure to rate cdrs"""
     ctx.vlog("Run SQL statements to create the stored procedure to rate cdrs")
+    if ctx.gconfig.get("db", "type") == "sqlite":
+        ctx.log("no stored procedure needed for sqlite")
+        return
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     sqltext = """
         CREATE PROCEDURE `kamailio_rating`(`rgroup` varchar(64))
@@ -651,6 +708,34 @@ def acc_rates_proc_create(ctx):
             ctx.log("stored procedure [kamailio_rating] already exists")
 
 
+def acc_rates_generate_sqlite(ctx, c, rgroup):
+    """Rate the CDRS without stored procedure (not supported by sqlite)"""
+    cdrs = (
+        c.execute(
+            text(
+                "SELECT cdr_id, dst_username, duration FROM cdrs WHERE rated=0"
+            )
+        )
+        .mappings()
+        .all()
+    )
+    for cdr in cdrs:
+        rate = c.execute(
+            text(
+                "SELECT rate_unit, time_unit FROM billing_rates "
+                "WHERE rate_group=:rgroup AND :dst_username LIKE prefix || '%' "
+                "ORDER BY prefix DESC LIMIT 1"
+            ),
+            dict(cdr, rgroup=rgroup),
+        ).first()
+        if rate is None:
+            continue
+        c.execute(
+            text("UPDATE cdrs SET rated=1, cost=:cost WHERE cdr_id=:cdr_id"),
+            dict(cdr, cost=rate[0] * math.ceil(cdr["duration"] / rate[1])),
+        )
+
+
 @cli.command(
     "rates-generate",
     short_help="Run SQL stored procedure to rate the CDRS and generate the costs",
@@ -670,7 +755,10 @@ def acc_rates_generate(ctx, rate_group):
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     with e.connect() as c:
         t = c.begin()
-        if not rate_group:
+        if ctx.gconfig.get("db", "type") == "sqlite":
+            for rg in rate_group or ("default",):
+                acc_rates_generate_sqlite(ctx, c, rg)
+        elif not rate_group:
             c.execute(text("call kamailio_rating('default')"))
         else:
             for rg in rate_group:
