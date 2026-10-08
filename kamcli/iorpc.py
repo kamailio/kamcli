@@ -172,7 +172,9 @@ class IOFifoThread(threading.Thread):
         if rcount == 0:
             self.ctx.vlog("timeout - nothing read")
         else:
-            command_ctl_response(self.ctx, rdata, self.oformat, self.cbexec)
+            command_ctl_response(
+                self.ctx, rdata.encode(), self.oformat, self.cbexec
+            )
 
 
 ##
@@ -241,7 +243,7 @@ def command_jsonrpc_fifo(
     except NoOptionError:
         pass
     # create new thread to read from reply fifo
-    tiofifo = IOFifoThread(ctx, rcvpath, oformat)
+    tiofifo = IOFifoThread(ctx, rcvpath, oformat, cbexec)
     # start new threadd
     tiofifo.start()
 
