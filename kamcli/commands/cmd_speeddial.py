@@ -94,7 +94,7 @@ def speeddial_add(
                 uri,
                 fname,
                 lname,
-                desc,
+                " ".join(desc),
             )
         )
     with e.connect() as c:
