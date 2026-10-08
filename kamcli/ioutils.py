@@ -52,7 +52,7 @@ def ioutils_dbres_print(ctx, oformat, ostyle, res):
         jdata = []
         for row in res.mappings():
             jdata.append(dict(row))
-        print(json.dumps(jdata, indent=4))
+        print(json.dumps(jdata, indent=4, default=str))
         print()
     elif oformat == "yaml":
         ydata = []
