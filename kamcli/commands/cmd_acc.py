@@ -665,7 +665,7 @@ def acc_rates_generate(ctx, rate_group):
     with e.connect() as c:
         t = c.begin()
         if not rate_group:
-            c.execute(text('call kamailio_rating("default")'))
+            c.execute(text("call kamailio_rating('default')"))
         else:
             for rg in rate_group:
                 c.execute(text("call kamailio_rating({0!r})".format(rg)))
