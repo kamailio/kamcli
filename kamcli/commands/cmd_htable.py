@@ -85,7 +85,7 @@ def htable_seti(ctx, htname, itname, ival):
 @cli.command("setex", short_help="Set expire for $sht(htname=>itname)")
 @click.argument("htname", metavar="<htname>")
 @click.argument("itname", metavar="<itname>")
-@click.argument("ival", metavar="<exval>", type=int)
+@click.argument("exval", metavar="<exval>", type=int)
 @pass_context
 def htable_setex(ctx, htname, itname, exval):
     """Set expire for $sht(htname=>itname)
