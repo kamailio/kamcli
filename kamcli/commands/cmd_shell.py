@@ -26,7 +26,6 @@
 
 
 import click
-import click._bashcomplete
 import click.parser
 from kamcli.cli import pass_context
 from kamcli.iorpc import command_ctl
@@ -49,6 +48,15 @@ import subprocess
 SHELL_COMMAND_REMAP = {}
 
 _ksr_rpc_commands = []
+
+try:
+    from click._bashcomplete import resolve_ctx
+except ImportError:
+    # click >= 8.0
+    from click.shell_completion import _resolve_context
+
+    def resolve_ctx(cli, prog_name, args):
+        return _resolve_context(cli, {}, prog_name, args)
 
 
 class InternalCommandException(Exception):
@@ -175,7 +183,7 @@ class ClickCompleter(Completer):
             # command, so give all relevant completions for this context.
             incomplete = ""
 
-        ctx = click._bashcomplete.resolve_ctx(self.cli, "", args)
+        ctx = resolve_ctx(self.cli, "", args)
         if ctx is None:
             return
 
@@ -204,7 +212,7 @@ class ClickCompleter(Completer):
                             Completion(str(choice), -len(incomplete))
                         )
 
-        if isinstance(ctx.command, click.MultiCommand):
+        if isinstance(ctx.command, click.Group):
             for name in ctx.command.list_commands(ctx):
                 command = ctx.command.get_command(ctx, name)
                 choices.append(
@@ -419,9 +427,16 @@ def cli(ctx, nohistory, nosyntax, noconnect, norpcautocomplete):
             "shell", "norpcautocomplete", fallback=False
         )
 
+    kcmd = sys.argv[0]
+    rparams = click.get_current_context().find_root().params
+    if rparams.get("nodefaultconfigs"):
+        kcmd += " -n"
+    if rparams.get("config"):
+        kcmd += " -c " + shlex.quote(rparams["config"])
+
     if not noconnect:
         proc = subprocess.Popen(
-            sys.argv[0] + " -F json rpc --no-log core.version",
+            kcmd + " -F json rpc --no-log core.version",
             stdout=subprocess.PIPE,
             shell=True,
         )
@@ -432,7 +447,7 @@ def cli(ctx, nohistory, nosyntax, noconnect, norpcautocomplete):
             click.echo("(info) connected to: " + jdata["result"])
 
             proc = subprocess.Popen(
-                sys.argv[0] + " -F json rpc --no-log core.uptime",
+                kcmd + " -F json rpc --no-log core.uptime",
                 stdout=subprocess.PIPE,
                 shell=True,
             )
@@ -455,7 +470,7 @@ def cli(ctx, nohistory, nosyntax, noconnect, norpcautocomplete):
 
             if not norpcautocomplete:
                 proc = subprocess.Popen(
-                    sys.argv[0] + " -F json rpc --no-log system.listMethods",
+                    kcmd + " -F json rpc --no-log system.listMethods",
                     stdout=subprocess.PIPE,
                     shell=True,
                 )

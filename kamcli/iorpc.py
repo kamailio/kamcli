@@ -116,7 +116,7 @@ def command_ctl_response_print(response, oformat):
                 )
             )
     else:
-        print(response)
+        print(response.decode())
 
 
 def command_ctl_response(ctx, response, oformat, cbexec={}):
@@ -152,7 +152,11 @@ class IOFifoThread(threading.Thread):
         wcount = 0
         rdata = ""
         while not self.stop_signal:
-            rbuf = os.read(r, 4096).decode()
+            try:
+                rbuf = os.read(r, 4096).decode()
+            except BlockingIOError:
+                # writer opened the fifo but did not write yet
+                rbuf = ""
             if rbuf == "":
                 if rcount != 0:
                     wcount += 1
@@ -172,7 +176,9 @@ class IOFifoThread(threading.Thread):
         if rcount == 0:
             self.ctx.vlog("timeout - nothing read")
         else:
-            command_ctl_response(self.ctx, rdata, self.oformat, self.cbexec)
+            command_ctl_response(
+                self.ctx, rdata.encode(), self.oformat, self.cbexec
+            )
 
 
 ##
@@ -241,7 +247,7 @@ def command_jsonrpc_fifo(
     except NoOptionError:
         pass
     # create new thread to read from reply fifo
-    tiofifo = IOFifoThread(ctx, rcvpath, oformat)
+    tiofifo = IOFifoThread(ctx, rcvpath, oformat, cbexec)
     # start new threadd
     tiofifo.start()
 
@@ -348,7 +354,7 @@ def command_jsonrpc_socket(
             ctx.log("Timeout receiving response on udp socket")
             sys.exit()
         except socket.error as emsg:
-            ctx.log("Error udp sock: " + str(emsg[0]) + " - " + emsg[1])
+            ctx.log("Error udp sock: %s - %s", emsg.errno, emsg.strerror)
             sys.exit()
     elif srvaddr.startswith("tcp:"):
         ctx.vlog("tcp socket provided: " + srvaddr)
@@ -381,7 +387,7 @@ def command_jsonrpc_socket(
             ctx.log("Timeout receiving response on tcp socket")
             sys.exit()
         except socket.error as emsg:
-            ctx.log("Error tcp sock: " + str(emsg[0]) + " - " + emsg[1])
+            ctx.log("Error tcp sock: %s - %s", emsg.errno, emsg.strerror)
             sys.exit()
     else:
         ctx.vlog("unix socket provided: " + srvaddr)
@@ -422,7 +428,7 @@ def command_jsonrpc_socket(
             os.remove(rcvaddr)
             sys.exit()
         except socket.error as emsg:
-            ctx.log("Error unix sock: " + str(emsg[0]) + " - " + emsg[1])
+            ctx.log("Error unix sock: %s - %s", emsg.errno, emsg.strerror)
             sockclient.close()
             os.remove(rcvaddr)
             sys.exit()
