@@ -68,7 +68,7 @@ def ioutils_dbres_print(ctx, oformat, ostyle, res):
     elif oformat == "table":
         arows = res.fetchall()
         dcols = dict((k, k) for k in res.keys())
-        drows = [dict(r) for r in arows]
+        drows = [dict(r._mapping) for r in arows]
         gstring = tabulate(drows, headers=dcols, tablefmt=ostyle)
         print(gstring)
     else:
