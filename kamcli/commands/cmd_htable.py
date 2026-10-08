@@ -213,7 +213,7 @@ def htable_store(ctx, htname):
     Parameters:
         <htname> - the name of hash table
     """
-    command_ctl(ctx, "htable.stored", [htname])
+    command_ctl(ctx, "htable.store", [htname])
 
 
 @cli.command(
