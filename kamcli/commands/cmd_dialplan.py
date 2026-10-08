@@ -111,7 +111,7 @@ def dialplan_rm(ctx, dpid, matchexp):
         else:
             for m in matchexp:
                 sqlquery = "delete from dialplan where dpid={0} and match_exp={1!r}".format(
-                    dpid, matchexp.encode("ascii", "ignore").decode()
+                    dpid, m.encode("ascii", "ignore").decode()
                 )
                 c.execute(text(sqlquery))
         c.commit()
