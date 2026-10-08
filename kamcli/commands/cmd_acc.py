@@ -830,6 +830,10 @@ def acc_report(ctx, oformat, ostyle, limit, interval, name):
     if ctx.gconfig.get("db", "type") == "postgresql":
         qchar = '"'
         sqlinterval = " WHERE NOW() - INTERVAL '{0} hour' <= time"
+    elif ctx.gconfig.get("db", "type") == "sqlite":
+        sqlinterval = (
+            " WHERE datetime('now', 'localtime', '-{0} hours') <= time"
+        )
 
     query = "SELECT {0}{1}{0}, count(*) AS {0}count{0} FROM acc".format(
         qchar, qfield
@@ -899,6 +903,11 @@ def acc_method_stats(ctx, oformat, ostyle, limit, interval):
     if ctx.gconfig.get("db", "type") == "postgresql":
         query = "SELECT method, sip_code, time, EXTRACT(EPOCH FROM time) as tstamp FROM acc"
         sqlinterval = " WHERE NOW() - INTERVAL '{0} hour' <= time"
+    elif ctx.gconfig.get("db", "type") == "sqlite":
+        query = "SELECT method, sip_code, time, strftime('%s', time) as tstamp FROM acc"
+        sqlinterval = (
+            " WHERE datetime('now', 'localtime', '-{0} hours') <= time"
+        )
 
     if interval > 0:
         query = query + sqlinterval.format(interval)
