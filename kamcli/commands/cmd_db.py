@@ -484,6 +484,23 @@ def db_create_postgresql(
                 )
                 c.execute(text(sqlquery))
         c.commit()
+    ea = create_engine(
+        "{0}+{1}://{2}:{3}@{4}/{5}".format(
+            ctx.gconfig.get("db", "type"),
+            ctx.gconfig.get("db", "driver"),
+            ctx.gconfig.get("db", "adminuser"),
+            ctx.gconfig.get("db", "adminpassword"),
+            ctx.gconfig.get("db", "host"),
+            ldbname,
+        )
+    )
+    with ea.connect() as c:
+        if not nogrants:
+            sqlquery = "GRANT ALL ON SCHEMA public TO {0};".format(
+                ctx.gconfig.get("db", "rwuser"),
+            )
+            c.execute(text(sqlquery))
+        c.commit()
     e = create_engine(
         "{0}+{1}://{2}:{3}@{4}/{5}".format(
             ctx.gconfig.get("db", "type"),
@@ -510,11 +527,13 @@ def db_create_postgresql(
                 ctx.gconfig.get("db", "rwuser"),
             )
             c.execute(text(sqlquery))
+        c.commit()
+    with ea.connect() as c:
+        if not nogrants:
             if ctx.gconfig.get("db", "rwuser") != ctx.gconfig.get(
                 "db", "rouser"
             ):
-                sqlquery = "GRANT SELECT ON DATABASE {0} TO {1};".format(
-                    ldbname,
+                sqlquery = "GRANT SELECT ON ALL TABLES IN SCHEMA public TO {0};".format(
                     ctx.gconfig.get("db", "rouser"),
                 )
                 c.execute(text(sqlquery))
