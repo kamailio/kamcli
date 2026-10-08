@@ -486,12 +486,10 @@ def acc_rates_rm(ctx, dbtname, rate_group, prefix):
     v_rate_group = rate_group.encode("ascii", "ignore").decode()
     v_prefix = prefix.encode("ascii", "ignore").decode()
 
-    sqltext = (
-        "delete from {0} where rate_group=({1!r} and prefix={2!r}".format(
-            v_dbtname,
-            v_rate_group,
-            v_prefix,
-        )
+    sqltext = "delete from {0} where rate_group={1!r} and prefix={2!r}".format(
+        v_dbtname,
+        v_rate_group,
+        v_prefix,
     )
     with e.connect() as c:
         c.execute(text(sqltext))
