@@ -731,17 +731,22 @@ def acc_report(ctx, oformat, ostyle, limit, interval, name):
     elif name == "top-srcip":
         qfield = "src_ip"
 
-    query = "SELECT `" + qfield + "`, count(*) AS `count` FROM acc"
+    qchar = "`"
+    sqlinterval = " WHERE DATE_SUB(NOW(), INTERVAL {0} HOUR) <= time"
+    if ctx.gconfig.get("db", "type") == "postgresql":
+        qchar = '"'
+        sqlinterval = " WHERE NOW() - INTERVAL '{0} hour' <= time"
+
+    query = "SELECT {0}{1}{0}, count(*) AS {0}count{0} FROM acc".format(
+        qchar, qfield
+    )
 
     if interval > 0:
-        query = (
-            query
-            + " WHERE DATE_SUB(NOW(), INTERVAL {0} HOUR) <= time".format(
-                interval
-            )
-        )
+        query = query + sqlinterval.format(interval)
 
-    query = query + " GROUP BY `" + qfield + "` ORDER BY count DESC"
+    query = query + " GROUP BY {0}{1}{0} ORDER BY count DESC".format(
+        qchar, qfield
+    )
 
     if limit > 0:
         query = query + " LIMIT {0}".format(limit)
@@ -796,14 +801,13 @@ def acc_method_stats(ctx, oformat, ostyle, limit, interval):
     ctx.vlog("Showing method statistics")
 
     query = "SELECT method, sip_code, time, UNIX_TIMESTAMP(time) as tstamp FROM acc"
+    sqlinterval = " WHERE DATE_SUB(NOW(), INTERVAL {0} HOUR) <= time"
+    if ctx.gconfig.get("db", "type") == "postgresql":
+        query = "SELECT method, sip_code, time, EXTRACT(EPOCH FROM time) as tstamp FROM acc"
+        sqlinterval = " WHERE NOW() - INTERVAL '{0} hour' <= time"
 
     if interval > 0:
-        query = (
-            query
-            + " WHERE DATE_SUB(NOW(), INTERVAL {0} HOUR) <= time".format(
-                interval
-            )
-        )
+        query = query + sqlinterval.format(interval)
 
     if limit > 0:
         query = query + " LIMIT {0}".format(limit)
