@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 import click
 from sqlalchemy import create_engine
@@ -889,6 +890,48 @@ def db_create_tables_group(ctx, scriptsdirectory, gname):
         c.commit()
 
 
+def db_create_table_like_sqlite(ctx, c, newname, oldname):
+    """Copy table and indexes definitions (sqlite has no CREATE TABLE LIKE)"""
+    res = c.execute(
+        text(
+            "SELECT type, name, sql FROM sqlite_master WHERE tbl_name=:tname "
+            "AND type IN ('table', 'index') AND sql IS NOT NULL "
+            "ORDER BY type DESC"
+        ),
+        {"tname": oldname},
+    )
+    rows = res.all()
+    if not rows:
+        ctx.log("table [%s] not found", oldname)
+        return
+    qname = r"[\"`\[]?{0}[\"`\]]?"
+    for otype, oname, osql in rows:
+        if otype == "table":
+            sqlquery = re.sub(
+                r"^CREATE TABLE\s+" + qname.format(re.escape(oldname)),
+                "CREATE TABLE " + newname,
+                osql,
+                count=1,
+                flags=re.IGNORECASE,
+            )
+        else:
+            if oname.startswith(oldname + "_"):
+                iname = newname + oname[len(oldname) :]
+            else:
+                iname = newname + "_" + oname
+            sqlquery = re.sub(
+                r"^CREATE (UNIQUE )?INDEX\s+"
+                + qname.format(re.escape(oname))
+                + r"\s+ON\s+"
+                + qname.format(re.escape(oldname)),
+                r"CREATE \1INDEX " + iname + " ON " + newname,
+                osql,
+                count=1,
+                flags=re.IGNORECASE,
+            )
+        c.execute(text(sqlquery))
+
+
 @cli.command(
     "create-table-like", short_help="Create a new table like another one"
 )
@@ -903,7 +946,10 @@ def db_create_table_like(ctx, newname, oldname):
             newname, oldname
         )
     with e.connect() as c:
-        c.execute(text(sqlquery))
+        if ctx.gconfig.get("db", "type") == "sqlite":
+            db_create_table_like_sqlite(ctx, c, newname, oldname)
+        else:
+            c.execute(text(sqlquery))
         c.commit()
 
 
