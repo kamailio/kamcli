@@ -149,7 +149,7 @@ def acc_cdrs_table_create(ctx):
     ctx.vlog("Run SQL statements to create cdrs table structure")
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     sqltext = """
-      CREATE TABLE `cdrs` (
+      CREATE TABLE IF NOT EXISTS `cdrs` (
       `cdr_id` bigint(20) NOT NULL auto_increment,
       `src_username` varchar(64) NOT NULL default '',
       `src_domain` varchar(128) NOT NULL default '',
@@ -239,7 +239,7 @@ def acc_rates_table_create(ctx):
     ctx.vlog("Run SQL statements to create billing_rates table structure")
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     sqltext = """
-      CREATE TABLE `billing_rates` (
+      CREATE TABLE IF NOT EXISTS `billing_rates` (
       `rate_id` bigint(20) NOT NULL auto_increment,
       `rate_group` varchar(64) NOT NULL default 'default',
       `prefix` varchar(64) NOT NULL default '',
