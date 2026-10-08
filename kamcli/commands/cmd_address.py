@@ -126,15 +126,18 @@ def address_showdb(ctx, oformat, ostyle, group):
         <group> - address group
     """
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
-    if not group:
-        ctx.vlog("Showing all address records")
-        sqltext = "select * from address"
-    else:
-        ctx.vlog("Showing address records for group")
-        sqltext = "select * from address where group={0}".format(group)
     with e.connect() as c:
-        res = c.execute(text(sqltext))
-    ioutils_dbres_print(ctx, oformat, ostyle, res)
+        if not group:
+            ctx.vlog("Showing all address records")
+            res = c.execute(text("select * from address"))
+            ioutils_dbres_print(ctx, oformat, ostyle, res)
+        else:
+            for g in group:
+                ctx.vlog("Showing address records for group")
+                res = c.execute(
+                    text("select * from address where grp={0}".format(g))
+                )
+                ioutils_dbres_print(ctx, oformat, ostyle, res)
 
 
 @cli.command("list", short_help="Show details for address records in memory")
