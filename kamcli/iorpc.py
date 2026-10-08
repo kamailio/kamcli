@@ -152,7 +152,11 @@ class IOFifoThread(threading.Thread):
         wcount = 0
         rdata = ""
         while not self.stop_signal:
-            rbuf = os.read(r, 4096).decode()
+            try:
+                rbuf = os.read(r, 4096).decode()
+            except BlockingIOError:
+                # writer opened the fifo but did not write yet
+                rbuf = ""
             if rbuf == "":
                 if rcount != 0:
                     wcount += 1
