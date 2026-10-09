@@ -10,7 +10,7 @@ Use 4 spaces for indentation.
 #### [pre-commit](https://pre-commit.com/) ####
 
 It is highly recommended to set the `pre-commit` git hook to get code identation and
-error detections using `black` and `flake8` tools before changes are committed.
+error detections using `ruff` tools before changes are committed.
 
 On a Debian/Ubuntu system, do:
 
