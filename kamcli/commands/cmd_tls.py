@@ -61,6 +61,23 @@ def tls_cfgprint(ctx, odir, cfgpath):
     \b
         [<cfgpath>] - config file path (optional)
     """
+
+    def print_field(r, key, _f="{0:s}={1:s}"):
+        if r[key] and r[key].strip():
+            print(_f.format(key, row[key]))
+
+    def print_field_decimal(r, key):
+        _f = "{0:s}={1:d}"
+        print(_f.format(key, row[key]))
+
+    def print_pemfile(r, key):
+        if r[key] and row[key].strip():
+            fpath = os.path.join(odir, key + "_" + str(row["id"]) + ".pem")
+            fout = open(fpath, "w")
+            fout.write(row[key])
+            fout.close()
+            print("{0}={1:s}".format(key, fpath))
+
     e = create_engine(ctx.gconfig.get("db", "rwurl"))
     ctx.vlog("Generating TLS config from database records")
     with e.connect() as c:
@@ -95,73 +112,27 @@ def tls_cfgprint(ctx, odir, cfgpath):
                 )
             )
 
-            if row["method"] and row["method"].strip():
-                print("method={0:s}".format(row["method"]))
-
-            print("verify_certificate={0:d}".format(row["verify_certificate"]))
-            print("verify_depth={0:d}".format(row["verify_depth"]))
-            print(
-                "require_certificate={0:d}".format(row["require_certificate"])
-            )
+            print_field(row, "method")
+            print_field_decimal(row, "verify_certificate")
+            print_field_decimal(row, "verify_depth")
+            print_field_decimal(row, "require_certificate")
 
             if row["file_type"] == 0:
-                if row["certificate"] and row["certificate"].strip():
-                    print("certificate={0:s}".format(row["certificate"]))
-
-                if row["private_key"] and row["private_key"].strip():
-                    print("private_key={0:s}".format(row["private_key"]))
-
-                if row["ca_list"] and row["ca_list"].strip():
-                    print("ca_list={0:s}".format(row["ca_list"]))
-
-                if row["crl"] and row["crl"].strip():
-                    print("crl={0:s}".format(row["crl"]))
+                print_field(row, "certificate")
+                print_field(row, "private_key")
+                print_field(row, "ca_list")
+                print_field(row, "crl")
             else:
-                if row["certificate"] and row["certificate"].strip():
-                    fpath = os.path.join(
-                        odir, "certificate_" + str(row["id"]) + ".pem"
-                    )
-                    fout = open(fpath, "w")
-                    fout.write(row["certificate"])
-                    fout.close()
-                    print("certificate={0:s}".format(fpath))
+                print_pemfile(row, "certificate")
+                print_pemfile(row, "private_key")
+                print_pemfile(row, "ca_list")
+                print_pemfile(row, "crl")
 
-                if row["private_key"] and row["private_key"].strip():
-                    fpath = os.path.join(
-                        odir, "private_key_" + str(row["id"]) + ".pem"
-                    )
-                    fout = open(fpath, "w")
-                    fout.write(row["private_key"])
-                    fout.close()
-                    print("private_key={0:s}".format(fpath))
-
-                if row["ca_list"] and row["ca_list"].strip():
-                    fpath = os.path.join(
-                        odir, "ca_list_" + str(row["id"]) + ".pem"
-                    )
-                    fout = open(fpath, "w")
-                    fout.write(row["ca_list"])
-                    fout.close()
-                    print("ca_list={0:s}".format(fpath))
-
-                if row["crl"] and row["crl"].strip():
-                    fpath = os.path.join(
-                        odir, "crl_" + str(row["id"]) + ".pem"
-                    )
-                    fout = open(fpath, "w")
-                    fout.write(row["crl"])
-                    fout.close()
-                    print("crl={0:s}".format(fpath))
-
-            if row["cipher_list"] and row["cipher_list"].strip():
-                print("cipher_list={0:s}".format(row["cipher_list"]))
-
+            print_field(row, "cipher_list")
             if row["server_name"] and row["server_name"].strip():
                 print("server_name={0:s}".format(row["server_name"]))
                 print("server_name_mode={0:d}".format(row["server_name_mode"]))
-
-            if row["server_id"] and row["server_id"].strip():
-                print("server_id={0:s}".format(row["server_id"]))
+            print_field(row, "server_id")
 
         pcount += 1
 
