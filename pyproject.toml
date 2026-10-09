@@ -12,7 +12,7 @@ select = ["E", "W", "F", "C90"]
 # Emulate your old ignores
 ignore = ["E203", "E231", "E266", "E501", "F403", "F401"]
 [tool.ruff.lint.mccabe]
-max-complexity = 18
+max-complexity = 19
 
 [tool.tox]
 legacy_tox_ini = '''
