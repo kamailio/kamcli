@@ -268,6 +268,77 @@ def command_jsonrpc_fifo(
     os.unlink(rcvpath)
 
 
+def get_jsonrpc_response(ctx, scmd, proto, host, port, family, s_type):
+    response = None
+    try:
+        sockclient = socket.socket(family, s_type)
+
+        sockclient.settimeout(4.0)
+        if proto == "udp":
+            sockclient.sendto(scmd.encode(), (host, int(port)))
+            data = sockclient.recvfrom(84000)
+            response = data[0]
+        elif proto == "tcp":
+            sockclient.connect((host, int(port)))
+            sockclient.sendall(scmd.encode())
+            response = sockclient.recv(84000)
+        else:
+            srvaddr = host
+            rcvaddr = port + "." + str(os.getpid())
+            ctx.vlog("{proto} socket reply: " + rcvaddr)
+            sockclient.bind(rcvaddr)
+            os.chmod(rcvaddr, 0o666)
+            try:
+                shutil.chown(
+                    rcvaddr, group=ctx.gconfig.get("jsonrpc", "kamgroup")
+                )
+            except NoOptionError:
+                pass
+            sockclient.sendto(scmd.encode(), srvaddr)
+            response = sockclient.recv(84000)
+        sockclient.close()
+        if proto == "unix":
+            os.remove(rcvaddr)
+
+        ctx.vlog("Server response: " + response.decode())
+
+    except socket.timeout:
+        ctx.log(f"Timeout receiving response on {proto} socket")
+        sockclient.close()
+        if proto == "unix":
+            os.remove(rcvaddr)
+        sys.exit()
+    except socket.error as emsg:
+        ctx.log(f"Error {proto} sock: {emsg.errno} - {emsg.strerror}")
+        sockclient.close()
+        if proto == "unix":
+            os.remove(rcvaddr)
+        sys.exit()
+    return response
+
+
+def get_srv_info(ctx, srvaddr):
+    socktype = socket.SOCK_DGRAM
+    if srvaddr.startswith("udp:") or srvaddr.startswith("tcp:"):
+        sproto, saddr = srvaddr.split(":", 1)
+        ctx.vlog(f"{sproto} socket provided: " + srvaddr)
+        if saddr.find("[", 0, 2) == -1:
+            ctx.vlog("IPv4 socket address")
+            host, port = saddr.split(":")
+            family = socket.AF_INET
+        else:
+            ctx.vlog("IPv6 socket address")
+            host, port = saddr.rsplit(":", 1)
+            host = host.strip("[]")
+            family = socket.AF_INET6
+        if sproto == "tcp":
+            socktype = socket.SOCK_STREAM
+    else:
+        sproto = "unix"
+        family = socket.AF_UNIX
+    return sproto, host, port, family, socktype
+
+
 ##
 #
 # {
@@ -316,122 +387,22 @@ def command_jsonrpc_socket(
         print(json.dumps(json.loads(scmd), indent=4, separators=(",", ": ")))
         return
 
-    sockclient = None
     response = None
-    socktype = "IPv4"
-    host = None
-    port = None
-    if srvaddr.startswith("udp:"):
-        ctx.vlog("udp socket provided: " + srvaddr)
-        sproto, saddr = srvaddr.split(":", 1)
-        if saddr.find("[", 0, 2) == -1:
-            ctx.vlog("IPv4 socket address")
-            host, port = saddr.split(":")
-        else:
-            ctx.vlog("IPv6 socket address")
-            ehost, port = saddr.rsplit(":", 1)
-            host = ehost.strip("[]")
-            socktype = "IPv6"
-
-        # create datagram udp socket
-        try:
-            if socktype == "IPv6":
-                sockclient = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
-            else:
-                sockclient = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
-            sockclient.settimeout(4.0)
-            sockclient.sendto(scmd.encode(), (host, int(port)))
-
-            # receive the response (content, sockserver)
-            data = sockclient.recvfrom(84000)
-            response = data[0]
-            # sockserver = data[1]
-
-            ctx.vlog("Server response: " + response.decode())
-
-        except socket.timeout:
-            ctx.log("Timeout receiving response on udp socket")
-            sys.exit()
-        except socket.error as emsg:
-            ctx.log("Error udp sock: %s - %s", emsg.errno, emsg.strerror)
-            sys.exit()
-    elif srvaddr.startswith("tcp:"):
-        ctx.vlog("tcp socket provided: " + srvaddr)
-        sproto, saddr = srvaddr.split(":", 1)
-        if saddr.find("[", 0, 2) == -1:
-            ctx.vlog("IPv4 socket address")
-            host, port = saddr.split(":")
-        else:
-            ctx.vlog("IPv6 socket address")
-            ehost, port = saddr.rsplit(":", 1)
-            host = ehost.strip("[]")
-            socktype = "IPv6"
-
-        # create datagram udp socket
-        try:
-            if socktype == "IPv6":
-                sockclient = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
-            else:
-                sockclient = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-            sockclient.settimeout(4.0)
-            sockclient.connect((host, int(port)))
-            sockclient.sendall(scmd.encode())
-            # receive the response (content, sockserver)
-            response = sockclient.recv(84000)
-
-            ctx.vlog("Server response: " + response.decode())
-
-        except socket.timeout:
-            ctx.log("Timeout receiving response on tcp socket")
-            sys.exit()
-        except socket.error as emsg:
-            ctx.log("Error tcp sock: %s - %s", emsg.errno, emsg.strerror)
-            sys.exit()
+    sproto, host, port, sfamily, stype = get_srv_info(ctx, srvaddr)
+    if sproto in ["udp", "tcp"]:
+        response = get_jsonrpc_response(
+            scmd, sproto, host, port, sfamily, stype
+        )
     else:
-        ctx.vlog("unix socket provided: " + srvaddr)
         if not os.path.exists(srvaddr):
             ctx.vlog("server unix socket file not found")
             ctx.vlog(
                 "be sure kamailio is running and listening on: " + srvaddr
             )
             return
-        # create datagram udp socket
-        try:
-            sockclient = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
-            sockclient.settimeout(4.0)
-            rcvaddr = rcvaddr + "." + str(os.getpid())
-            ctx.vlog("unix socket reply: " + rcvaddr)
-            sockclient.bind(rcvaddr)
-            os.chmod(rcvaddr, 0o666)
-            try:
-                shutil.chown(
-                    rcvaddr, group=ctx.gconfig.get("jsonrpc", "kamgroup")
-                )
-            except NoOptionError:
-                pass
-            # sockclient.connect( srvaddr )
-            # sockclient.send( scmd )
-            sockclient.sendto(scmd.encode(), srvaddr)
-
-            # receive the response (content, sockserver)
-            response = sockclient.recv(84000)
-            sockclient.close()
-            os.remove(rcvaddr)
-
-            ctx.vlog("Server response: " + response.decode())
-
-        except socket.timeout:
-            ctx.log("Timeout receiving response on unix sock")
-            sockclient.close()
-            os.remove(rcvaddr)
-            sys.exit()
-        except socket.error as emsg:
-            ctx.log("Error unix sock: %s - %s", emsg.errno, emsg.strerror)
-            sockclient.close()
-            os.remove(rcvaddr)
-            sys.exit()
+        response = get_jsonrpc_response(
+            ctx, scmd, sproto, srvaddr, rcvaddr, sfamily, stype
+        )
 
     if response is None:
         ctx.vlog("timeout - nothing read")
