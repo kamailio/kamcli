@@ -9,6 +9,7 @@ Build-Depends:
  dh-python,
  python3-all,
  python3-setuptools,
+ python3-wheel,
 
 Package: kamcli
 Architecture: all
