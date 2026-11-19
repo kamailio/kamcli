@@ -334,6 +334,7 @@ def get_srv_info(ctx, srvaddr):
         if sproto == "tcp":
             socktype = socket.SOCK_STREAM
     else:
+        host, port = None, None
         sproto = "unix"
         family = socket.AF_UNIX
     return sproto, host, port, family, socktype
